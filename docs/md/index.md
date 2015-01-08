@@ -36,6 +36,8 @@ ASP.NET (と Visual Studio) のメリットは、開発者がコードを書く�
 
 ### ASP.NET概要
 
+`ASP.NET`のコアを土台に、サイト作成用の技術とサービス作成用の技術が構築されています。
+
 ![ASP.NET Architecture image](../images/asp-net-architecture.png)
 
 * Sites
@@ -54,6 +56,24 @@ ASP.NET (と Visual Studio) のメリットは、開発者がコードを書く�
 クライアントとなるプログラムから呼び出されます。
 
 クライアント側は受け取ったデータを処理した上で画面に表示します。
+
+  - `ASP.NET Web API` は RESTスタイルのAPI開発に使用します。
+  - `ASP.NET SignalR` は `WebSocket`のようなサーバー-ブラウザ間の双方向リアルタイム通信を実現するためのライブラリです。
+
+
+#### Building Web Sites in ASP.NET
+
+ASP.NETでは、Webアプリケーションを作成するため、以下の3つのフレームワークを提供しています。
+
+|                   | 開発スタイル | If you have experience in |
+| ----------------- | -------- | ------------------------- |
+| ASP.NET Web Forms | HTMLとコードを同じファイルに記載 | Windows Form, WPF, .NET |
+| ASP.NET Web Pages | 豊富なHTMLをカプセル化したコントロールのライブラリを使用した高速開発 | Classic ASP, PHP        |
+| ASP.NET MVC       | MVC(Model, View, Controller)スタイルの開発 | Ruby on Rails, .NET |
+
+
+上記の図にある `Single Page Application` は `ASP.NET MVC` の発展型です。
+
 
 ---
 
