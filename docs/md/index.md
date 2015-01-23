@@ -86,4 +86,12 @@ ASP.NETでは、Webアプリケーションを作成するため、以下の3つ
 3. `ASP.NET Web API`によるREST API開発
 4. `ASP.NET`と`knockout.js`によるSingle Page Application開発
 
+---
+
+<br><br>
+
+各ページのサンプルコードは [Github](https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net) にアップしています。
+
+また、このページの元となるファイルも上記レポジトリで管理していますので、
+誤り等あれば`Issue`など登録してください。
 
