@@ -1,9 +1,0 @@
-{
-  "source": "../docs/md",
-  "destination": "/dest/path",
-  "template": "../templates",
-  "info": {
-    "project": "Introduction to ASP.NET",
-    "copyright": "2015 kazunori.kimura.js@gmail.com"
-  }
-}

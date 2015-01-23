@@ -19,8 +19,9 @@
       min-height: 100%;
     }
     body {
+      padding-top: 70px;
       /* Margin bottom by footer height */
-      margin-bottom: 60px;
+      margin-bottom: 70px;
     }
     .footer {
       position: absolute;
@@ -35,8 +36,15 @@
     /* Not required for template or sticky footer method. */
     .container {
       width: auto;
-      max-width: 680px;
+      max-width: 980px;
       padding: 0 15px;
+    }
+    .contents p, .contents li {
+      font-size: large;
+      line-height: 180%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 20px;
     }
     .container .text-muted {
       margin: 20px 0;
@@ -51,10 +59,15 @@
 </head>
 <body>
 
-  <div class="container">
-    <div class="page-header">
-      <h1><%= @title %></h1>
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="<%= @base_url %>"><%= @title %></a>
+      </div>
     </div>
+  </nav>
+
+  <div class="container contents">
     <!-- contents -->
     <%- @content %>
   </div>
@@ -67,5 +80,10 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+  <script>
+  $(function(){
+    $(".contents table").addClass("table");
+  });
+  </script>
 </body>
 </html>

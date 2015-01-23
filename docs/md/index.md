@@ -38,7 +38,7 @@ ASP.NET (と Visual Studio) のメリットは、開発者がコードを書く�
 
 `ASP.NET`のコアを土台に、サイト作成用の技術とサービス作成用の技術が構築されています。
 
-![ASP.NET Architecture image](../images/asp-net-architecture.png)
+![ASP.NET Architecture image](./images/asp-net-architecture.png)
 
 * Sites
 
@@ -81,8 +81,8 @@ ASP.NETでは、Webアプリケーションを作成するため、以下の3つ
 
 以下の様な内容を解説していきます。
 
-1. `ASP.NET Web Forms`を使用した簡単なWebアプリケーションの開発手順について
-2. `ASP.NET MVC`によるWebアプリケーション開発
+1. [`ASP.NET Web Forms`を使用した簡単なWebアプリケーションの開発手順について](step1/step1.html)
+2. [`ASP.NET MVC`によるWebアプリケーション開発](step2/step2.html)
 3. `ASP.NET Web API`によるREST API開発
 4. `ASP.NET`と`knockout.js`によるSingle Page Application開発
 
