@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>introduction to asp dot net - Webアプリケーション開発勉強会</title>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+  <!-- highlightjs -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css">
+  <style>
+    /* Sticky footer styles
+    -------------------------------------------------- */
+    html {
+      position: relative;
+      min-height: 100%;
+    }
+    body {
+      padding-top: 70px;
+      /* Margin bottom by footer height */
+      margin-bottom: 70px;
+    }
+    .footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      /* Set the fixed height of the footer here */
+      height: 60px;
+      background-color: #f5f5f5;
+    }
+    /* Custom page CSS
+    -------------------------------------------------- */
+    /* Not required for template or sticky footer method. */
+    .container {
+      width: auto;
+      max-width: 980px;
+      padding: 0 15px;
+    }
+    .contents p, .contents li {
+      font-size: large;
+      line-height: 180%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 20px;
+    }
+    .container .text-muted {
+      margin: 20px 0;
+    }
+  </style>
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="http://kazunori-kimura.github.io/introduction-to-asp-dot-net/">introduction to asp dot net</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container contents">
+    <!-- contents -->
+    <h1 id="1-asp-net-web-forms-web-">1. <code>ASP.NET Web Forms</code>を使用した簡単なWebアプリケーションの開発手順について</h1>
+<h2 id="-asp-net-web-forms-"><code>ASP.NET Web Forms</code>の概要</h2>
+<p><code>ASP.NET Web Forms</code>のページは HTML、クライアント スクリプト、サーバー コントロールとサーバー コードを組み合わせて記述します。
+ユーザーからページが要求 (request) されると、.NET Frameworkによりサーバー上でコンパイル・実行され、ブラウザでレンダリングできるHTMLマークアップを生成します。</p>
+<p>Visual Studioを使用して <code>ASP.NET Web Forms</code>のページを作成することができます。
+Visual StudioではサーバーコントロールをWebフォームのレイアウトにドラッグアンドドロップできます。
+その後、Webページの動作、ルックアンドフィールを定義するためにプロパティ、メソッド、およびイベントを設定します。
+ページのロジックを処理するためのサーバーコードを作成するには、<code>C#</code>または<code>Visual Basic</code>などの.NET言語を使用することができます。</p>
+<ul>
+<li><a href="http://www.asp.net/web-forms/what-is-web-forms">Introduction to ASP.NET Web Forms</a></li>
+</ul>
+<hr>
+<h2 id="-web-">簡単なWebアプリケーションの構築</h2>
+<h3 id="-">アプリケーション仕様</h3>
+<ul>
+<li>テキストボックスに名前を入力しボタンをクリックすると、ラベルに「こんにちは、○○ さん！」というメッセージを表示する。</li>
+<li>テキストボックス未入力時は名前の入力を促すメッセージを表示する。</li>
+</ul>
+<h3 id="-">開発手順</h3>
+<p>Visual Studio 2013 を使用して Webアプリケーションを作成する手順です。</p>
+<p>(1) 新規プロジェクトの作成</p>
+<p>Visual Studioを起動し、「ファイル」→「新規作成」→「プロジェクト」を選択します。</p>
+<p><img src="./images/WS000000.JPG" alt="新規プロジェクトの作成"></p>
+<p>左側ツリーを「インストール済み」→「テンプレート」→「Visual C#」→「Web」の順に展開していきます。
+中央ペインにて「ASP.NET 空の Web アプリケーション」を選択します。</p>
+<p>名前、ソリューション名は適当で結構です。</p>
+<p><img src="./images/WS000001.JPG" alt="新しいプロジェクト"></p>
+<pre><code>「ASP<span class="hljs-class">.NET</span> Webフォーム アプリケーション」を選択すると、最初から様々なファイルがプロジェクトに含まれています。
+今回は認証機能などの無い、<span class="hljs-number">1</span>ページだけのアプリケーションを作成したいので、空のテンプレートを使用します。
+</code></pre><p><img src="./images/WS000002.JPG" alt="生成されたプロジェクト"></p>
+<p>(2) Webフォームの追加</p>
+<p>プロジェクトを右クリックし、「追加」→「新しい項目」を選択します。</p>
+<p><img src="./images/WS000003.JPG" alt="ファイルの追加"></p>
+<p>「Webフォーム」を選択し、名前を「default.aspx」とし、「追加」をクリックします。</p>
+<p><img src="./images/WS000004.JPG" alt="新しい項目の追加"></p>
+<p>以下のファイルが追加されます。</p>
+<ul>
+<li>default.aspx</li>
+<li>default.aspx.cs</li>
+<li>default.aspx.designer.cs</li>
+</ul>
+<p><img src="./images/WS000005.JPG" alt="ファイル構成"></p>
+<p>(3) サーバーコントロールの配置</p>
+<p><code>default.aspx</code>を開いた状態で、左下の「デザイン」をクリックします。
+「ツールボックス」を表示します。</p>
+<p><img src="./images/WS000006.JPG" alt="デザインビュー"></p>
+<p><code>default.aspx</code>の<code>div</code>に<code>TextBox</code>をドラッグアンドドロップで配置します。
+「プロパティ」で<code>Text</code>に適当な値を設定します。</p>
+<p><img src="./images/WS000007.JPG" alt="サーバーコントロールの配置"></p>
+<p>左下の「ソース」をクリックします。
+以下のようになっています。</p>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">%@</span> <span class="hljs-attribute">Page</span> <span class="hljs-attribute">Language</span>=<span class="hljs-value">"C#"</span> <span class="hljs-attribute">AutoEventWireup</span>=<span class="hljs-value">"true"</span> <span class="hljs-attribute">CodeBehind</span>=<span class="hljs-value">"default.aspx.cs"</span> <span class="hljs-attribute">Inherits</span>=<span class="hljs-value">"WebApplication1._default"</span> %&gt;</span>
+
+<span class="hljs-doctype">&lt;!DOCTYPE html&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-title">html</span> <span class="hljs-attribute">xmlns</span>=<span class="hljs-value">"http://www.w3.org/1999/xhtml"</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">head</span> <span class="hljs-attribute">runat</span>=<span class="hljs-value">"server"</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">meta</span> <span class="hljs-attribute">http-equiv</span>=<span class="hljs-value">"Content-Type"</span> <span class="hljs-attribute">content</span>=<span class="hljs-value">"text/html; charset=utf-8"</span>/&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">title</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">title</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">form</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"form1"</span> <span class="hljs-attribute">runat</span>=<span class="hljs-value">"server"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>
+
+        <span class="hljs-tag">&lt;<span class="hljs-title">asp:TextBox</span> <span class="hljs-attribute">ID</span>=<span class="hljs-value">"TextBox1"</span> <span class="hljs-attribute">runat</span>=<span class="hljs-value">"server"</span>&gt;</span>ほげほげ<span class="hljs-tag">&lt;/<span class="hljs-title">asp:TextBox</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-title">form</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">html</span>&gt;</span>
+</code></pre>
+<p><code>F5</code>キーを押すとデバッグ実行できます。
+ブラウザが起動し、テキストボックスが表示されることを確認します。
+ブラウザを閉じると、デバッグ実行が終了します。</p>
+<p>「ツールボックス」から<code>Label</code>を2つ、<code>Button</code>を1つ配置します。
+ソースが以下のようになるように配置してください。</p>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">%@</span> <span class="hljs-attribute">Page</span> <span class="hljs-attribute">Language</span>=<span class="hljs-value">"C#"</span> <span class="hljs-attribute">AutoEventWireup</span>=<span class="hljs-value">"true"</span> <span class="hljs-attribute">CodeBehind</span>=<span class="hljs-value">"default.aspx.cs"</span> <span class="hljs-attribute">Inherits</span>=<span class="hljs-value">"WebApplication1._default"</span> %&gt;</span>
+
+<span class="hljs-doctype">&lt;!DOCTYPE html&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-title">html</span> <span class="hljs-attribute">xmlns</span>=<span class="hljs-value">"http://www.w3.org/1999/xhtml"</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">head</span> <span class="hljs-attribute">runat</span>=<span class="hljs-value">"server"</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">meta</span> <span class="hljs-attribute">http-equiv</span>=<span class="hljs-value">"Content-Type"</span> <span class="hljs-attribute">content</span>=<span class="hljs-value">"text/html; charset=utf-8"</span>/&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">title</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">title</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">form</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"form1"</span> <span class="hljs-attribute">runat</span>=<span class="hljs-value">"server"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>
+
+        <span class="hljs-tag">&lt;<span class="hljs-title">asp:Label</span> <span class="hljs-attribute">ID</span>=<span class="hljs-value">"Label1"</span> <span class="hljs-attribute">runat</span>=<span class="hljs-value">"server"</span> <span class="hljs-attribute">Text</span>=<span class="hljs-value">"お名前を教えてください！"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">asp:Label</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">asp:TextBox</span> <span class="hljs-attribute">ID</span>=<span class="hljs-value">"TextBox1"</span> <span class="hljs-attribute">runat</span>=<span class="hljs-value">"server"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">asp:TextBox</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">asp:Button</span> <span class="hljs-attribute">ID</span>=<span class="hljs-value">"Button1"</span> <span class="hljs-attribute">runat</span>=<span class="hljs-value">"server"</span> <span class="hljs-attribute">OnClick</span>=<span class="hljs-value">"Button1_Click"</span> <span class="hljs-attribute">Text</span>=<span class="hljs-value">"OK"</span> /&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">br</span> /&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">br</span> /&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">asp:Label</span> <span class="hljs-attribute">ID</span>=<span class="hljs-value">"Label2"</span> <span class="hljs-attribute">runat</span>=<span class="hljs-value">"server"</span> <span class="hljs-attribute">Font-Bold</span>=<span class="hljs-value">"True"</span> <span class="hljs-attribute">Font-Size</span>=<span class="hljs-value">"X-Large"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">asp:Label</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-title">form</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">html</span>&gt;</span>
+</code></pre>
+<p>(4) イベントの設定</p>
+<p>「ソース」にて<code>&lt;asp:Button&gt;</code>にカーソルを移動させます。
+「プロパティ」にて「イベント」(雷のようなボタン)をクリックします。
+<code>Click</code>を選択し、Enterキーを押します。</p>
+<p><code>default.aspx.cs</code> に <code>protected void Button1_Click</code>メソッドが生成されます。</p>
+<p>以下の様にコードを記述します。</p>
+<pre><code class="lang-cs"><span class="hljs-keyword">using</span> System;
+<span class="hljs-keyword">using</span> System.Collections.Generic;
+<span class="hljs-keyword">using</span> System.Linq;
+<span class="hljs-keyword">using</span> System.Web;
+<span class="hljs-keyword">using</span> System.Web.UI;
+<span class="hljs-keyword">using</span> System.Web.UI.WebControls;
+
+<span class="hljs-keyword">namespace</span> WebApplication1
+{
+    <span class="hljs-keyword">public</span> partial <span class="hljs-keyword">class</span> _default : System.Web.UI.Page
+    {
+        <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Page_Load</span><span class="hljs-params">(object sender, EventArgs e)</span>
+        </span>{
+
+        }
+
+        <span class="hljs-comment">/// &lt;summary&gt;</span>
+        <span class="hljs-comment">/// OKボタンのクリック</span>
+        <span class="hljs-comment">/// &lt;/summary&gt;</span>
+        <span class="hljs-comment">/// &lt;param name="sender"&gt;&lt;/param&gt;</span>
+        <span class="hljs-comment">/// &lt;param name="e"&gt;&lt;/param&gt;</span>
+        <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Button1_Click</span><span class="hljs-params">(object sender, EventArgs e)</span>
+        </span>{
+            <span class="hljs-comment">// 名前を取得</span>
+            <span class="hljs-built_in">string</span> name = TextBox1.Text;
+
+            <span class="hljs-built_in">string</span> message = <span class="hljs-built_in">string</span>.Empty;
+            <span class="hljs-keyword">if</span> (<span class="hljs-built_in">string</span>.IsNullOrEmpty(name))
+            {
+                <span class="hljs-comment">// 名前が未入力</span>
+                message = <span class="hljs-string">"お名前を入力してください！"</span>;
+            }
+            <span class="hljs-keyword">else</span>
+            {
+                message = <span class="hljs-built_in">string</span>.Format(<span class="hljs-string">"こんにちは、{0} さん！"</span>, name);
+            }
+
+            <span class="hljs-comment">// ラベルにメッセージをセット</span>
+            Label2.Text = message;
+        }
+    }
+}
+</code></pre>
+<p>メソッド上部の <code>///</code> から始まるコメントは <em>ドキュメント コメント</em> と呼ばれ、JavaでいうJavaDoc的な記法です。
+メソッド宣言の上の行で <code>///</code> とタイプすると、<code>&lt;sammary&gt;</code>や<code>&lt;param&gt;</code>といったタグが自動生成されます。
+クラスや定数、メンバ変数でもドキュメントコメントを設定できます。</p>
+<p>Visual Studioのエディタでドキュメントコメントが記述されたメソッド等にマウスカーソルを合わせると、ドキュメントコメントの内容がツールチップに表示されます。
+また、コード補完時にもドキュメントコメントの内容が表示されます。</p>
+<ul>
+<li><a href="http://msdn.microsoft.com/ja-jp/library/5ast78ax.aspx">ドキュメント コメント用の推奨タグ</a></li>
+</ul>
+<p>(5) デバッグ実行</p>
+<p><code>F5</code>キーを押してデバッグ実行してください。</p>
+<p>テキストボックスに名前を入力し、OKボタンを押下すると
+ラベルに入力した値が反映されることを確認します。</p>
+<p><img src="./images/WS000011.JPG" alt="デバッグ実行"></p>
+<p><br>
+<br></p>
+<hr>
+<p><br>
+<br></p>
+<p><code>ASP.NET Web Forms</code>でのWebアプリケーションの開発手順について解説しました。</p>
+<p>Windows デスクトップ アプリケーションの開発手法に近いイメージでWebアプリケーションの開発ができることを
+実感いただけたかと思います。</p>
+<p>今回取り上げたテキストボックスとラベル以外にも、チェックボックスやラジオボタン、リストボックスといった
+サーバーコントロールが用意されていますので、もっと凝ったアプリケーションも開発可能です。</p>
+<p>デバッグ実行したブラウザでソースコードを見ると分かりますが、サーバーサイドでは<code>&lt;asp:TextBox&gt;</code>という
+単純なタグですが、実際にクライアントに返ってくるHTMLは.NET Frameworkが生成した、もう少し複雑なコードになっています。</p>
+<p>昨今のWebアプリケーションの傾向として、 jQueryなどのJavaScriptライブラリを活用した
+動きのあるサイト(ユーザーの操作によって一部分だけが更新されたり、非同期で処理がされる)が主流ですが、
+<code>ASP.NET Web Forms</code>では実際にレンダリングされるHTMLが.aspxの内容と異なるため、クライアント側のコーディングがやりにくいです。</p>
+<p>非同期通信等を多用する場合は <code>ASP.NET Ajax Control</code> といったライブラリも用意されていますが、
+より複雑さが増してしまうので、次回取り上げる <code>ASP.NET MVC</code> を使用して
+サーバーサイドとクライアントサイドを明確に分けて構築するスタイルを導入するのが良いでしょう。</p>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p class="text-muted">Webアプリケーション開発勉強会 , &copy; 2015 Kazunori Kimura</p>
+    </div>
+  </footer>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+  <script>
+  $(function(){
+    $(".contents table").addClass("table");
+  });
+  </script>
+</body>
+</html>

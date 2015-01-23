@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>introduction to asp dot net - Webアプリケーション開発勉強会</title>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+  <!-- highlightjs -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css">
+  <style>
+    /* Sticky footer styles
+    -------------------------------------------------- */
+    html {
+      position: relative;
+      min-height: 100%;
+    }
+    body {
+      padding-top: 70px;
+      /* Margin bottom by footer height */
+      margin-bottom: 70px;
+    }
+    .footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      /* Set the fixed height of the footer here */
+      height: 60px;
+      background-color: #f5f5f5;
+    }
+    /* Custom page CSS
+    -------------------------------------------------- */
+    /* Not required for template or sticky footer method. */
+    .container {
+      width: auto;
+      max-width: 980px;
+      padding: 0 15px;
+    }
+    .contents p, .contents li {
+      font-size: large;
+      line-height: 180%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 20px;
+    }
+    .container .text-muted {
+      margin: 20px 0;
+    }
+  </style>
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="http://kazunori-kimura.github.io/introduction-to-asp-dot-net/">introduction to asp dot net</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container contents">
+    <!-- contents -->
+    <h1 id="2-asp-net-mvc-web-">2. <code>ASP.NET MVC</code>によるWebアプリケーション開発</h1>
+<h2 id="-asp-net-mvc-"><code>ASP.NET MVC</code>の概要</h2>
+<h3 id="mvc-">MVCとは</h3>
+<blockquote>
+<p><a href="http://ja.wikipedia.org/wiki/Model_View_Controller">Model View Controller</a></p>
+<p>MVC（Model View Controller モデル・ビュー・コントローラ）は、ユーザーインタフェースをもつアプリケーションソフトウェアを実装するためのデザインパターンである。
+アプリケーションソフトウェアの内部データを、ユーザーが直接参照・編集する情報から分離する。そのためにアプリケーションソフトウェアを以下の3つの部分に分割する。</p>
+<ol>
+<li>model: アプリケーションデータ、ビジネスルール、ロジック、関数</li>
+<li>view: グラフや図などの任意の情報表現</li>
+<li>controller: 入力を受け取りmodelとviewへの命令に変換する</li>
+</ol>
+</blockquote>
+<p>元々は <code>Smalltalk</code> における ウィンドウプログラム開発の設計指針として生まれたものです。</p>
+<p><code>ASP.NET MVC</code>は MVCのデザインパターンで ASP.NET Webアプリケーション を開発するにあたって
+必須であったり、便利な機能を提供するフレームワークです。</p>
+<hr>
+<p><br></p>
+<h2 id="todo-">ToDoアプリの開発</h2>
+<p>参考: <a href="http://www.asp.net/mvc/overview/getting-started/getting-started-with-ef-using-mvc/creating-an-entity-framework-data-model-for-an-asp-net-mvc-application">Getting Started with Entity Framework 6 Code First using MVC 5</a></p>
+<ul>
+<li>以降の手順は、ASP.NET MVC 5 と Entity Framework 6 を活用して、非常にシンプルなWebアプリケーションを、簡単・簡潔に作成する事を目的にしています。
+必ずこの手順で開発しなければならない、ということではありません。</li>
+</ul>
+<h3 id="-">仕様概要</h3>
+<ul>
+<li>ToDoリストの一覧を表示 (index)</li>
+<li>ToDoをクリックすると詳細を表示 (edit)<ul>
+<li>詳細ページで更新/削除</li>
+</ul>
+</li>
+</ul>
+<h4 id="todo-">Todoリストの項目</h4>
+<ul>
+<li>id: Todoを一意に特定する数値。</li>
+<li>summary: 概要。文字列。</li>
+<li>detail: 詳細。文字列。</li>
+<li>limit: 期限。日時。</li>
+<li>done: 完了フラグ。真偽値。</li>
+</ul>
+<h3 id="-">環境について</h3>
+<ul>
+<li>Visual Studio 2013<ul>
+<li>最新のupdateを適用している前提です。</li>
+<li>設定によって画面の構成は異なります。(ソリューション エクスプローラーが右側にある、など)</li>
+</ul>
+</li>
+<li>SQL Server LocalDB<ul>
+<li>Visual Studioを普通にセットアップすると、合わせてインストールされます。</li>
+</ul>
+</li>
+<li>Entity Framework 6</li>
+</ul>
+<hr>
+<h3 id="-asp-net-mvc5-entity-framework-"><code>ASP.NET MVC5</code> と <code>Entity Framework</code> によるアプリケーションの開発</h3>
+<h4 id="-">プロジェクトの作成</h4>
+<ul>
+<li>「テンプレート」→「Visual C#」→「Web」を選択</li>
+<li>「ASP.NET Webアプリケーション」を選択し、名前を適当に入力して「OK」をクリックします。</li>
+</ul>
+<p><img src="./images/WS000000.JPG" alt="新しいプロジェクト"></p>
+<ul>
+<li>「テンプレートの選択」で「Empty」を選択</li>
+<li>「以下にフォルダーおよびコア参照を追加：」で「MVC」にチェックしてください。</li>
+<li>「OK」をクリックします。</li>
+</ul>
+<p><img src="./images/WS000001.JPG" alt="新規 ASP.NET プロジェクト"></p>
+<ul>
+<li>以下の様なフォルダ構成になります。</li>
+</ul>
+<p><img src="./images/WS000002.JPG" alt="ASP.NET MVCプロジェクトのフォルダ構成"></p>
+<h4 id="entity-framework-">Entity Framework のインストール</h4>
+<p>NuGetを使用して、最新の<code>Entity Framework</code>をインストールします。</p>
+<h5 id="entity-framework">Entity Framework</h5>
+<blockquote>
+<p><a href="https://msdn.microsoft.com/ja-jp/data/ef.aspx">Entity Framework</a></p>
+<p>Entity Framework (EF) は、.NET 開発者がドメイン固有のオブジェクトを使用してリレーショナル データを処理できるようにするオブジェクト リレーショナル マッパーです。
+開発者が通常、記述する必要のあるデータ アクセス コードがほとんど不要になります。</p>
+</blockquote>
+<h5 id="nuget">NuGet</h5>
+<p>Visual Studio用のパッケージ管理システム。
+rubyのgemやpythonのpipのようなツール。</p>
+<h5 id="-">手順</h5>
+<ul>
+<li>「ソリューション エクスプローラー」でプロジェクト名を右クリック</li>
+<li>「NuGet パッケージ マネージャー」→「ソリューションの NuGet パッケージの管理」を選択します。</li>
+</ul>
+<p><img src="./images/WS000003.JPG" alt="NuGetパッケージ マネージャーを開く"></p>
+<ul>
+<li><code>EntityFramework</code>を検索し、「インストール」をクリックします。<ul>
+<li>NuGetパッケージをインストールする際は、名前、作成者、バージョンを確認するようにしてください。似たような名称のパッケージが多数あります。</li>
+</ul>
+</li>
+</ul>
+<p><img src="./images/WS000004.JPG" alt="NuGetパッケージの管理"></p>
+<ul>
+<li>画面の指示に従ってインストールを進めます。</li>
+<li>インストール完了後、<code>EntityFramework</code>にチェックが入っている事を確認します。</li>
+<li>「閉じる」をクリックします。</li>
+</ul>
+<p><img src="./images/WS000007.JPG" alt="インストール完了"></p>
+<h4 id="model-">Modelの作成</h4>
+<h5 id="entity-framework-">Entity Framework の コード ファースト開発</h5>
+<p>データ構造を表現するPOCO (Plain Old Clr Object: 特別なクラスやインターフェイスを継承していないクラス(のオブジェクト)) と
+POCOを管理する Contextクラスを定義することで、Entity Frameworkが必要なテーブルを生成します。
+(開発段階においてDatabaseの操作は全く必要ありません。)</p>
+<pre><code><span class="hljs-escape">`E</span>ntity Framework <span class="hljs-number">4.1</span><span class="hljs-escape">` </span>から提供された機能です。
+</code></pre><p>詳細については <a href="http://msdn.microsoft.com/ja-jp/data/ee712907">Entity Framework (EF) の概要</a> を参照してください。</p>
+<h5 id="todo-">Todoクラスの作成</h5>
+<ul>
+<li><code>Models</code>を右クリックし、「追加」→「クラス」を選択します。</li>
+</ul>
+<p><img src="./images/WS000012.JPG" alt="クラスの追加-1"></p>
+<ul>
+<li>名前を<code>Todo.cs</code>とし、「追加」をクリックします。</li>
+</ul>
+<p><img src="./images/WS000013.JPG" alt="クラスの追加-2"></p>
+<p><code>Todo.cs</code></p>
+<pre><code class="lang-cs"><span class="hljs-keyword">using</span> System;
+<span class="hljs-keyword">using</span> System.Collections.Generic;
+<span class="hljs-keyword">using</span> System.Linq;
+<span class="hljs-keyword">using</span> System.Web;
+<span class="hljs-keyword">using</span> System.ComponentModel;
+
+<span class="hljs-class"><span class="hljs-keyword">namespace</span> <span class="hljs-title">WebApplication1</span>.<span class="hljs-title">Models</span>
+</span>{
+    <span class="hljs-comment">/// &lt;summary&gt;</span>
+    <span class="hljs-comment">/// ToDoモデル</span>
+    <span class="hljs-comment">/// &lt;/summary&gt;</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span>
+    </span>{
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> id { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+        [DisplayName(<span class="hljs-string">"概要"</span>)]
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> summary { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+        [DisplayName(<span class="hljs-string">"詳細"</span>)]
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> detail { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+        [DisplayName(<span class="hljs-string">"期限"</span>)]
+        <span class="hljs-keyword">public</span> DateTime limit { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+        [DisplayName(<span class="hljs-string">"完了"</span>)]
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">bool</span> done { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+    }
+}
+</code></pre>
+<p><code>DisplayName</code>に表示名を設定します。
+Viewで項目が表示される時に、ここに設定した文言が使用されます。</p>
+<h5 id="todoescontext-">TodoesContextクラスの作成</h5>
+<ul>
+<li><code>Models</code>を右クリックし、「追加」→「クラス」を選択します。</li>
+<li>名前を<code>TodoesContext.cs</code>とし、「追加」をクリックします。</li>
+</ul>
+<p><code>TodoesContext.cs</code></p>
+<pre><code class="lang-cs"><span class="hljs-keyword">using</span> System;
+<span class="hljs-keyword">using</span> System.Collections.Generic;
+<span class="hljs-keyword">using</span> System.Data.Entity;
+<span class="hljs-keyword">using</span> System.Linq;
+<span class="hljs-keyword">using</span> System.Web;
+
+<span class="hljs-class"><span class="hljs-keyword">namespace</span> <span class="hljs-title">WebApplication1</span>.<span class="hljs-title">Models</span>
+</span>{
+    <span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoesContext</span> : <span class="hljs-title">DbContext</span>
+    </span>{
+        <span class="hljs-keyword">public</span> DbSet&lt;Todo&gt; Todoes { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+    }
+}
+</code></pre>
+<h4 id="controller-view-">ControllerとViewの作成</h4>
+<h5 id="-">共通レイアウトの作成</h5>
+<ul>
+<li><code>Views</code>を右クリックし、「追加」→「MVC 5 レイアウト ページ (Razor)」 を選択します。</li>
+</ul>
+<p><img src="./images/WS000008.JPG" alt="レイアウトページの追加"></p>
+<p><code>_LayoutPage1.cshtml</code></p>
+<pre><code class="lang-html"><span class="hljs-doctype">&lt;!DOCTYPE html&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-title">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">meta</span> <span class="hljs-attribute">charset</span>=<span class="hljs-value">"utf-8"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">meta</span> <span class="hljs-attribute">http-equiv</span>=<span class="hljs-value">"X-UA-Compatible"</span> <span class="hljs-attribute">content</span>=<span class="hljs-value">"IE=edge"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">meta</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"viewport"</span> <span class="hljs-attribute">content</span>=<span class="hljs-value">"width=device-width, initial-scale=1"</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-title">title</span>&gt;</span>@ViewBag.Title<span class="hljs-tag">&lt;/<span class="hljs-title">title</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">link</span> <span class="hljs-attribute">rel</span>=<span class="hljs-value">"stylesheet"</span> <span class="hljs-attribute">href</span>=<span class="hljs-value">"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"container"</span>&gt;</span>
+        @RenderBody()
+    <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">html</span>&gt;</span>
+</code></pre>
+<p><code>Bootstrap</code>を読み込むように指定します。
+また、<code>div</code>に<code>class=&quot;container&quot;</code>の指定を追加します。</p>
+<h5 id="controller-">Controllerの作成</h5>
+<p>スキャフォールディング(Scaffolding、「骨組み」「足場」という意味)によって、
+Create（作成）、Read（参照）、Update（更新）、Delete（削除）のような定型的なコードの骨組みを自動生成できます。</p>
+<ul>
+<li><code>Controllers</code>を右クリックし、「追加」→「コントローラー」を選択します。</li>
+</ul>
+<p><img src="./images/WS000009.JPG" alt="コントローラーの追加-1"></p>
+<ul>
+<li>「Entity Framework を使用した、ビューがある MVC 5 コントローラー」を選択し、「追加」をクリックします。</li>
+</ul>
+<p><img src="./images/WS000010.JPG" alt="コントローラーの追加-2"></p>
+<ul>
+<li>以下のように入力します。<ul>
+<li>モデル クラス: <code>Todo</code></li>
+<li>データ コンテキスト クラス: <code>TodoesContext</code></li>
+<li>レイアウトページの使用: <code>~/Views/_LayoutPage1.cshtml</code></li>
+<li>コントローラー名: <code>TodoesController</code></li>
+</ul>
+</li>
+</ul>
+<p><img src="./images/WS000011.JPG" alt="コントローラーの追加-3"></p>
+<p>以下のファイルが生成されます。</p>
+<ul>
+<li>Controllers/<ul>
+<li>TodoesController.cs</li>
+</ul>
+</li>
+<li>Views/Todoes/<ul>
+<li>Create.cshtml</li>
+<li>Delete.cshtml</li>
+<li>Details.cshtml</li>
+<li>Edit.cshtml</li>
+<li>Index.cshtml</li>
+</ul>
+</li>
+</ul>
+<h4 id="-">デフォルトページの設定</h4>
+<p><code>App_Start/RouteConfig.cs</code> を修正し、デフォルトのページを
+ToDoの一覧ページに変更します。</p>
+<pre><code class="lang-cs"><span class="hljs-keyword">using</span> System;
+<span class="hljs-keyword">using</span> System.Collections.Generic;
+<span class="hljs-keyword">using</span> System.Linq;
+<span class="hljs-keyword">using</span> System.Web;
+<span class="hljs-keyword">using</span> System.Web.Mvc;
+<span class="hljs-keyword">using</span> System.Web.Routing;
+
+<span class="hljs-keyword">namespace</span> <span class="hljs-title">WebApplication1</span>
+{
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">RouteConfig</span>
+    {
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">RegisterRoutes</span><span class="hljs-params">(RouteCollection routes)</span>
+        </span>{
+            routes.IgnoreRoute(<span class="hljs-string">"{resource}.axd/{*pathInfo}"</span>);
+
+            routes.MapRoute(
+                name: <span class="hljs-string">"Default"</span>,
+                url: <span class="hljs-string">"{controller}/{action}/{id}"</span>,
+                defaults: <span class="hljs-keyword">new</span> { controller = <span class="hljs-string">"Todoes"</span>, action = <span class="hljs-string">"Index"</span>, id = UrlParameter.Optional }
+            );
+        }
+    }
+}
+</code></pre>
+<h4 id="-">デバッグ実行</h4>
+<p>F5キーを押して、デバッグ実行を行います。
+ブラウザが起動し、一覧ページが表示されます。</p>
+<p><img src="./images/WS000014.JPG" alt="Index"></p>
+<p>ToDoの追加、変更、削除が行えることを確認します。</p>
+<p><img src="./images/WS000015.JPG" alt="Details"></p>
+<hr>
+<p><br>
+<br></p>
+<p><code>ASP.NET MVC 5</code> と <code>Entity Framework 6</code> を活用して、非常にシンプルなWebアプリケーションを、簡単・簡潔に作成する手順について解説しました。</p>
+<p>ほとんどコーディングを行わずに、基本的な CRUD を行うアプリケーションが作成できることに驚かれたと思います。</p>
+<p>また、デバッグ実行したブラウザで <code>F12</code> キーを押し、開発者ツールを起動すると分かりますが
+生成されるHTMLは見通しがよく、<code>JavaScript</code>や<code>CSS</code>での操作が容易です。</p>
+<p>生成されるViewは<code>Bootstrap</code>や<code>jQuery</code>を使用することを想定した作りになっていますので
+特別な対応を行わなくても、ある程度見栄えのするアプリケーションが作成できます。</p>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p class="text-muted">Webアプリケーション開発勉強会 , &copy; 2015 Kazunori Kimura</p>
+    </div>
+  </footer>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+  <script>
+  $(function(){
+    $(".contents table").addClass("table");
+  });
+  </script>
+</body>
+</html>
