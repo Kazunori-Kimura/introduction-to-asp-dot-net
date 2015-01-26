@@ -76,12 +76,6 @@
 
 参考: [Getting Started with ASP.NET Web API 2](http://www.asp.net/web-api/overview/getting-started-with-aspnet-web-api/tutorial-your-first-web-api)
 
-### 作成するWeb APIの仕様
-
-* ToDo管理API
-
-
-
 ---
 
 ### クライアント環境のインストール
@@ -138,4 +132,211 @@ choco install curl
 
 きちんとhtmlが返ってくれば、準備完了です。
 
+<br>
 
+------
+
+<br>
+
+### 作成するWeb APIの仕様
+
+* ToDo管理API
+
+| 操作 | URL | Method | 説明 |
+| ---- | ---- | ---- | ---- |
+| Create | /api/Todoes/ | post | 1件作成 |
+| Read | /api/Todoes/{id} | get | 指定したTodoを取得 |
+| ReadAll | /api/Todoes/ | get | 全てのTodoを取得 |
+| Update | /api/Todoes/{id} | put | 指定したTodoを更新 |
+| Delete | /api/Todoes/{id} | delete | 指定したTodoを削除 |
+
+
+#### Todoリストの項目
+
+* id: Todoを一意に特定する数値。
+* summary: 概要。文字列。
+* detail: 詳細。文字列。
+* limit: 期限。日時。
+* done: 完了フラグ。真偽値。
+
+------
+
+
+* `Todo.cs`
+
+```cs
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace TodoApi.Models
+{
+    public class Todo
+    {
+        public int id { get; set; }
+        public string summary { get; set; }
+        public string detail { get; set; }
+        public DateTime limit { get; set; }
+        public bool done { get; set; }
+    }
+}
+```
+
+* `TodoesContext.cs`
+
+```cs
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Web;
+
+namespace TodoApi.Models
+{
+    public class TodoesContext : DbContext
+    {
+        public DbSet<Todo> Todoes { get; set; }
+    }
+}
+```
+
+
+* `TodoesController.cs`
+
+```cs
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+using System.Web.Http.Description;
+using TodoApi.Models;
+
+namespace TodoApi.Controllers
+{
+    public class TodoesController : ApiController
+    {
+        private TodoesContext db = new TodoesContext();
+
+        // GET: api/Todoes
+        public IQueryable<Todo> GetTodoes()
+        {
+            return db.Todoes;
+        }
+
+        // GET: api/Todoes/5
+        [ResponseType(typeof(Todo))]
+        public IHttpActionResult GetTodo(int id)
+        {
+            Todo todo = db.Todoes.Find(id);
+            if (todo == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(todo);
+        }
+
+        // PUT: api/Todoes/5
+        [ResponseType(typeof(void))]
+        public IHttpActionResult PutTodo(int id, Todo todo)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (id != todo.id)
+            {
+                return BadRequest();
+            }
+
+            db.Entry(todo).State = EntityState.Modified;
+
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TodoExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        // POST: api/Todoes
+        [ResponseType(typeof(Todo))]
+        public IHttpActionResult PostTodo(Todo todo)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            db.Todoes.Add(todo);
+            db.SaveChanges();
+
+            return CreatedAtRoute("DefaultApi", new { id = todo.id }, todo);
+        }
+
+        // DELETE: api/Todoes/5
+        [ResponseType(typeof(Todo))]
+        public IHttpActionResult DeleteTodo(int id)
+        {
+            Todo todo = db.Todoes.Find(id);
+            if (todo == null)
+            {
+                return NotFound();
+            }
+
+            db.Todoes.Remove(todo);
+            db.SaveChanges();
+
+            return Ok(todo);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        private bool TodoExists(int id)
+        {
+            return db.Todoes.Count(e => e.id == id) > 0;
+        }
+    }
+}
+```
+
+#### 動作確認
+
+```sh
+# get all items
+curl http://localhost:49192/api/Todoes/
+
+# create item
+curl -v -H "Content-Type: application/json" -H "Accept:application/json" -X POST -d "{\"summary\":\"test\",\"detail\":\"hogehoge\",\"limit\":\"2015-02-01\",\"done\":\"false\"}" http://localhost:49192/api/Todoes/
+
+# get item
+curl http://localhost:49192/api/Todoes/1
+
+# update item
+curl -v -H "Content-Type: application/json" -H "Accept:application/json" -X PUT -d "{\"id\":5,\"summary\":\"test2\",\"detail\":\"hogehoge\",\"limit\":\"2015-02-01\",\"done\":\"false\"}" http://localhost:49192/api/Todoes/5
+```
