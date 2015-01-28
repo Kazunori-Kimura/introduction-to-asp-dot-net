@@ -261,6 +261,8 @@ namespace TodoApi.Models
   - コントローラー名は自動で `TodoesController` となるはず
   - Model 作成時にビルドを実行していない場合、ここでエラーが発生します。
 
+![コントローラーの追加-3](./images/WS000009.JPG)
+
 * 以下の様なコードが自動生成されます。
 
 `TodoesController.cs`
