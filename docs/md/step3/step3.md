@@ -25,7 +25,7 @@
 
 * Web API のソフトウェアアーキテクチャのスタイルのひとつ。
   - REST の原則に従っているシステムは `RESTful`なシステム、 といわれます。
-  - REST をとても熱心に支持する *RESTafarians* と呼ばれる人たちがいます。
+  - REST をとても熱心に支持する *RESTafarians* と呼ばれる人たちがいます。  
 このような人たちに、適当な設計のWebアプリケーションを「REST APIです」と紹介すると、すごいマサカリが飛んできます。
 
 
@@ -115,6 +115,8 @@ HTTPが喋れるツールであれば何でも良いのですが、今回は `cU
 choco install curl
 ```
 
+![cURLのインストール](./images/WS000014.JPG)
+
 #### 動作確認
 
 `www.example.com`のhtmlを取得してみます。
@@ -159,10 +161,48 @@ choco install curl
 * limit: 期限。日時。
 * done: 完了フラグ。真偽値。
 
+    前回作成した MVC の Todo管理アプリケーションと同じ内容です。
+
 ------
 
+### 開発手順
 
-* `Todo.cs`
+#### プロジェクトの作成
+
+* 新しいプロジェクトの作成
+  - 名前は `TodoApi` とします。
+
+![新しいプロジェクト](./images/WS000000.JPG)
+
+* テンプレートは `Empty`を選択し、`Web API`にチェックを入れます。
+
+![新規 ASP.NET プロジェクト](./images/WS000001.JPG)
+
+<br>
+
+#### EntityFrameworkを追加
+
+* プロジェクトを右クリック→「NuGet パッケージの管理」
+
+![NuGet パッケージの管理-1](./images/WS000002.JPG)
+
+* EntityFrameworkを選択して「インストール」
+
+![NuGet パッケージの管理-2](./images/WS000003.JPG)
+
+<br>
+
+#### Modelクラスの追加
+
+* `Models`を右クリック→「追加」→「クラス」を選択
+
+![Todoクラスの追加-1](./images/WS000005.JPG)
+
+* 名前を `Todo.cs` として「追加」
+
+![Todoクラスの追加-2](./images/WS000006.JPG)
+
+`Todo.cs`
 
 ```cs
 using System;
@@ -183,7 +223,9 @@ namespace TodoApi.Models
 }
 ```
 
-* `TodoesContext.cs`
+* 続いて `TodoesContext.cs` を追加
+
+`TodoesContext.cs`
 
 ```cs
 using System;
@@ -201,8 +243,27 @@ namespace TodoApi.Models
 }
 ```
 
+ここまで作成したら、一旦ソリューション全体をビルドする。
 
-* `TodoesController.cs`
+<br>
+
+#### Controllerクラスの追加
+
+* Controllersを右クリック→「追加」→「コントローラー」を選択
+
+![コントローラーの追加-1](./images/WS000007.JPG)
+
+* `Entity Framework を使用したアクションがある Web API 2 コントローラー` を選択して「追加」をクリック
+
+![コントローラーの追加-2](./images/WS000008.JPG)
+
+* モデル クラスに `Todo`、データ コンテキスト クラスに `TodoesContext` を選択して「追加」をクリック
+  - コントローラー名は自動で `TodoesController` となるはず
+  - Model 作成時にビルドを実行していない場合、ここでエラーが発生します。
+
+* 以下の様なコードが自動生成されます。
+
+`TodoesController.cs`
 
 ```cs
 using System;
