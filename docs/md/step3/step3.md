@@ -76,7 +76,7 @@
 
 参考: [Getting Started with ASP.NET Web API 2](http://www.asp.net/web-api/overview/getting-started-with-aspnet-web-api/tutorial-your-first-web-api)
 
----
+<br>
 
 ### クライアント環境のインストール
 
@@ -388,7 +388,18 @@ namespace TodoApi.Controllers
 }
 ```
 
+F5キーを押下して実行します。
+
+ブラウザが起動します。
+
+Webページは用意していないのでエラー画面が表示されると思いますが、
+Web API は稼働しています。
+(動作確認を完了するまでブラウザは終了せず、そのままにしておいてください。)
+
+
 #### 動作確認
+
+* curlコマンドを使用して、Web APIにリクエストを投げます。
 
 ```sh
 # get all items
@@ -403,3 +414,58 @@ curl http://localhost:49192/api/Todoes/1
 # update item
 curl -v -H "Content-Type: application/json" -H "Accept:application/json" -X PUT -d "{\"id\":5,\"summary\":\"test2\",\"detail\":\"hogehoge\",\"limit\":\"2015-02-01\",\"done\":\"false\"}" http://localhost:49192/api/Todoes/5
 ```
+
+
+#### 絞り込み機能の追加
+
+現状、`http://localhost:49192/api/Todoes/` にリクエストを投げると全件返ってきます。
+
+URLにパラメータ (`QueryString`といいます) を付与することで、Todoを絞り込めるように機能を追加してみます。
+
+```cs
+// GET: api/Todoes
+public IQueryable<Todo> GetTodoes([FromUri] Todo param)
+{
+    var todoes = db.Todoes.OrderBy(item => item.id).Select(item => item);
+
+    if (!string.IsNullOrEmpty(param.summary))
+    {
+        // summary検索
+        todoes = todoes.Where(item => item.summary.Contains(param.summary));
+    }
+    if (param.done)
+    {
+        // 完了フラグ
+        todoes = todoes.Where(item => true.Equals(item.done));
+    }
+
+    return todoes;
+}
+```
+
+`[FromUri]` は `QueryString`の内容を引数にセットする指定です。
+
+`Select`, `OrderBy`, `Where` は `クエリ ビルダー メソッド` と言われるメソッドで
+`DbSet` (ここでは `db.Todoes`) のデータをフィルタリングしたり、並べ替えたりする際に使用します。
+
+[データをフィルター選択する方法 (Entity Framework)](https://msdn.microsoft.com/ja-jp/library/cc716755(v=vs.100).aspx)
+
+
+`http://localhost:49192/api/Todoes/?summary=test&done=false` といったようにパラメータに絞り込み条件を付与すると、
+条件に一致した項目のみ返ってきます。
+
+
+<br>
+<br>
+
+------
+
+<br>
+
+Web APIの開発手順について解説しました。
+
+基本的な CRUD については Modelクラスの定義のみで生成することが可能です。
+
+検索機能などはここにコードを追加していくか、クライアントサイドに実装することになります。
+
+
