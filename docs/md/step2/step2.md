@@ -2,7 +2,7 @@
 
 ## `ASP.NET MVC`の概要
 
-### MVCとは
+### MVC とは？
 
 > [Model View Controller](http://ja.wikipedia.org/wiki/Model_View_Controller)
 > 

@@ -1,4 +1,3 @@
-
 # 3. `ASP.NET Web API`によるREST API開発
 
 ## Web API とは？
@@ -388,16 +387,17 @@ namespace TodoApi.Controllers
 }
 ```
 
-F5キーを押下して実行します。
+Web APIとして公開されるメソッドは `Public` になっています。
 
-ブラウザが起動します。
-
-Webページは用意していないのでエラー画面が表示されると思いますが、
-Web API は稼働しています。
-(動作確認を完了するまでブラウザは終了せず、そのままにしておいてください。)
+また、それぞれの命名規則は `HTTPメソッド名 + Model名` となっています。
 
 
 #### 動作確認
+
+Visual Studioで F5キーを押下 (あるいは `|>`ボタンをクリック) してデバッグ実行します。
+
+ブラウザが起動しますが、Webページは用意していないのでエラー画面が表示されると思います。
+Web API は正常に稼働しているはずです。 (動作確認を完了するまでブラウザは終了せず、そのままにしておいてください。)
 
 * curlコマンドを使用して、Web APIにリクエストを投げます。
 
@@ -415,12 +415,14 @@ curl http://localhost:49192/api/Todoes/1
 curl -v -H "Content-Type: application/json" -H "Accept:application/json" -X PUT -d "{\"id\":5,\"summary\":\"test2\",\"detail\":\"hogehoge\",\"limit\":\"2015-02-01\",\"done\":\"false\"}" http://localhost:49192/api/Todoes/5
 ```
 
-
-#### 絞り込み機能の追加
+### 補足(1) 絞り込み機能の追加
 
 現状、`http://localhost:49192/api/Todoes/` にリクエストを投げると全件返ってきます。
 
 URLにパラメータ (`QueryString`といいます) を付与することで、Todoを絞り込めるように機能を追加してみます。
+
+
+`GetTodoes`を拡張し、引数にパラメータを取得するように指定します。
 
 ```cs
 // GET: api/Todoes
@@ -443,16 +445,51 @@ public IQueryable<Todo> GetTodoes([FromUri] Todo param)
 }
 ```
 
-`[FromUri]` は `QueryString`の内容を引数にセットする指定です。
+* `[FromUri]` は `QueryString`の内容を引数にセットする指定です。
 
-`Select`, `OrderBy`, `Where` は `クエリ ビルダー メソッド` と言われるメソッドで
-`DbSet` (ここでは `db.Todoes`) のデータをフィルタリングしたり、並べ替えたりする際に使用します。
-
-[データをフィルター選択する方法 (Entity Framework)](https://msdn.microsoft.com/ja-jp/library/cc716755(v=vs.100).aspx)
+* `Select`, `OrderBy`, `Where` は `クエリ ビルダー メソッド` と言われるメソッドで `DbSet` (ここでは `db.Todoes`) のデータをフィルタリングしたり、並べ替えたりする際に使用します。
+  - [データをフィルター選択する方法 (Entity Framework)](https://msdn.microsoft.com/ja-jp/library/cc716755(v=vs.100).aspx)
 
 
-`http://localhost:49192/api/Todoes/?summary=test&done=false` といったようにパラメータに絞り込み条件を付与すると、
-条件に一致した項目のみ返ってきます。
+`http://localhost:49192/api/Todoes/?summary=test&done=false` といったようにURLパラメータに絞り込み条件を付与すると、条件に一致した項目のみ返ってきます。
+
+<br>
+
+### 補足(2) データの格納場所について
+
+これまでの処理で登録されたデータは、`SQL Server LocalDB` に保存されています。
+
+以下の手順で、登録されたデータを確認することができます。
+
+* `Web.config` に登録されている LocalDB のインスタンス名を確認します。
+
+```xml
+  :
+  <entityFramework>
+    <defaultConnectionFactory type="System.Data.Entity.Infrastructure.LocalDbConnectionFactory, EntityFramework">
+      <parameters>
+        <parameter value="mssqllocaldb" />
+      </parameters>
+    </defaultConnectionFactory>
+    <providers>
+      <provider invariantName="System.Data.SqlClient" type="System.Data.Entity.SqlServer.SqlProviderServices, EntityFramework.SqlServer" />
+    </providers>
+  </entityFramework>
+```
+
+* `mssqllocaldb` がインスタンス名です。
+* Visual Studio にて `表示` > `SQL Server オブジェクト エクスプローラー` を選択します。
+* `SQL Serverの追加` をクリックします。
+* サーバー名に `(localdb)\mssqllocaldb` と入力し、接続します。
+* 「データベース」フォルダに `TodoApi.Models.TodoesContext` というデータベースが存在します。
+  - `テーブル > dbo.Todoes` を右クリックし、「データの表示」を選択します。
+
+正常に接続できない場合は、以下の手順でインスタンス名を確認します。
+
+* コマンドプロンプトを起動します。
+* `>sqllocaldb i` と入力します。
+  - インスタンスの一覧が表示されます。
+  - `SQL Server オブジェクト エクスプローラー` で各インスタンスの中身を確認してください。
 
 
 <br>
@@ -462,10 +499,15 @@ public IQueryable<Todo> GetTodoes([FromUri] Todo param)
 
 <br>
 
-Web APIの開発手順について解説しました。
+ASP.NET Web APIの開発手順について解説しました。
 
-基本的な CRUD については Modelクラスの定義のみで生成することが可能です。
+`ASP.NET Web API` と `EntityFramework` により、以下のようなメリットがあることを実感いただけたのではないでしょうか。
 
-検索機能などはここにコードを追加していくか、クライアントサイドに実装することになります。
+* 基本的な CRUD については Modelクラスの定義のみで生成できる
+* 少しのコード追加で機能拡張ができる
+* データベースの準備なしにコーディングが開始できる
+
+
+次回は 今回作成したAPIを操作する WebアプリケーションのView部分を作成します。
 
 
