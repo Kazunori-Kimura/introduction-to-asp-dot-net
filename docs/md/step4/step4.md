@@ -42,16 +42,7 @@
 
 ------
 
-## アプリ仕様
-
-前回作成した Web API を使用した Todoアプリケーションを作成します。
-
-* 画面を表示すると、Todoの一覧が表示されます。
-* `Done`チェックボックスをONにすると、該当Todoがグレーアウトします。
-* `Edit`ボタンをクリックすると、該当Todoを編集できます。
-  - `Save`ボタンで編集内容が登録されます。
-  - `Cancel`ボタンで編集状態が解除されます。 (編集内容は破棄)
-* `Add`ボタンで新規Todoを登録します。
+## Knockout.js
 
 ### knockout.js の MVVM
 
@@ -63,6 +54,83 @@
 
 `MVVM` は `クライアントサイドMVC` と呼ばれる事もあります。
 
+### Hello, World!
+
+まず、非常に簡単な `knockout.js` のアプリをサンプルとして
+`MVVM` の概要について解説します。
+
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ko hello</title>
+</head>
+<body>
+  <input type="text"
+    placeholder="お名前"
+    data-bind="value: user.name, valueUpdate: 'afterkeydown'">
+
+  <p>こんにちは、<span data-bind="text: user.name"></span>さん！</p>
+
+  <script src="knockout.js"></script>
+  <script>
+
+// Model
+var UserModel = function UserModel(){
+  var self = this;
+
+  self.name = ko.observable("名無し");
+};
+
+// ViewModel
+var AppViewModel = function AppViewModel(){
+  var self = this;
+
+  self.user = new UserModel();
+};
+
+// bind
+ko.applyBindings(new AppViewModel());
+
+  </script>
+</body>
+</html>
+```
+
+`ko` は `knockout.js`のオブジェクト。
+`observable` は該当の変数を`knockout.js`の監視対象とします。
+
+HTMLに変数をバインド (紐付け) すると、JavaScriptで変数の値が変わると自動的にHTMLに反映されます。
+
+
+
+### Contacts List
+
+すこし本格的なWebアプリケーションのサンプルを元に
+もう一歩踏み込んだ `knockout.js` の機能を紹介します。
+
+* `foreach`
+* `click`
+* `template`
+
+<br>
+<br>
+
+------
+
+# ToDoアプリの開発
+
+## アプリ仕様
+
+前回作成した Web API を使用した Todoアプリケーションを作成します。
+
+* 画面を表示すると、Todoの一覧が表示されます。
+* `Done`チェックボックスをONにすると、該当Todoがグレーアウトします。
+* `Edit`ボタンをクリックすると、該当Todoを編集できます。
+  - `Save`ボタンで編集内容が登録されます。
+  - `Cancel`ボタンで編集状態が解除されます。 (編集内容は破棄)
+* `Add`ボタンで新規Todoを登録します。
 
 #### Todoリストの項目
 
@@ -73,3 +141,55 @@
 * done: 完了フラグ。真偽値。
 
     前回作成した Web API の Todo Modelと同じ内容です。
+
+<br><br>
+
+------
+
+### model
+
+サーバーから取得したデータを格納するModel。
+
+```js
+// TodoModel.js
+var TodoModel = function TodoModel(){
+  var self = this;
+
+  self.id = ko.observable();
+  self.summary = ko.observable("");
+  self.detail = ko.observable("");
+  self.limit = ko.observable();
+  self.done = ko.observable(false);
+};
+```
+
+
+
+
+```js
+// AppViewModel.js
+var AppViewModel = function AppViewModel(){
+  var self = this;
+
+  self.todoes = ko.observableArray();
+
+  self.todo = ko.observable();
+
+  self.addTodo = function(){};
+
+  self.editTodo = function(){};
+
+  self.deleteTodo = function(){};
+
+  function init(){}
+
+  function getTodoes(){}
+
+  function postTodo(todo){}
+
+  function putTodo(todo){}
+
+  function deleteTodo(todo){}
+
+};
+```

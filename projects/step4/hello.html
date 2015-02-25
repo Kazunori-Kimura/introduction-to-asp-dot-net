@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ko hello</title>
+</head>
+<body>
+  <input type="text"
+    placeholder="お名前"
+    data-bind="value: user.name, valueUpdate: 'afterkeydown'">
+
+  <p>こんにちは、<span data-bind="text: user.name"></span>さん！</p>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js"></script>
+  <script>
+
+// Model
+var UserModel = function UserModel(){
+  var self = this;
+
+  self.name = ko.observable("名無し");
+};
+
+// ViewModel
+var AppViewModel = function AppViewModel(){
+  var self = this;
+
+  self.user = new UserModel();
+};
+
+// bind
+ko.applyBindings(new AppViewModel());
+
+  </script>
+</body>
+</html>
