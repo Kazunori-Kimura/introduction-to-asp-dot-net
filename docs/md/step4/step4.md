@@ -105,7 +105,7 @@ HTMLに変数をバインド (紐付け) すると、JavaScriptで変数の値�
 
 
 
-### Contacts List
+### Bookmark List
 
 すこし本格的なWebアプリケーションのサンプルを元に
 もう一歩踏み込んだ `knockout.js` の機能を紹介します。
