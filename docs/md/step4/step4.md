@@ -110,9 +110,159 @@ HTMLに変数をバインド (紐付け) すると、JavaScriptで変数の値�
 すこし本格的なWebアプリケーションのサンプルを元に
 もう一歩踏み込んだ `knockout.js` の機能を紹介します。
 
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Bookmark List</title>
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+  <style>
+    body{
+      margin: 40px;
+    }
+  </style>
+</head>
+<body>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th class="col-sm-4">Title</th>
+        <th class="col-sm-6">URL</th>
+        <th class="col-sm-2">&nbsp;</th>
+      </tr>
+    </thead>
+    <tbody data-bind="foreach: bookmarks">
+      <tr>
+        <td data-bind="text: title"></td>
+        <td data-bind="text: url"></td>
+        <td>
+          <button class="btn btn-primary" data-bind="click: $root.currentItem">
+            <span class="glyphicon glyphicon-pencil"></span>
+          </button>
+          <button class="btn btn-danger" data-bind="click: $root.deleteBookmark">
+            <span class="glyphicon glyphicon-trash"></span>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td>
+          <button class="btn btn-success" data-bind="click: addBookmark">
+            <span class="glyphicon glyphicon-plus"></span>
+          </button>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+  <div class="panel panel-info" data-bind="if: currentItem">
+    <div class="panel-heading">
+      入力フォーム
+    </div>
+    <div class="panel-body">
+      <form class="form-horizontal">
+        <div class="form-group">
+          <label for="txtTitle" class="col-sm-2 control-label">Title</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="txtTitle"
+              data-bind="value: currentItem().title, valueUpdate: 'afterkeydown'">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="txtUrl" class="col-sm-2 control-label">URL</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="URL"
+              data-bind="value: currentItem().url, valueUpdate: 'afterkeydown'">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js"></script>
+  <script>
+/**
+ * Bookmark Model
+ * @class
+ * @param {string} title
+ * @param {string} url
+ */
+var BookmarkModel = function(title, url){
+  var self = this;
+
+  self.title = ko.observable(title);
+  self.url = ko.observable(url);
+};
+
+/**
+ * Application ViewModel
+ * @class
+ * @param {BookmarkModel[]}
+ */
+var AppViewModel = function(models){
+  var self = this;
+
+  // bookmarkのリスト
+  self.bookmarks = ko.observableArray(models);
+  // 編集中のbookmark
+  self.currentItem = ko.observable();
+
+  /**
+   * [+]ボタンクリック時の処理
+   * リストに空のブックマークを追加し、編集状態とする
+   */
+  self.addBookmark = function(){
+    var model = new BookmarkModel("", "");
+    self.bookmarks.push(model);
+    self.currentItem(model);
+  };
+
+  /**
+   * 削除処理
+   * 該当ブックマークをリストから削除し、編集状態を解除する
+   * @param {BookmarkModel} 削除対象model
+   */
+  self.deleteBookmark = function(model){
+    self.bookmarks.remove(model);
+    self.currentItem(null);
+  };
+};
+
+// 初期表示データ
+var models = [
+  new BookmarkModel("Google", "http://google.com"),
+  new BookmarkModel("はてなブックマーク", "http://b.hatena.ne.jp/"),
+  new BookmarkModel("Qiita", "http://qiita.com/")
+];
+
+// bind処理
+ko.applyBindings(new AppViewModel(models));
+
+  </script>
+</body>
+</html>
+```
+
+* `observableArray`
+
+配列を監視し、要素が追加/削除されるとViewに反映されます。
+
 * `foreach`
+
+繰り返し処理の構文です。  
+`foreach`の内側では、カレントのスコープが各アイテムになります。
+
+`$root`はバインドされたViewModelを指します。
+
+
 * `click`
-* `template`
+
+該当要素をクリックすると、指定された処理が実行されます。  
+引数にはカレントのオブジェクト (デフォルトはバインドされたViewModel、`foreach`内なら各アイテム)
+
 
 <br>
 <br>

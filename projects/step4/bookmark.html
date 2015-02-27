@@ -24,10 +24,10 @@
         <td data-bind="text: title"></td>
         <td data-bind="text: url"></td>
         <td>
-          <button class="btn btn-primary">
+          <button class="btn btn-primary" data-bind="click: $root.currentItem">
             <span class="glyphicon glyphicon-pencil"></span>
           </button>
-          <button class="btn btn-danger">
+          <button class="btn btn-danger" data-bind="click: $root.deleteBookmark">
             <span class="glyphicon glyphicon-trash"></span>
           </button>
         </td>
@@ -36,7 +36,7 @@
     <tfoot>
       <tr>
         <td>
-          <button class="btn btn-success">
+          <button class="btn btn-success" data-bind="click: addBookmark">
             <span class="glyphicon glyphicon-plus"></span>
           </button>
         </td>
@@ -72,6 +72,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js"></script>
   <script>
 
+/**
+ * Bookmark Model
+ * @class
+ * @param {string} title
+ * @param {string} url
+ */
 var BookmarkModel = function(title, url){
   var self = this;
 
@@ -79,18 +85,49 @@ var BookmarkModel = function(title, url){
   self.url = ko.observable(url);
 };
 
-var AppViewModel = function(){
+/**
+ * Application ViewModel
+ * @class
+ * @param {BookmarkModel[]}
+ */
+var AppViewModel = function(models){
   var self = this;
 
-  self.bookmarks = ko.observableArray();
-
+  // bookmarkのリスト
+  self.bookmarks = ko.observableArray(models);
+  // 編集中のbookmark
   self.currentItem = ko.observable();
 
-  self.initialize = function(models){
-    self.bookmarks(models);
+  /**
+   * [+]ボタンクリック時の処理
+   * リストに空のブックマークを追加し、編集状態とする
+   */
+  self.addBookmark = function(){
+    var item = new BookmarkModel("", "");
+    self.bookmarks.push(item);
+    self.currentItem(item);
   };
 
+  /**
+   * 削除処理
+   * 該当ブックマークをリストから削除し、編集状態を解除する
+   * @param {BookmarkModel} 削除対象
+   */
+  self.deleteBookmark = function(model){
+    self.bookmarks.remove(model);
+    self.currentItem(null);
+  };
 };
+
+// 初期表示データ
+var models = [
+  new BookmarkModel("Google", "http://google.com"),
+  new BookmarkModel("はてなブックマーク", "http://b.hatena.ne.jp/"),
+  new BookmarkModel("Qiita", "http://qiita.com/")
+];
+
+// bind処理
+ko.applyBindings(new AppViewModel(models));
 
   </script>
 </body>

@@ -14,21 +14,31 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js"></script>
   <script>
 
-// Model
+/**
+ * UserModel
+ * @class
+ */
 var UserModel = function UserModel(){
   var self = this;
 
+  // ユーザー名。デフォルトは"名無し"
   self.name = ko.observable("名無し");
 };
 
-// ViewModel
+/**
+ * Application ViewModel
+ * @class
+ */
 var AppViewModel = function AppViewModel(){
   var self = this;
 
+  // user変数にModelをセット
   self.user = new UserModel();
 };
 
-// bind
+// ViewModelをHTMLにバインドする
+//    特定の要素にバインドする場合は
+//    ko.applyBindings(viewMode, document.getElementById("hoge"));
 ko.applyBindings(new AppViewModel());
 
   </script>
