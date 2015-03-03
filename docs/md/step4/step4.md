@@ -98,12 +98,39 @@ ko.applyBindings(new AppViewModel());
 </html>
 ```
 
-`ko` は `knockout.js`のオブジェクト。
-`observable` は該当の変数を`knockout.js`の監視対象とします。
+ちなみに...
 
-HTMLに変数をバインド (紐付け) すると、JavaScriptで変数の値が変わると自動的にHTMLに反映されます。
+```js
+var varName = function funcName(){ };
+```
+
+というのは `JavaScript`で`class` (のようなもの) を定義する際の構文です。
+
+また、`var self = this;` というのは、`JavaScript`でよく使用する技法です。
+
+`JavaScript`では文脈によって `this` の中身が異なります (例えば、button押下時のイベントから呼び出された場合、thisにはbuttonのオブジェクトが入っています) が
+`class`内部ではどのような状況であっても自分自身を取得する方法が欲しいので、 `new` した際に 自分自身を `self` という変数に格納しています。
+
+以降、`self`変数を参照することで、どのような文脈からの呼び出しであっても `self` は自分自身を指します。
+
+<br>
+
+#### 概要
+
+* `UserModel`が *MVVM* の *Model* です。
+* `AppViewModel`が *MVVM* の *ViewModel* です。
+  - `AppViewModel` は 変数 `user` に *Model* `UserModel` のインスタンスを一つ保持しています。
+* `ko` は `knockout.js`のオブジェクトです。
+* `ko.applyBindings(viewModel);` で `body`と`ViewModel`を紐付けます。
+  - つまり、*MVVM* の *View* と *ViewModel* の紐付けを行っています。
+  - HTML内の各要素に`data-bind`属性を設定することで、*ViewModel* と *View* の紐付けの詳細を定義します。
+* `observable` は該当の変数を`knockout.js`の監視対象とします。
+  - ここでは、`UserModel`の`name`の値が変わるたびに *ViewModel* を介して *View* に反映されます。
+
+⇒ テキストボックスの値を変更すると、ほぼリアルタイムで `span`タグ内のテキストに反映されます。
 
 
+<br><br>
 
 ### Bookmark List
 
@@ -181,7 +208,6 @@ HTMLに変数をバインド (紐付け) すると、JavaScriptで変数の値�
       </form>
     </div>
   </div>
-  <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js"></script>
   <script>
 /**
@@ -246,23 +272,76 @@ ko.applyBindings(new AppViewModel(models));
 </html>
 ```
 
-* `observableArray`
+#### 概要
 
-配列を監視し、要素が追加/削除されるとViewに反映されます。
+##### ViewModel
+
+* `ko.applyBindings`で *View* と *ViewModel* を紐付けます。
+  - `AppViewModel`の引数に初期表示する`BookmarkModel`の配列を渡しています。
+* `AppViewModel` では受け取った配列を `observableArray` にセットします。
+  - `observableArray` は配列を監視し、要素が追加/削除されると *View* に反映されます。
+  - また、合わせて 編集中のbookmark を管理する `currentItem` を定義します。
+`observable`定義時に引数に何も渡さないと、`null`がセットされます。
+  - `addBookmark`メソッドは`observableArray`に要素を追加し、追加された要素を編集中として
+`currentItem`に保持します。
+  - `deleteBookmark`メソッドは`observableArray`から指定された要素を削除します。
+
+<br>
+
+##### Model
+
+* `title` と `url` のプロパティを持ちます。
+
+<br>
+
+##### View
 
 * `foreach`
 
 繰り返し処理の構文です。  
 `foreach`の内側では、カレントのスコープが各アイテムになります。
 
-`$root`はバインドされたViewModelを指します。
+ここでは、`foreach: bookmarks` としているので
+`AppViewModel`の`bookmarks`の中身を一つづつ取り出し、処理します。
+
+また、`bookmarks`は`observableArray`なので、要素が追加/削除されるたびに
+`foreach`が呼び出され、配列の内容が反映されます。
+
+`$root`はバインドされた *ViewModel* です。
+`$root.currentItem` は `AppViewModel`の`currentItem`を指します。
 
 
 * `click`
 
-該当要素をクリックすると、指定された処理が実行されます。  
-引数にはカレントのオブジェクト (デフォルトはバインドされたViewModel、`foreach`内なら各アイテム)
+該当要素をクリックすると、指定された処理が実行されます。
+引数にはカレントのオブジェクト (デフォルトはバインドされたViewModel、`foreach`内なら各アイテム) がセットされます。
 
+
+* `if`
+
+指定された要素が `true` と判定されるような場合、該当要素が表示されます。  
+逆に、指定された要素が `false` と判定されるような場合(`boolean`の`false`、`string`の`""`、`number`の`0`、`null`、`undefined`)、該当要素は非表示となります。
+
+> if バインディングでは、対象のマークアップを物理的に追加・削除します。 したがって、配下エレメントの data-bind は if にバインドされた評価値が true のときにのみ適用されます。  
+> [Knockout.js 日本語ドキュメント](http://kojs.sukobuto.com/docs/if-binding)
+
+    `currentItem().title` などで null pointer exception 的なエラーになりそうですが、
+    `currentItem`が`null` の場合は `data-bind="if: currentItem"` の要素 (子要素含む) が
+    `DOM` から削除されるため `currentItem().title` は評価されず、エラーにはなりません。
+
+<br><br>
+
+### ViewModelについて
+
+今回の例は *ViewModel* がひとつですが、メニュー部分とコンテンツ部分で *ViewModel* を分割するような場合、
+以下のように記述することが可能です。
+
+```js
+// メニュー部分
+ko.applyBindings(new MenuViewModel(), document.getElementById("menu"));
+// コンテンツ部分
+ko.applyBindings(new ContentViewModel(), document.getElementById("content"));
+```
 
 <br>
 <br>
