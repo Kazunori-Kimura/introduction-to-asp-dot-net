@@ -11,7 +11,8 @@
 
 * Webアプリケーションなので、ユーザー インターフェースは `HTML` です。
 * 単一ページなので、画面遷移は行われません。
-  - サーバーから受信したデータを表示するためには、HTMLの要素 (*D*ocument *O*bject *M*odel, `DOM`) を JavaScript で頻繁に書き換える必要があります。
+  - サーバーから受信したデータを表示するためには、HTMLの要素
+(*D* ocument *O* bject *M* odel, `DOM`) を JavaScript で頻繁に書き換える必要があります。
   - 全ての処理を自分でコーディングすることも可能ですが、通常はJavaScriptフレームワークを使用します。
 
 <br>
@@ -48,9 +49,9 @@
 
 `knockout.js`では、以下の様な構成でコーディングします。
 
-* *M*odel : サーバーから受け取ったデータ
-* *V*iew : HTML
-* *V*iew*M*odel : Modelを保持し、Viewとの仲介を行います。
+* *M* odel : サーバーから受け取ったデータ
+* *V* iew : HTML
+* *V* iew*M*odel : Modelを保持し、Viewとの仲介を行います。
 
 `MVVM` は `クライアントサイドMVC` と呼ばれる事もあります。
 

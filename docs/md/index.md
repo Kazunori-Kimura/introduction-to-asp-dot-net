@@ -83,8 +83,8 @@ ASP.NETでは、Webアプリケーションを作成するため、以下の3つ
 
 1. [`ASP.NET Web Forms`を使用した簡単なWebアプリケーションの開発手順について](step1/step1.html)
 2. [`ASP.NET MVC`によるWebアプリケーション開発](step2/step2.html)
-3. `ASP.NET Web API`によるREST API開発
-4. `ASP.NET Web API`と`knockout.js`によるSingle Page Application開発
+3. [`ASP.NET Web API`によるREST API開発](step3/step3.html)
+4. [`ASP.NET Web API`と`knockout.js`によるSingle Page Application開発](step4/step4.html)
 
 ---
 
@@ -94,4 +94,3 @@ ASP.NETでは、Webアプリケーションを作成するため、以下の3つ
 
 また、このページの元となるファイルも上記レポジトリで管理していますので、
 誤り等あれば`Issue`など登録してください。
-
