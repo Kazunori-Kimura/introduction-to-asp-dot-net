@@ -2,13 +2,16 @@
 
 ## `ASP.NET Web Forms`の概要
 
-`ASP.NET Web Forms`のページは HTML、クライアント スクリプト、サーバー コントロールとサーバー コードを組み合わせて記述します。
+`ASP.NET Web Forms` のページは HTML、クライアント スクリプト、サーバー コントロールと
+サーバー コードを組み合わせて記述します。
+
 ユーザーからページが要求 (request) されると、.NET Frameworkによりサーバー上でコンパイル・実行され、ブラウザでレンダリングできるHTMLマークアップを生成します。
 
-Visual Studioを使用して `ASP.NET Web Forms`のページを作成することができます。
+Visual Studioを使用して `ASP.NET Web Forms` のページを作成することができます。
 Visual StudioではサーバーコントロールをWebフォームのレイアウトにドラッグアンドドロップできます。
 その後、Webページの動作、ルックアンドフィールを定義するためにプロパティ、メソッド、およびイベントを設定します。
-ページのロジックを処理するためのサーバーコードを作成するには、`C#`または`Visual Basic`などの.NET言語を使用することができます。
+ページのロジックを処理するためのサーバーコードを作成するには、
+`C#` または `Visual Basic` などの.NET言語を使用することができます。
 
 * [Introduction to ASP.NET Web Forms](http://www.asp.net/web-forms/what-is-web-forms)
 
@@ -88,9 +91,9 @@ Visual Studioを起動し、「ファイル」→「新規作成」→「プロ�
 <body>
     <form id="form1" runat="server">
     <div>
-    
+
         <asp:TextBox ID="TextBox1" runat="server">ほげほげ</asp:TextBox>
-    
+
     </div>
     </form>
 </body>
@@ -117,14 +120,14 @@ Visual Studioを起動し、「ファイル」→「新規作成」→「プロ�
 <body>
     <form id="form1" runat="server">
     <div>
-    
+
         <asp:Label ID="Label1" runat="server" Text="お名前を教えてください！"></asp:Label>
         <asp:TextBox ID="TextBox1" runat="server"></asp:TextBox>
         <asp:Button ID="Button1" runat="server" OnClick="Button1_Click" Text="OK" />
         <br />
         <br />
         <asp:Label ID="Label2" runat="server" Font-Bold="True" Font-Size="X-Large"></asp:Label>
-    
+
     </div>
     </form>
 </body>
@@ -231,4 +234,3 @@ Windows デスクトップ アプリケーションの開発手法に近いイ�
 非同期通信等を多用する場合は `ASP.NET Ajax Control` といったライブラリも用意されていますが、
 より複雑さが増してしまうので、次回取り上げる `ASP.NET MVC` を使用して
 サーバーサイドとクライアントサイドを明確に分けて構築するスタイルを導入するのが良いでしょう。
-
