@@ -5,7 +5,7 @@
 ### MVC とは？
 
 > [Model View Controller](http://ja.wikipedia.org/wiki/Model_View_Controller)
-> 
+>
 > MVC（Model View Controller モデル・ビュー・コントローラ）は、ユーザーインタフェースをもつアプリケーションソフトウェアを実装するためのデザインパターンである。
 > アプリケーションソフトウェアの内部データを、ユーザーが直接参照・編集する情報から分離する。そのためにアプリケーションソフトウェアを以下の3つの部分に分割する。
 > 1. model: アプリケーションデータ、ビジネスルール、ロジック、関数
@@ -81,14 +81,29 @@ NuGetを使用して、最新の`Entity Framework`をインストールします
 ##### Entity Framework
 
 > [Entity Framework](https://msdn.microsoft.com/ja-jp/data/ef.aspx)
-> 
+>
 > Entity Framework (EF) は、.NET 開発者がドメイン固有のオブジェクトを使用してリレーショナル データを処理できるようにするオブジェクト リレーショナル マッパーです。
 > 開発者が通常、記述する必要のあるデータ アクセス コードがほとんど不要になります。
+
+------
+
+##### O/Rマッパーとは
+
+* O/Rマッピング ... オブジェクトの各プロパティを、RDBのテーブルの各フィールドに関連付けること。
+* O/Rマッパー ... O/Rマッピングを行うライブラリのこと。
+
+Microsoft謹製のものが `EntityFramework`。  
+軽量で、最も利用されていると思われるのが [dapper](https://github.com/StackExchange/dapper-dot-net)。
+
+------
+
 
 ##### NuGet
 
 Visual Studio用のパッケージ管理システム。
 rubyのgemやpythonのpipのようなツール。
+
+コマンドラインやPowerShellからも利用可能ですが、今回は Visual Studio が用意している GUI で操作します。
 
 ##### 手順
 
@@ -162,6 +177,17 @@ namespace WebApplication1.Models
 `DisplayName`に表示名を設定します。
 Viewで項目が表示される時に、ここに設定した文言が使用されます。
 
+------
+
+`[DisplayName("概要")]`など、プロパティの上に記述されたカギカッコで括られた記述は
+[属性(Attributes あるいは Annotation)](https://msdn.microsoft.com/ja-jp/library/z0w1kczw.aspx)と呼ばれるものです。
+
+* 参考
+  - [Code First のデータ注釈](https://msdn.microsoft.com/ja-jp/data/jj591583.aspx)
+  - [System.ComponentModel.DataAnnotations 名前空間](https://msdn.microsoft.com/ja-jp/library/system.componentmodel.dataannotations(v=vs.110).aspx)
+
+------
+
 
 ##### TodoesContextクラスの作成
 
@@ -185,6 +211,17 @@ namespace WebApplication1.Models
     }
 }
 ```
+
+Contextクラスは先ほど作成した POCO とデータベースを繋げる役割を果たします。  
+Todoのコレクションを管理するので、`Todoes`という`DbSet<Todo>`を定義します。
+
+`<Todo>` は`DbSet`に格納するクラスを表します。  
+`Todoes` にはデータベースから取得した `Todo` のコレクション (配列のようなもの) です。
+
+* [DbSet<TEntity> クラス](https://msdn.microsoft.com/ja-jp/library/gg696460(v=vs.113).aspx)
+
+------
+
 
 #### ControllerとViewの作成
 
@@ -219,6 +256,22 @@ namespace WebApplication1.Models
 `Bootstrap`を読み込むように指定します。
 また、`div`に`class="container"`の指定を追加します。
 
+------
+
+##### Razorについて
+
+`Razor` は HTMLにC#/VBのコードを埋め込むための仕組み (ビューエンジン) です。  
+`@`で始まる箇所がサーバーサイドで実行され、クライアントに生成したHTMLが返されます。
+
+------
+
+##### Bootstrapについて
+
+> BootstrapはWebサイトやWebアプリケーションを作成するフリーソフトウェアツール集である。 タイポグラフィ、フォーム、ボタン、ナビゲーション、その他構成要素やJavaScript用拡張などがHTML及びCSSベースのデザインテンプレートとして用意されている。
+
+[Bootstrap](http://getbootstrap.com/)
+
+------
 
 ##### Controllerの作成
 
@@ -253,10 +306,13 @@ Create（作成）、Read（参照）、Update（更新）、Delete（削除）�
   - Edit.cshtml
   - Index.cshtml
 
+
 #### デフォルトページの設定
 
 `App_Start/RouteConfig.cs` を修正し、デフォルトのページを
 ToDoの一覧ページに変更します。
+
+`routes.MapRoute`メソッドの`defaults`引数にデフォルトの設定を定義します。
 
 ```cs
 using System;
@@ -284,6 +340,22 @@ namespace WebApplication1
 }
 ```
 
+##### ルーティング
+
+ルーティングとは、リクエストURIに応じて処理を受け渡し先を決定することを言います。
+
+`ASP.NET MVC`ではクライアントからの要求を受け取ると、`RouteConfig.cs`の内容を元に
+呼び出すべきコントローラー/アクションを決定します。
+
+`routes.MapRoute`メソッドの`url`引数がルーティングの定義です。
+
+例えば `http://localhost/Todoes/Details/3` というリクエストが来た場合、
+`url`の定義にしたがって`TodoesController`の`Details`メソッドに`id=3`を引数に与えて呼び出します。
+
+また、`defaults`でデフォルトのコントローラー、アクションを指定しているので、`http://localhost/` という
+リクエストが来た場合は `http://localhost/Todoes/Index`というリクエストとして処理されます。
+
+
 #### デバッグ実行
 
 F5キーを押して、デバッグ実行を行います。
@@ -295,7 +367,213 @@ ToDoの追加、変更、削除が行えることを確認します。
 
 ![Details](./images/WS000015.JPG)
 
----
+------
+
+#### ソース解説
+
+##### Controller
+
+* ポイント
+  - コントローラークラスの名前は必ず`Controller`で終わる必要があります。
+  - コントローラーは`Controller`クラスを継承します。
+  - 具体的な処理を記述するのは *アクションメソッド*
+  - アクションメソッドの戻り値は `ActionResult`オブジェクト
+
+コードの細部について、順に解説します。
+
+* [TodoesController.cs](https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/blob/master/projects/step2/WebApplication1/WebApplication1/Controllers/TodoesController.cs)
+
+```cs
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using WebApplication1.Models;
+
+namespace WebApplication1.Controllers
+{
+    public class TodoesController : Controller
+    {
+        private TodoesContext db = new TodoesContext();
+```
+
+コントローラーのプライベートな変数として、Modelに作成した`TodoesContext`を保持しています。
+
+データベースへのアクセスは`TodoesContext`を介して行います。
+
+```cs
+        // GET: Todoes
+        public ActionResult Index()
+        {
+            return View(db.Todoes.ToList());
+        }
+```
+
+`Index`メソッドの定義です。
+[View](https://msdn.microsoft.com/ja-jp/library/dd492930(v=vs.118).aspx) メソッドは
+アクションメソッドに対応した View を元に `ViewResult` ( `ActionResult` を継承した、Viewを表示するためのクラス)を返します。
+
+ここでは、`views/Index.cshtml` に すべてのTodoをListに格納したオブジェクトを渡して生成される結果を返しています。
+
+
+```cs
+        // GET: Todoes/Details/5
+        public ActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Todo todo = db.Todoes.Find(id);
+            if (todo == null)
+            {
+                return HttpNotFound();
+            }
+            return View(todo);
+        }
+```
+
+`Details`メソッドの定義です。
+
+`int?` は `int` の *Nullable型* です。  
+通常の `int` は `null` を設定できませんが、Nullable型は `null` が許容されます。
+
+`RouteConfig.cs` の `defaults` の定義により、`id`は省略可能です。  
+`id` が省略された場合、`Details`の引数 `id` には `null` が設定されます。
+
+`id` が `null` の場合は要求されたURLが正しくないので、
+`BadRequest`を返しています。
+
+`Todo todo = db.Todoes.Find(id);` はデータベースから `id` が一致するデータをひとつ取り出します。
+
+一致するデータが存在しない場合は `Find` から `null` が返ってくるので、
+`NotFound`を返しています。
+
+一致するデータが存在すれば、それを`View`にセットして返します。
+
+
+```cs
+        // GET: Todoes/Create
+        public ActionResult Create()
+        {
+            return View();
+        }
+```
+
+新規登録時は `View` を表示するだけです。
+
+```cs
+        // POST: Todoes/Create
+        // 過多ポスティング攻撃を防止するには、バインド先とする特定のプロパティを有効にしてください。
+        // 詳細については、http://go.microsoft.com/fwlink/?LinkId=317598 を参照してください。
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create([Bind(Include = "id,summary,detail,limit,done")] Todo todo)
+        {
+            if (ModelState.IsValid)
+            {
+                db.Todoes.Add(todo);
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+
+            return View(todo);
+        }
+```
+
+`[HttpPost]`は `http` の `POST`メソッドでリクエストがあった場合に呼び出されるアクションメソッドを表す属性です。
+
+`ValidateAntiForgeryToken` は *クロスサイト・リクエスト・フォージェリ攻撃* を防ぐための記述です。
+* TODO: 詳細を記載する
+
+[Bind](https://msdn.microsoft.com/ja-jp/library/system.web.mvc.bindattribute(v=vs.118).aspx) は POSTされたデータを `Todo`モデルに紐付けます。
+
+`ModelState.IsValid` は入力チェックがOKかどうかを判定します。  
+例えば、`DateTime`型の `limit`に日付以外の値がセットされている場合は `IsValid` が `false`となるため
+登録処理が行われません。
+
+更新処理の中身はそのままの意味ですが、
+
+- `Add` でPOSTされたデータを `DbSet` に登録し
+- `SaveChanges` で `DbSet` の変更をデータベースに反映します。
+- `RedirectToAction` は 指定されたアクションメソッドに転送します。
+
+
+```cs
+        // GET: Todoes/Edit/5
+        public ActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Todo todo = db.Todoes.Find(id);
+            if (todo == null)
+            {
+                return HttpNotFound();
+            }
+            return View(todo);
+        }
+
+        // POST: Todoes/Edit/5
+        // 過多ポスティング攻撃を防止するには、バインド先とする特定のプロパティを有効にしてください。
+        // 詳細については、http://go.microsoft.com/fwlink/?LinkId=317598 を参照してください。
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit([Bind(Include = "id,summary,detail,limit,done")] Todo todo)
+        {
+            if (ModelState.IsValid)
+            {
+                db.Entry(todo).State = EntityState.Modified;
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            return View(todo);
+        }
+
+        // GET: Todoes/Delete/5
+        public ActionResult Delete(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Todo todo = db.Todoes.Find(id);
+            if (todo == null)
+            {
+                return HttpNotFound();
+            }
+            return View(todo);
+        }
+
+        // POST: Todoes/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            Todo todo = db.Todoes.Find(id);
+            db.Todoes.Remove(todo);
+            db.SaveChanges();
+            return RedirectToAction("Index");
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+    }
+}
+```
+
+------
 
 <br>
 <br>
@@ -309,6 +587,3 @@ ToDoの追加、変更、削除が行えることを確認します。
 
 生成されるViewは`Bootstrap`や`jQuery`を使用することを想定した作りになっていますので
 特別な対応を行わなくても、ある程度見栄えのするアプリケーションが作成できます。
-
-
-
