@@ -131,47 +131,43 @@
 <h3 id="hello-world-">Hello, World!</h3>
 <p>まず、非常に簡単な <code>knockout.js</code> のアプリをサンプルとして
 <code>MVVM</code> の概要について解説します。</p>
-<pre><code class="lang-html"><span class="hljs-doctype">&lt;!DOCTYPE html&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-title">html</span> <span class="hljs-attribute">lang</span>=<span class="hljs-value">"ja"</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-title">head</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-title">meta</span> <span class="hljs-attribute">charset</span>=<span class="hljs-value">"UTF-8"</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-title">title</span>&gt;</span>ko hello<span class="hljs-tag">&lt;/<span class="hljs-title">title</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-title">head</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-title">body</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-title">input</span> <span class="hljs-attribute">type</span>=<span class="hljs-value">"text"</span>
-    <span class="hljs-attribute">placeholder</span>=<span class="hljs-value">"お名前"</span>
-    <span class="hljs-attribute">data-bind</span>=<span class="hljs-value">"value: user.name, valueUpdate: 'afterkeydown'"</span>&gt;</span>
+<pre><code><!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ko hello</title>
+</head>
+<body>
+  <input type="text"
+    placeholder="お名前"
+    data-bind="value: user.name, valueUpdate: 'afterkeydown'">
 
-  <span class="hljs-tag">&lt;<span class="hljs-title">p</span>&gt;</span>こんにちは、<span class="hljs-tag">&lt;<span class="hljs-title">span</span> <span class="hljs-attribute">data-bind</span>=<span class="hljs-value">"text: user.name"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span>さん！<span class="hljs-tag">&lt;/<span class="hljs-title">p</span>&gt;</span>
+  <p>こんにちは、<span data-bind="text: user.name"></span>さん！</p>
 
-  <span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"knockout.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-title">script</span>&gt;</span><span class="http">
+  <script src="knockout.js"></script>
+  <script>
 
-<span class="php"><span class="hljs-comment">// Model</span>
-<span class="hljs-keyword">var</span> UserModel = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">UserModel</span><span class="hljs-params">()</span></span>{
-  <span class="hljs-keyword">var</span> <span class="hljs-keyword">self</span> = this;
+// Model
+var UserModel = function UserModel(){
+  var self = this;
 
-  <span class="hljs-keyword">self</span>.name = ko.observable(<span class="hljs-string">"名無し"</span>);
+  self.name = ko.observable("名無し");
 };
 
-<span class="hljs-comment">// ViewModel</span>
-<span class="hljs-keyword">var</span> AppViewModel = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">AppViewModel</span><span class="hljs-params">()</span></span>{
-  <span class="hljs-keyword">var</span> <span class="hljs-keyword">self</span> = this;
+// ViewModel
+var AppViewModel = function AppViewModel(){
+  var self = this;
 
-  <span class="hljs-keyword">self</span>.user = <span class="hljs-keyword">new</span> UserModel();
+  self.user = new UserModel();
 };
 
-<span class="hljs-comment">// bind</span>
-ko.applyBindings(<span class="hljs-keyword">new</span> AppViewModel());
+// bind
+ko.applyBindings(new AppViewModel());
 
-  </span></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-title">body</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-title">html</span>&gt;</span>
-</code></pre>
-<p>ちなみに...</p>
-<pre><code class="lang-js"><span class="hljs-keyword">var</span> varName = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">funcName</span><span class="hljs-params">()</span></span>{ };
-</code></pre>
-<p>というのは <code>JavaScript</code>で<code>class</code> (のようなもの) を定義する際の構文です。</p>
+  </script>
+</body>
+</html></code></pre><p>ちなみに...</p>
+<pre><code>var varName = function funcName(){ };</code></pre><p>というのは <code>JavaScript</code>で<code>class</code> (のようなもの) を定義する際の構文です。</p>
 <p>また、<code>var self = this;</code> というのは、<code>JavaScript</code>でよく使用する技法です。</p>
 <p><code>JavaScript</code>では文脈によって <code>this</code> の中身が異なります (例えば、button押下時のイベントから呼び出された場合、thisにはbuttonのオブジェクトが入っています) が
 <code>class</code>内部ではどのような状況であっても自分自身を取得する方法が欲しいので、 <code>new</code> した際に 自分自身を <code>self</code> という変数に格納しています。</p>
@@ -200,140 +196,138 @@ ko.applyBindings(<span class="hljs-keyword">new</span> AppViewModel());
 <h3 id="bookmark-list">Bookmark List</h3>
 <p>すこし本格的なWebアプリケーションのサンプルを元に
 もう一歩踏み込んだ <code>knockout.js</code> の機能を紹介します。</p>
-<pre><code class="lang-html"><span class="hljs-doctype">&lt;!DOCTYPE html&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-title">html</span> <span class="hljs-attribute">lang</span>=<span class="hljs-value">"ja"</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-title">head</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-title">meta</span> <span class="hljs-attribute">charset</span>=<span class="hljs-value">"UTF-8"</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-title">title</span>&gt;</span>Bookmark List<span class="hljs-tag">&lt;/<span class="hljs-title">title</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-title">link</span> <span class="hljs-attribute">rel</span>=<span class="hljs-value">"stylesheet"</span> <span class="hljs-attribute">href</span>=<span class="hljs-value">"//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-title">style</span>&gt;</span><span class="css">
-    <span class="hljs-tag">body</span><span class="hljs-rules">{
-      <span class="hljs-rule"><span class="hljs-attribute">margin</span>:<span class="hljs-value"> <span class="hljs-number">40px</span></span></span>;
-    }</span>
-  </span><span class="hljs-tag">&lt;/<span class="hljs-title">style</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-title">head</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-title">body</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-title">table</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"table table-striped"</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">thead</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">tr</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-title">th</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"col-sm-4"</span>&gt;</span>Title<span class="hljs-tag">&lt;/<span class="hljs-title">th</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-title">th</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"col-sm-6"</span>&gt;</span>URL<span class="hljs-tag">&lt;/<span class="hljs-title">th</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-title">th</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"col-sm-2"</span>&gt;</span>&amp;nbsp;<span class="hljs-tag">&lt;/<span class="hljs-title">th</span>&gt;</span>
-      <span class="hljs-tag">&lt;/<span class="hljs-title">tr</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-title">thead</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">tbody</span> <span class="hljs-attribute">data-bind</span>=<span class="hljs-value">"foreach: bookmarks"</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">tr</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-title">td</span> <span class="hljs-attribute">data-bind</span>=<span class="hljs-value">"text: title"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">td</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-title">td</span> <span class="hljs-attribute">data-bind</span>=<span class="hljs-value">"text: url"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">td</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-title">td</span>&gt;</span>
-          <span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"btn btn-primary"</span> <span class="hljs-attribute">data-bind</span>=<span class="hljs-value">"click: $root.currentItem"</span>&gt;</span>
-            <span class="hljs-tag">&lt;<span class="hljs-title">span</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"glyphicon glyphicon-pencil"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span>
-          <span class="hljs-tag">&lt;/<span class="hljs-title">button</span>&gt;</span>
-          <span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"btn btn-danger"</span> <span class="hljs-attribute">data-bind</span>=<span class="hljs-value">"click: $root.deleteBookmark"</span>&gt;</span>
-            <span class="hljs-tag">&lt;<span class="hljs-title">span</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"glyphicon glyphicon-trash"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span>
-          <span class="hljs-tag">&lt;/<span class="hljs-title">button</span>&gt;</span>
-        <span class="hljs-tag">&lt;/<span class="hljs-title">td</span>&gt;</span>
-      <span class="hljs-tag">&lt;/<span class="hljs-title">tr</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-title">tbody</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">tfoot</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">tr</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-title">td</span>&gt;</span>
-          <span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"btn btn-success"</span> <span class="hljs-attribute">data-bind</span>=<span class="hljs-value">"click: addBookmark"</span>&gt;</span>
-            <span class="hljs-tag">&lt;<span class="hljs-title">span</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"glyphicon glyphicon-plus"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span>
-          <span class="hljs-tag">&lt;/<span class="hljs-title">button</span>&gt;</span>
-        <span class="hljs-tag">&lt;/<span class="hljs-title">td</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-title">td</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">td</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-title">td</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">td</span>&gt;</span>
-      <span class="hljs-tag">&lt;/<span class="hljs-title">tr</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-title">tfoot</span>&gt;</span>
-  <span class="hljs-tag">&lt;/<span class="hljs-title">table</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"panel panel-info"</span> <span class="hljs-attribute">data-bind</span>=<span class="hljs-value">"if: currentItem"</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"panel-heading"</span>&gt;</span>
+<pre><code><!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Bookmark List</title>
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+  <style>
+    body{
+      margin: 40px;
+    }
+  </style>
+</head>
+<body>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th class="col-sm-4">Title</th>
+        <th class="col-sm-6">URL</th>
+        <th class="col-sm-2">&nbsp;</th>
+      </tr>
+    </thead>
+    <tbody data-bind="foreach: bookmarks">
+      <tr>
+        <td data-bind="text: title"></td>
+        <td data-bind="text: url"></td>
+        <td>
+          <button class="btn btn-primary" data-bind="click: $root.currentItem">
+            <span class="glyphicon glyphicon-pencil"></span>
+          </button>
+          <button class="btn btn-danger" data-bind="click: $root.deleteBookmark">
+            <span class="glyphicon glyphicon-trash"></span>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td>
+          <button class="btn btn-success" data-bind="click: addBookmark">
+            <span class="glyphicon glyphicon-plus"></span>
+          </button>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+  <div class="panel panel-info" data-bind="if: currentItem">
+    <div class="panel-heading">
       入力フォーム
-    <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"panel-body"</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">form</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"form-horizontal"</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"form-group"</span>&gt;</span>
-          <span class="hljs-tag">&lt;<span class="hljs-title">label</span> <span class="hljs-attribute">for</span>=<span class="hljs-value">"txtTitle"</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"col-sm-2 control-label"</span>&gt;</span>Title<span class="hljs-tag">&lt;/<span class="hljs-title">label</span>&gt;</span>
-          <span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"col-sm-10"</span>&gt;</span>
-            <span class="hljs-tag">&lt;<span class="hljs-title">input</span> <span class="hljs-attribute">type</span>=<span class="hljs-value">"text"</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"form-control"</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"txtTitle"</span>
-              <span class="hljs-attribute">data-bind</span>=<span class="hljs-value">"value: currentItem().title, valueUpdate: 'afterkeydown'"</span>&gt;</span>
-          <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
-        <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"form-group"</span>&gt;</span>
-          <span class="hljs-tag">&lt;<span class="hljs-title">label</span> <span class="hljs-attribute">for</span>=<span class="hljs-value">"txtUrl"</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"col-sm-2 control-label"</span>&gt;</span>URL<span class="hljs-tag">&lt;/<span class="hljs-title">label</span>&gt;</span>
-          <span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"col-sm-10"</span>&gt;</span>
-            <span class="hljs-tag">&lt;<span class="hljs-title">input</span> <span class="hljs-attribute">type</span>=<span class="hljs-value">"text"</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"form-control"</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"URL"</span>
-              <span class="hljs-attribute">data-bind</span>=<span class="hljs-value">"value: currentItem().url, valueUpdate: 'afterkeydown'"</span>&gt;</span>
-          <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
-        <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
-      <span class="hljs-tag">&lt;/<span class="hljs-title">form</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
-  <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-title">script</span>&gt;</span><span class="php">
-<span class="hljs-comment">/**
+    </div>
+    <div class="panel-body">
+      <form class="form-horizontal">
+        <div class="form-group">
+          <label for="txtTitle" class="col-sm-2 control-label">Title</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="txtTitle"
+              data-bind="value: currentItem().title, valueUpdate: 'afterkeydown'">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="txtUrl" class="col-sm-2 control-label">URL</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="URL"
+              data-bind="value: currentItem().url, valueUpdate: 'afterkeydown'">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js"></script>
+  <script>
+/**
  * Bookmark Model
- *<span class="hljs-phpdoc"> @class</span>
- *<span class="hljs-phpdoc"> @param</span> {string} title
- *<span class="hljs-phpdoc"> @param</span> {string} url
- */</span>
-<span class="hljs-keyword">var</span> BookmarkModel = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(title, url)</span></span>{
-  <span class="hljs-keyword">var</span> <span class="hljs-keyword">self</span> = this;
+ * @class
+ * @param {string} title
+ * @param {string} url
+ */
+var BookmarkModel = function(title, url){
+  var self = this;
 
-  <span class="hljs-keyword">self</span>.title = ko.observable(title);
-  <span class="hljs-keyword">self</span>.url = ko.observable(url);
+  self.title = ko.observable(title);
+  self.url = ko.observable(url);
 };
 
-<span class="hljs-comment">/**
+/**
  * Application ViewModel
- *<span class="hljs-phpdoc"> @class</span>
- *<span class="hljs-phpdoc"> @param</span> {BookmarkModel[]}
- */</span>
-<span class="hljs-keyword">var</span> AppViewModel = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(models)</span></span>{
-  <span class="hljs-keyword">var</span> <span class="hljs-keyword">self</span> = this;
+ * @class
+ * @param {BookmarkModel[]}
+ */
+var AppViewModel = function(models){
+  var self = this;
 
-  <span class="hljs-comment">// bookmarkのリスト</span>
-  <span class="hljs-keyword">self</span>.bookmarks = ko.observableArray(models);
-  <span class="hljs-comment">// 編集中のbookmark</span>
-  <span class="hljs-keyword">self</span>.currentItem = ko.observable();
+  // bookmarkのリスト
+  self.bookmarks = ko.observableArray(models);
+  // 編集中のbookmark
+  self.currentItem = ko.observable();
 
-  <span class="hljs-comment">/**
+  /**
    * [+]ボタンクリック時の処理
    * リストに空のブックマークを追加し、編集状態とする
-   */</span>
-  <span class="hljs-keyword">self</span>.addBookmark = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
-    <span class="hljs-keyword">var</span> model = <span class="hljs-keyword">new</span> BookmarkModel(<span class="hljs-string">""</span>, <span class="hljs-string">""</span>);
-    <span class="hljs-keyword">self</span>.bookmarks.push(model);
-    <span class="hljs-keyword">self</span>.currentItem(model);
+   */
+  self.addBookmark = function(){
+    var model = new BookmarkModel("", "");
+    self.bookmarks.push(model);
+    self.currentItem(model);
   };
 
-  <span class="hljs-comment">/**
+  /**
    * 削除処理
    * 該当ブックマークをリストから削除し、編集状態を解除する
-   *<span class="hljs-phpdoc"> @param</span> {BookmarkModel} 削除対象model
-   */</span>
-  <span class="hljs-keyword">self</span>.deleteBookmark = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(model)</span></span>{
-    <span class="hljs-keyword">self</span>.bookmarks.remove(model);
-    <span class="hljs-keyword">self</span>.currentItem(<span class="hljs-keyword">null</span>);
+   * @param {BookmarkModel} 削除対象model
+   */
+  self.deleteBookmark = function(model){
+    self.bookmarks.remove(model);
+    self.currentItem(null);
   };
 };
 
-<span class="hljs-comment">// 初期表示データ</span>
-<span class="hljs-keyword">var</span> models = [
-  <span class="hljs-keyword">new</span> BookmarkModel(<span class="hljs-string">"Google"</span>, <span class="hljs-string">"http://google.com"</span>),
-  <span class="hljs-keyword">new</span> BookmarkModel(<span class="hljs-string">"はてなブックマーク"</span>, <span class="hljs-string">"http://b.hatena.ne.jp/"</span>),
-  <span class="hljs-keyword">new</span> BookmarkModel(<span class="hljs-string">"Qiita"</span>, <span class="hljs-string">"http://qiita.com/"</span>)
+// 初期表示データ
+var models = [
+  new BookmarkModel("Google", "http://google.com"),
+  new BookmarkModel("はてなブックマーク", "http://b.hatena.ne.jp/"),
+  new BookmarkModel("Qiita", "http://qiita.com/")
 ];
 
-<span class="hljs-comment">// bind処理</span>
-ko.applyBindings(<span class="hljs-keyword">new</span> AppViewModel(models));
+// bind処理
+ko.applyBindings(new AppViewModel(models));
 
-  </span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-title">body</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-title">html</span>&gt;</span>
-</code></pre>
-<h4 id="-">概要</h4>
+  </script>
+</body>
+</html></code></pre><h4 id="-">概要</h4>
 <h5 id="viewmodel">ViewModel</h5>
 <ul>
 <li><code>ko.applyBindings</code>で <em>View</em> と <em>ViewModel</em> を紐付けます。<ul>
@@ -379,19 +373,16 @@ ko.applyBindings(<span class="hljs-keyword">new</span> AppViewModel(models));
 <blockquote>
 <p>if バインディングでは、対象のマークアップを物理的に追加・削除します。 したがって、配下エレメントの data-bind は if にバインドされた評価値が true のときにのみ適用されます。<br><a href="http://kojs.sukobuto.com/docs/if-binding">Knockout.js 日本語ドキュメント</a></p>
 </blockquote>
-<pre><code><span class="hljs-escape">`c</span>urrentItem().title<span class="hljs-escape">` </span>などで null pointer exception 的なエラーになりそうですが、
-<span class="hljs-escape">`c</span>urrentItem<span class="hljs-escape">`が</span><span class="hljs-escape">`n</span>ull<span class="hljs-escape">` </span>の場合は <span class="hljs-escape">`d</span>ata-bind=<span class="hljs-string">"if: currentItem"</span><span class="hljs-escape">` </span>の要素 (子要素含む) が
-<span class="hljs-escape">`D</span>OM<span class="hljs-escape">` </span>から削除されるため <span class="hljs-escape">`c</span>urrentItem().title<span class="hljs-escape">` </span>は評価されず、エラーにはなりません。
-</code></pre><p><br><br></p>
+<pre><code>`currentItem().title` などで null pointer exception 的なエラーになりそうですが、
+`currentItem`が`null` の場合は `data-bind="if: currentItem"` の要素 (子要素含む) が
+`DOM` から削除されるため `currentItem().title` は評価されず、エラーにはなりません。</code></pre><p><br><br></p>
 <h3 id="viewmodel-">ViewModelについて</h3>
 <p>今回の例は <em>ViewModel</em> がひとつですが、メニュー部分とコンテンツ部分で <em>ViewModel</em> を分割するような場合、
 以下のように記述することが可能です。</p>
-<pre><code class="lang-js"><span class="hljs-comment">// メニュー部分</span>
-ko.applyBindings(<span class="hljs-keyword">new</span> MenuViewModel(), <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"menu"</span>));
-<span class="hljs-comment">// コンテンツ部分</span>
-ko.applyBindings(<span class="hljs-keyword">new</span> ContentViewModel(), <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"content"</span>));
-</code></pre>
-<p><br>
+<pre><code>// メニュー部分
+ko.applyBindings(new MenuViewModel(), document.getElementById("menu"));
+// コンテンツ部分
+ko.applyBindings(new ContentViewModel(), document.getElementById("content"));</code></pre><p><br>
 <br></p>
 <hr>
 <h1 id="todo-">ToDoアプリの開発</h1>
@@ -421,44 +412,40 @@ ko.applyBindings(<span class="hljs-keyword">new</span> ContentViewModel(), <span
 <hr>
 <h3 id="model">model</h3>
 <p>サーバーから取得したデータを格納するModel。</p>
-<pre><code class="lang-js"><span class="hljs-comment">// TodoModel.js</span>
-<span class="hljs-keyword">var</span> TodoModel = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">TodoModel</span><span class="hljs-params">()</span></span>{
-  <span class="hljs-keyword">var</span> <span class="hljs-keyword">self</span> = this;
+<pre><code>// TodoModel.js
+var TodoModel = function TodoModel(){
+  var self = this;
 
-  <span class="hljs-keyword">self</span>.id = ko.observable();
-  <span class="hljs-keyword">self</span>.summary = ko.observable(<span class="hljs-string">""</span>);
-  <span class="hljs-keyword">self</span>.detail = ko.observable(<span class="hljs-string">""</span>);
-  <span class="hljs-keyword">self</span>.limit = ko.observable();
-  <span class="hljs-keyword">self</span>.done = ko.observable(<span class="hljs-keyword">false</span>);
-};
-</code></pre>
-<pre><code class="lang-js"><span class="hljs-comment">// AppViewModel.js</span>
-<span class="hljs-keyword">var</span> AppViewModel = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">AppViewModel</span><span class="hljs-params">()</span></span>{
-  <span class="hljs-keyword">var</span> <span class="hljs-keyword">self</span> = this;
+  self.id = ko.observable();
+  self.summary = ko.observable("");
+  self.detail = ko.observable("");
+  self.limit = ko.observable();
+  self.done = ko.observable(false);
+};</code></pre><pre><code>// AppViewModel.js
+var AppViewModel = function AppViewModel(){
+  var self = this;
 
-  <span class="hljs-keyword">self</span>.todoes = ko.observableArray();
+  self.todoes = ko.observableArray();
 
-  <span class="hljs-keyword">self</span>.todo = ko.observable();
+  self.todo = ko.observable();
 
-  <span class="hljs-keyword">self</span>.addTodo = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{};
+  self.addTodo = function(){};
 
-  <span class="hljs-keyword">self</span>.editTodo = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{};
+  self.editTodo = function(){};
 
-  <span class="hljs-keyword">self</span>.deleteTodo = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{};
+  self.deleteTodo = function(){};
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">init</span><span class="hljs-params">()</span></span>{}
+  function init(){}
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getTodoes</span><span class="hljs-params">()</span></span>{}
+  function getTodoes(){}
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">postTodo</span><span class="hljs-params">(todo)</span></span>{}
+  function postTodo(todo){}
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">putTodo</span><span class="hljs-params">(todo)</span></span>{}
+  function putTodo(todo){}
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">deleteTodo</span><span class="hljs-params">(todo)</span></span>{}
+  function deleteTodo(todo){}
 
-};
-</code></pre>
-  </div>
+};</code></pre>  </div>
 
   <footer class="footer">
     <div class="container">
