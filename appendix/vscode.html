@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>introduction to asp dot net - ASP.NET開発勉強会</title>
+  <title>introduction to asp dot net - ASP.NET勉強会</title>
   <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
   <!-- Optional theme -->
@@ -112,12 +112,18 @@ Mac OS XでASP.NETのアプリケーションを開発する手順について�
 <blockquote>
 <p>HomebrewはAppleが用意していないあなたが必要なものをインストールします。</p>
 </blockquote>
-<pre><code>brew tap aspnet/dnx
-brew update
-brew install dnvm</code></pre><p><code>.bash_profile</code>に以下を追加。</p>
-<pre><code>source dnvm.sh
-export MONO_MANAGED_WATCHER=disabled</code></pre><p>追加した後に再読み込みしておくこと。</p>
-<pre><code>source ~/.bash_profile</code></pre><h2 id="installing-visual-studio-code">Installing Visual Studio Code</h2>
+<pre><code class="lang-sh">brew tap aspnet/dnx
+brew <span class="hljs-operator"><span class="hljs-keyword">update</span>
+brew <span class="hljs-keyword">install</span> dnvm</span>
+</code></pre>
+<p><code>.bash_profile</code>に以下を追加。</p>
+<pre><code class="lang-sh"><span class="hljs-built_in">source</span> dnvm.sh
+<span class="hljs-built_in">export</span> MONO_MANAGED_WATCHER=disabled
+</code></pre>
+<p>追加した後に再読み込みしておくこと。</p>
+<pre><code class="lang-sh"><span class="hljs-built_in">source</span> ~/.bash_profile
+</code></pre>
+<h2 id="installing-visual-studio-code">Installing Visual Studio Code</h2>
 <ul>
 <li><p><a href="https://code.visualstudio.com/Docs/setup">Setting up Visual Studio Code</a></p>
 </li>
@@ -128,15 +134,17 @@ export MONO_MANAGED_WATCHER=disabled</code></pre><p>追加した後に再読み�
 <li>Add VSCode to your Dock by right-clicking on the icon and choosing Options, Keep in Dock</li>
 </ul>
 <p>If you want to run VSCode from the terminal, append the following to your <code>.bash_profile</code> file</p>
-<pre><code>code () {
-    if [[ $# = 0 ]]
-    then
-        open -a "Visual Studio Code"
-    else
-        [[ $1 = /* ]] && F="$1" || F="$PWD/${1#./}"
-        open -a "Visual Studio Code" --args "$F"
+<pre><code class="lang-sh">code () {
+    <span class="hljs-keyword">if</span> <span class="hljs-string">[[ $# = 0 ]]</span>
+    <span class="hljs-keyword">then</span>
+        open -a <span class="hljs-string">"Visual Studio Code"</span>
+    <span class="hljs-keyword">else</span>
+        <span class="hljs-string">[[ $1 = /* ]]</span> &amp;&amp; F=<span class="hljs-string">"$1"</span> || F=<span class="hljs-string">"$PWD/${1#./}"</span>
+        open -a <span class="hljs-string">"Visual Studio Code"</span> <span class="hljs-comment">--args "$F"</span>
     fi
-}</code></pre><p>Now, you can simply type <code>code .</code> in any folder to start editing files in that folder.</p>
+}
+</code></pre>
+<p>Now, you can simply type <code>code .</code> in any folder to start editing files in that folder.</p>
 <h2 id="getting-started">Getting Started</h2>
 <blockquote>
 <p>If you don&#39;t have an existing ASP.NET DNX application, we recommend using yeoman to scaffold a new one. Presuming you have Node.js installed, simply npm install yeoman and a few supporting tools such as the asp.net generator, grunt, and bower.</p>
@@ -157,7 +165,9 @@ export MONO_MANAGED_WATCHER=disabled</code></pre><p>追加した後に再読み�
 <blockquote>
 <p>npm makes it easy for JavaScript developers to share and reuse code, and it makes it easy to update the code that you&#39;re sharing.</p>
 </blockquote>
-<pre><code>npm install -g yo grunt-cli generator-aspnet bower</code></pre><p>このコマンドでインストールされるのは、以下のツール類になります。</p>
+<pre><code class="lang-sh">npm install -<span class="hljs-keyword">g</span> yo grunt-<span class="hljs-keyword">cli</span> generator-aspnet bower
+</code></pre>
+<p>このコマンドでインストールされるのは、以下のツール類になります。</p>
 <ul>
 <li><code>yo</code> : yeoman. Webアプリケーションのひな形を生成するツール。</li>
 <li><code>grunt-cli</code> : タスクランナー。Javaだとant。ビルド等の自動化を行う。</li>
@@ -173,28 +183,32 @@ export MONO_MANAGED_WATCHER=disabled</code></pre><p>追加した後に再読み�
 <blockquote>
 <p>From the terminal, run yo aspnet to start the generator. Follow the prompts and pick the Web Application</p>
 </blockquote>
-<pre><code>yo aspnet
+<pre><code class="lang-sh">yo aspnet
 ? ==========================================================================
-We're constantly looking for ways to make yo better!
-May we anonymously report usage statistics to improve the tool over time?
-More info: https://github.com/yeoman/insight & http://yeoman.io
+We<span class="hljs-attribute">'re</span> constantly looking <span class="hljs-keyword">for</span> ways <span class="hljs-keyword">to</span> make yo better!
+May we anonymously <span class="hljs-keyword">report</span> usage statistics <span class="hljs-keyword">to</span> improve the tool over <span class="hljs-typename">time</span>?
+More info: https://github.com/yeoman/insight &amp; http://yeoman.io
 ========================================================================== Yes
  Y
-     _-----_
-    |       |    .--------------------------.
-    |--(o)--|    |      Welcome to the      |
-   `---------´   |   marvellous ASP.NET 5   |
+     _<span class="hljs-comment">-----_</span>
+    |       |    .<span class="hljs-comment">--------------------------.</span>
+    |<span class="hljs-comment">--(o)--|    |      Welcome to the      |</span>
+   `<span class="hljs-comment">---------´   |   marvellous ASP.NET 5   |</span>
     ( _´U`_ )    |        generator!        |
-    /___A___\    '--------------------------'
+    /___A___\    '<span class="hljs-comment">--------------------------'</span>
      |  ~  |
    __'.___.'__
  ´   `  |° ´ Y `
 
-? What type of application do you want to create? Web Application
-? What's the name of your ASP.NET application? WebApplication</code></pre><p><code>yo</code>コマンドで土台を作成したら、生成されたプロジェクトのフォルダに移動して
+? What <span class="hljs-keyword">type</span> <span class="hljs-keyword">of</span> application do you want <span class="hljs-keyword">to</span> create? Web Application
+? What<span class="hljs-attribute">'s</span> the name <span class="hljs-keyword">of</span> your ASP.NET application? WebApplication
+</code></pre>
+<p><code>yo</code>コマンドで土台を作成したら、生成されたプロジェクトのフォルダに移動して
 Visual Studio Codeを起動します。</p>
-<pre><code>cd WebApplication
-code .</code></pre><h3 id="your-first-asp-net-5-application-on-a-mac">Your First ASP.NET 5 Application on a Mac</h3>
+<pre><code class="lang-sh">cd WebApplication
+<span class="hljs-tag">code</span> .
+</code></pre>
+<h3 id="your-first-asp-net-5-application-on-a-mac">Your First ASP.NET 5 Application on a Mac</h3>
 <p><a href="http://docs.asp.net/en/latest/tutorials/your-first-mac-aspnet.html">Your First ASP.NET 5 Application on a Mac</a></p>
 <p>まずは必要なパッケージをダウンロードします。</p>
 <ol>
@@ -203,14 +217,17 @@ code .</code></pre><h3 id="your-first-asp-net-5-application-on-a-mac">Your First
 </ol>
 <p>NuGetから色々なパッケージがダウンロードされます。
 (めっちゃ時間がかかります...)</p>
-<pre><code>Done, without errors.
-Restore complete, 294192ms elapsed</code></pre><h3 id="running-locally-using-kestrel">Running Locally Using Kestrel</h3>
+<pre><code>Done, <span class="hljs-keyword">without</span> errors.
+Restore complete, <span class="hljs-number">294192</span>ms elapsed
+</code></pre><h3 id="running-locally-using-kestrel">Running Locally Using Kestrel</h3>
 <ul>
 <li>起動</li>
 </ul>
 <p>ターミナルで、カレントディレクトリを該当プロジェクトとした状態で
 以下のコマンドを実行</p>
-<pre><code>dnx . kestrel</code></pre><ul>
+<pre><code class="lang-sh"><span class="hljs-title">dnx</span> . kestrel
+</code></pre>
+<ul>
 <li>停止</li>
 </ul>
 <p>ターミナルで <code>Enter</code> を押下</p>
@@ -232,7 +249,7 @@ Restore complete, 294192ms elapsed</code></pre><h3 id="running-locally-using-kes
 
   <footer class="footer">
     <div class="container">
-      <p class="text-muted">ASP.NET開発勉強会 , &copy; 2015 Kazunori Kimura</p>
+      <p class="text-muted">ASP.NET勉強会 , &copy; 2015 Kazunori Kimura</p>
     </div>
   </footer>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
