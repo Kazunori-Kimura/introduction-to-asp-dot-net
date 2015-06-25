@@ -494,7 +494,7 @@ namespace WebApplication1.Controllers
 
 代表的なActionResultの派生クラスは以下の通りです。
 
-<table class="table">
+<table>
   <thead>
     <tr>
       <th>クラス名</th>
@@ -664,27 +664,63 @@ public ActionResult Create(Todo todo)
 
 例えば、以下の様な `Account`クラスがあった場合を考えます。
 
+* Account.cs
+
 ```cs
 public class Account
 {
   public int id { get; set; }
   public string mail { get; set; }
   public string password { get; set; }
-  public int role { get; set; }
+  public string role { get; set; }
 }
 ```
+
+<br>
 
 ここで、 `role`(権限) は管理者のみが設定でき、エンドユーザーからは勝手に編集できないものとします。
 (以下の様なViewのイメージ)
 
+* Create.cshtml
+
 ```html
+<html>
+<body>
 @using (Html.BeginForm())
 {
   @Html.HiddenFor(model => model.id)
   @Html.EditorFor(model => model.mail)
   @Html.EditorFor(model => model.password)
 }
+</body>
 ```
+
+<br>
+
+Create.cshtml から POSTされた際に実行されるアクションメソッドを以下のように実装したとします。
+
+* XxxController.cs
+
+```cs
+[HttpPost]
+[ValidateAntiForgeryToken]
+public ActionResult Create(Account account)
+{
+    if (ModelState.IsValid)
+    {
+        db.Accounts.Add(account);
+        db.SaveChanges();
+        return RedirectToAction("Index");
+    }
+
+    return View(account);
+}
+```
+
+Create.cshtmlからPOSTされた場合は id, mail, password のみがセットされてきます。  
+`Add`では新しいレコードとしてDBに登録されるので、id は自動的に採番されますので、
+プログラマーが期待している動作としては、 *POSTされてきた mail と password がDBに登録される*
+という動作だと思います。
 
 しかし、悪意あるユーザーがPOSTデータを改ざんし、role値を含んだデータを送信すると、
 `Create`メソッドはその値をモデルに割り当ててしまい、結果、意図せず `role`に値が設定されてしまいます。
@@ -692,7 +728,13 @@ public class Account
 このような攻撃を *過多ポスティング攻撃* といいます。
 
 自動生成された `Create` メソッドのように `Bind` を使用して
-モデルバインドするプロパティを明示することにより、過多ポスティング攻撃を防止しています。
+モデルバインドするプロパティを明示することにより、過多ポスティング攻撃を防止します。
+
+```cs
+[HttpPost]
+[ValidateAntiForgeryToken]
+public ActionResult Create([Bind(Include = "id,mail,password")] Account account)
+```
 
 ------
 
@@ -795,7 +837,7 @@ public class Account
 
 <br><br>
 
-##### View
+### View
 
 まず、`Index.cshtml` の内容について順に解説していきます。
 
