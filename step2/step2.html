@@ -47,6 +47,7 @@
     }
     h1, h2, h3, h4, h5, h6 {
       margin-top: 20px;
+      margin-bottom: 15px;
     }
     .container .text-muted {
       margin: 20px 0;
@@ -478,7 +479,7 @@ Create（作成）、Read（参照）、Update（更新）、Delete（削除）�
 <h3 id="-actionresult">用語解説: ActionResult</h3>
 <p>アクションメソッドは、戻り値となる <code>ActionResult</code> の派生オブジェクトを介してアクションの結果 (その後に行うべき挙動) を通知します。</p>
 <p>代表的なActionResultの派生クラスは以下の通りです。</p>
-<table class="table">
+<table>
   <thead>
     <tr>
       <th>クラス名</th>
@@ -609,28 +610,64 @@ public ActionResult Create<span class="hljs-list">(<span class="hljs-keyword">To
 <p>こうすることで、クライアントからPOSTされてきたデータのkey名を見てモデルに自動的に割り当ててくれるのですが、
 上記の記述ではセキュリティホールの原因となる場合もあります。</p>
 <p>例えば、以下の様な <code>Account</code>クラスがあった場合を考えます。</p>
+<ul>
+<li>Account.cs</li>
+</ul>
 <pre><code class="lang-cs"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Account</span>
 {
   <span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> id { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
   <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> mail { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
   <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> password { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
-  <span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> role { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+  <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> role { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
 }
 </code></pre>
+<p><br></p>
 <p>ここで、 <code>role</code>(権限) は管理者のみが設定でき、エンドユーザーからは勝手に編集できないものとします。
 (以下の様なViewのイメージ)</p>
-<pre><code class="lang-html"><span class="hljs-variable">@using</span> (Html.<span class="hljs-function">BeginForm</span>())
+<ul>
+<li>Create.cshtml</li>
+</ul>
+<pre><code class="lang-html">&lt;html&gt;
+&lt;body&gt;
+<span class="hljs-annotation">@using</span> (Html.BeginForm())
 {
-  <span class="hljs-variable">@Html</span>.<span class="hljs-function">HiddenFor</span>(model =&gt; model.id)
-  <span class="hljs-variable">@Html</span>.<span class="hljs-function">EditorFor</span>(model =&gt; model.mail)
-  <span class="hljs-variable">@Html</span>.<span class="hljs-function">EditorFor</span>(model =&gt; model.password)
+  <span class="hljs-annotation">@Html</span>.HiddenFor(model =&gt; model.id)
+  <span class="hljs-annotation">@Html</span>.EditorFor(model =&gt; model.mail)
+  <span class="hljs-annotation">@Html</span>.EditorFor(model =&gt; model.password)
 }
+&lt;/body&gt;
 </code></pre>
+<p><br></p>
+<p>Create.cshtml から POSTされた際に実行されるアクションメソッドを以下のように実装したとします。</p>
+<ul>
+<li>XxxController.cs</li>
+</ul>
+<pre><code class="lang-cs"><span class="hljs-list">[<span class="hljs-keyword">HttpPost</span>]
+<span class="hljs-list">[<span class="hljs-keyword">ValidateAntiForgeryToken</span>]
+public ActionResult Create<span class="hljs-list">(<span class="hljs-keyword">Account</span> account)</span>
+{
+    if <span class="hljs-list">(<span class="hljs-keyword">ModelState.IsValid</span>)</span>
+    {
+        db.Accounts.Add<span class="hljs-list">(<span class="hljs-keyword">account</span>)</span><span class="hljs-comment">;</span>
+        db.SaveChanges<span class="hljs-list">()</span><span class="hljs-comment">;</span>
+        return RedirectToAction<span class="hljs-list">(<span class="hljs-string">"Index"</span>)</span><span class="hljs-comment">;</span>
+    }
+
+    return View<span class="hljs-list">(<span class="hljs-keyword">account</span>)</span><span class="hljs-comment">;</span>
+}</span></span>
+</code></pre>
+<p>Create.cshtmlからPOSTされた場合は id, mail, password のみがセットされてきます。<br><code>Add</code>では新しいレコードとしてDBに登録されるので、id は自動的に採番されますので、
+プログラマーが期待している動作としては、 <em>POSTされてきた mail と password がDBに登録される</em>
+という動作だと思います。</p>
 <p>しかし、悪意あるユーザーがPOSTデータを改ざんし、role値を含んだデータを送信すると、
 <code>Create</code>メソッドはその値をモデルに割り当ててしまい、結果、意図せず <code>role</code>に値が設定されてしまいます。</p>
 <p>このような攻撃を <em>過多ポスティング攻撃</em> といいます。</p>
 <p>自動生成された <code>Create</code> メソッドのように <code>Bind</code> を使用して
-モデルバインドするプロパティを明示することにより、過多ポスティング攻撃を防止しています。</p>
+モデルバインドするプロパティを明示することにより、過多ポスティング攻撃を防止します。</p>
+<pre><code class="lang-cs"><span class="hljs-list">[<span class="hljs-keyword">HttpPost</span>]
+<span class="hljs-list">[<span class="hljs-keyword">ValidateAntiForgeryToken</span>]
+public ActionResult Create<span class="hljs-list">(<span class="hljs-list">[<span class="hljs-keyword">Bind</span><span class="hljs-list">(<span class="hljs-keyword">Include</span> = <span class="hljs-string">"id,mail,password"</span>)</span>] Account account)</span></span></span></span>
+</code></pre>
 <hr>
 <p><br><br></p>
 <pre><code class="lang-cs">        <span class="hljs-comment">// GET: Todoes/Edit/5</span>
@@ -721,7 +758,7 @@ public ActionResult Create<span class="hljs-list">(<span class="hljs-keyword">To
 <p><br><br></p>
 <hr>
 <p><br><br></p>
-<h5 id="view">View</h5>
+<h3 id="view">View</h3>
 <p>まず、<code>Index.cshtml</code> の内容について順に解説していきます。</p>
 <ul>
 <li><a href="https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/blob/master/projects/step2/WebApplication1/WebApplication1/Views/Todoes/Index.cshtml">Index.cshtml</a></li>
