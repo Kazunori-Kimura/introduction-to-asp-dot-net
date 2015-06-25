@@ -127,14 +127,6 @@
 </ul>
 </li>
 </ul>
-<h3 id="todo-">Todoリストの項目</h3>
-<ul>
-<li>id: Todoを一意に特定する数値。</li>
-<li>summary: 概要。文字列。</li>
-<li>detail: 詳細。文字列。</li>
-<li>limit: 期限。日時。</li>
-<li>done: 完了フラグ。真偽値。</li>
-</ul>
 <p><br></p>
 <hr>
 <h3 id="-">プロジェクトの作成</h3>
@@ -198,12 +190,15 @@ rubyのgemやpythonのpipのようなツール。</p>
 </ul>
 <p><img src="./images/WS000007.JPG" alt="インストール完了"></p>
 <p><br><br></p>
+<hr>
 <h3 id="-entity-framework-">用語解説: Entity Framework の コード ファースト開発</h3>
 <p>データ構造を表現する <code>POCO</code> (Plain Old Clr Object: 特別なクラスやインターフェイスを継承していないクラス(のオブジェクト)) と
 POCOを管理する Contextクラスを定義することで、Entity Frameworkが必要なテーブルを生成します。
 (Databaseの操作は必要ありません。)</p>
 <p>コード ファースト開発は <code>Entity Framework 4.1</code> から提供された機能です。</p>
 <p>詳細については <a href="http://msdn.microsoft.com/ja-jp/data/ee712907">Entity Framework (EF) の概要</a> を参照してください。</p>
+<hr>
+<p><br><br></p>
 <h3 id="model-">Modelの作成</h3>
 <p><em>Todoクラス</em> を作成していきます。</p>
 <ul>
@@ -240,6 +235,16 @@ POCOを管理する Contextクラスを定義することで、Entity Framework�
     }
 }
 </code></pre>
+<ul>
+<li>Todoリストの項目<ul>
+<li>id: Todoを一意に特定する数値。</li>
+<li>summary: 概要。文字列。</li>
+<li>detail: 詳細。文字列。</li>
+<li>limit: 期限。日時。</li>
+<li>done: 完了フラグ。真偽値。</li>
+</ul>
+</li>
+</ul>
 <p>モデルの定義にあたって抑えるポイントは以下の3点です。</p>
 <ul>
 <li>クラス名は単数形の名詞<ul>
@@ -329,6 +334,7 @@ POCOを管理する Contextクラスを定義することで、Entity Framework�
 <hr>
 <h3 id="-razor">用語解説: Razor</h3>
 <p><code>Razor</code> は HTMLにC#/VBのコードを埋め込むための仕組み (ビューエンジン) です。<br><code>@</code>で始まる箇所がサーバーサイドで実行され、クライアントに生成したHTMLが返されます。</p>
+<p><br></p>
 <h3 id="-bootstrap">用語解説: Bootstrap</h3>
 <blockquote>
 <p>BootstrapはWebサイトやWebアプリケーションを作成するフリーソフトウェアツール集である。 タイポグラフィ、フォーム、ボタン、ナビゲーション、その他構成要素やJavaScript用拡張などがHTML及びCSSベースのデザインテンプレートとして用意されている。</p>
@@ -402,6 +408,7 @@ Create（作成）、Read（参照）、Update（更新）、Delete（削除）�
 }
 </code></pre>
 <p><br><br></p>
+<hr>
 <h3 id="-">用語解説: ルーティング</h3>
 <p>ルーティングとは、リクエストURIに応じて処理を受け渡し先を決定することを言います。</p>
 <p><code>ASP.NET MVC</code>ではクライアントからの要求を受け取ると、<code>RouteConfig.cs</code>の内容を元に
@@ -411,6 +418,8 @@ Create（作成）、Read（参照）、Update（更新）、Delete（削除）�
 <code>url</code>の定義にしたがって<code>TodoesController</code>の<code>Details</code>メソッドに<code>id=3</code>を引数に与えて呼び出します。</p>
 <p>また、<code>defaults</code>でデフォルトのコントローラー、アクションを指定しているので、<code>http://localhost/</code> という
 リクエストが来た場合は <code>http://localhost/Todoes/Index</code>というリクエストとして処理されます。</p>
+<hr>
+<p><br><br></p>
 <h3 id="-">デバッグ実行</h3>
 <p>F5キーを押して、デバッグ実行を行います。
 ブラウザが起動し、一覧ページが表示されます。</p>
@@ -425,7 +434,7 @@ Create（作成）、Read（参照）、Update（更新）、Delete（削除）�
 <ul>
 <li>ポイント<ul>
 <li>コントローラークラスの名前は必ず<code>Controller</code>で終わる必要があります。</li>
-<li>コントローラーは<code>Controller</code>クラスを継承します。</li>
+<li>コントローラーは<code>Controller</code>クラスを継承します。(Controllerクラスを継承した独自のControllerクラスでも構いません)</li>
 <li>具体的な処理を記述するのは <em>アクションメソッド</em></li>
 <li>アクションメソッドの戻り値は <code>ActionResult</code>オブジェクト</li>
 </ul>
@@ -453,6 +462,7 @@ Create（作成）、Read（参照）、Update（更新）、Delete（削除）�
 </code></pre>
 <p>コントローラーのプライベート変数に Models に作成した<code>TodoesContext</code>を保持しています。</p>
 <p>データベースへのアクセスは<code>TodoesContext</code>を介して行います。</p>
+<p><br><br></p>
 <pre><code class="lang-cs">        <span class="hljs-comment">// GET: Todoes</span>
         public ActionResult <span class="hljs-literal">Index</span>()
         {
@@ -466,7 +476,55 @@ Create（作成）、Read（参照）、Update（更新）、Delete（削除）�
 <p><br><br></p>
 <hr>
 <h3 id="-actionresult">用語解説: ActionResult</h3>
-<p>TODO: ActionResultとその継承クラスについて説明する</p>
+<p>アクションメソッドは、戻り値となる <code>ActionResult</code> の派生オブジェクトを介してアクションの結果 (その後に行うべき挙動) を通知します。</p>
+<p>代表的なActionResultの派生クラスは以下の通りです。</p>
+<table class="table">
+  <thead>
+    <tr>
+      <th>クラス名</th>
+      <th>ヘルパーメソッド</th>
+      <th>概要</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ViewResult</td>
+      <td>View</td>
+      <td>アクションメソッドに対応したViewを出力</td>
+    </tr>
+    <tr>
+      <td>RedirectToRouteResult</td>
+      <td>RedirectToAction</td>
+      <td>指定のアクションメソッドに処理を転送</td>
+    </tr>
+    <tr>
+      <td>ContentResult</td>
+      <td>Content</td>
+      <td>指定されたテキストを出力</td>
+    </tr>
+    <tr>
+      <td>FileContentResult</td>
+      <td>File</td>
+      <td>指定されたファイルを出力</td>
+    </tr>
+    <tr>
+      <td>JsonResult</td>
+      <td>Json</td>
+      <td>指定されたオブジェクトをJSON形式で出力</td>
+    </tr>
+    <tr>
+      <td>HttpNotFoundResult</td>
+      <td>HttpNotFound</td>
+      <td>404ページを出力</td>
+    </tr>
+    <tr>
+      <td>EmptyResult</td>
+      <td>-</td>
+      <td>なにも行わない</td>
+    </tr>
+  </tbody>
+</table>
+
 <hr>
 <p><br><br></p>
 <pre><code class="lang-cs">        <span class="hljs-comment">// GET: Todoes/Details/5</span>
@@ -493,6 +551,7 @@ Create（作成）、Read（参照）、Update（更新）、Delete（削除）�
 <p>一致するデータが存在しない場合は <code>Find</code> から <code>null</code> が返ってくるので、
 <code>NotFound</code>を返しています。</p>
 <p>一致するデータが存在すれば、それを<code>View</code>にセットして返します。</p>
+<p><br><br></p>
 <pre><code class="lang-cs">        // GET: Todoes/<span class="hljs-operator"><span class="hljs-keyword">Create</span>
         <span class="hljs-keyword">public</span> ActionResult <span class="hljs-keyword">Create</span>()
         {
@@ -500,6 +559,7 @@ Create（作成）、Read（参照）、Update（更新）、Delete（削除）�
         }
 </code></pre>
 <p>新規登録時は <code>View</code> を表示するだけです。</p>
+<p><br><br></p>
 <pre><code class="lang-cs">        <span class="hljs-comment">// POST: Todoes/Create</span>
         <span class="hljs-comment">// 過多ポスティング攻撃を防止するには、バインド先とする特定のプロパティを有効にしてください。</span>
         <span class="hljs-comment">// 詳細については、http://go.microsoft.com/fwlink/?LinkId=317598 を参照してください。</span>
@@ -519,10 +579,15 @@ Create（作成）、Read（参照）、Update（更新）、Delete（削除）�
 </code></pre>
 <p><code>[HttpPost]</code>は <code>http</code> の <code>POST</code>メソッドでリクエストがあった場合に呼び出されるアクションメソッドを表す属性です。</p>
 <p><code>ValidateAntiForgeryToken</code> は <em>クロスサイト・リクエスト・フォージェリ攻撃</em> を防ぐための記述です。</p>
+<p><br><br></p>
+<hr>
+<h3 id="-csrf-">用語解説: クロスサイトリクエストフォージェリ (CSRF)</h3>
 <blockquote>
 <p>クロスサイトリクエストフォージェリ（Cross site request forgeries、略記：CSRF、またはXSRF）は、WWW における攻撃手法のひとつである。 具体的な被害としては、掲示板に意図しない書き込みをさせられたり、オンラインショップで買い物をさせられたりするなどが挙げられる。
 <a href="https://ja.wikipedia.org/wiki/%E3%82%AF%E3%83%AD%E3%82%B9%E3%82%B5%E3%82%A4%E3%83%88%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%E3%83%95%E3%82%A9%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%AA">クロスサイトリクエストフォージェリ</a></p>
 </blockquote>
+<hr>
+<p><br><br></p>
 <p><a href="https://msdn.microsoft.com/ja-jp/library/system.web.mvc.bindattribute.aspx">Bind</a> は POSTされたデータを
 <code>Todo</code>モデルに紐付けます。</p>
 <p><code>ModelState.IsValid</code> は入力チェックがOKかどうかを判定します。<br>例えば、<code>DateTime</code>型の <code>limit</code>に日付以外の値がセットされている場合は <code>IsValid</code> が <code>false</code>となるため
@@ -533,10 +598,9 @@ Create（作成）、Read（参照）、Update（更新）、Delete（削除）�
 <li><code>SaveChanges</code> で <code>DbSet</code> の変更をデータベースに反映します。</li>
 <li><code>RedirectToAction</code> は 指定されたアクションメソッドに転送します。</li>
 </ul>
+<p><br><br></p>
 <hr>
-<ul>
-<li>モデルバインド と 過多ポスティング攻撃について</li>
-</ul>
+<h3 id="-">モデルバインド と 過多ポスティング攻撃について</h3>
 <p>ASP.NET MVCでは、クライアントからの入力値を自動的にモデルに割り当てる <em>モデルバインド</em> という機能があります。<br>上記の <code>Create</code> は以下のように書くこともできます。</p>
 <pre><code class="lang-cs"><span class="hljs-list">[<span class="hljs-keyword">HttpPost</span>]
 <span class="hljs-list">[<span class="hljs-keyword">ValidateAntiForgeryToken</span>]
@@ -568,6 +632,7 @@ public ActionResult Create<span class="hljs-list">(<span class="hljs-keyword">To
 <p>自動生成された <code>Create</code> メソッドのように <code>Bind</code> を使用して
 モデルバインドするプロパティを明示することにより、過多ポスティング攻撃を防止しています。</p>
 <hr>
+<p><br><br></p>
 <pre><code class="lang-cs">        <span class="hljs-comment">// GET: Todoes/Edit/5</span>
         <span class="hljs-keyword">public</span> <span class="hljs-function">ActionResult <span class="hljs-title">Edit</span><span class="hljs-params">(<span class="hljs-keyword">int</span>? id)</span>
         </span>{
@@ -600,6 +665,7 @@ public ActionResult Create<span class="hljs-list">(<span class="hljs-keyword">To
         }
 </code></pre>
 <p><code>Edit</code>メソッドは <code>Details</code> と <code>Create</code> の処理を組み合わせた内容です。</p>
+<p><br><br></p>
 <pre><code class="lang-cs">        <span class="hljs-comment">// GET: Todoes/Delete/5</span>
         <span class="hljs-keyword">public</span> <span class="hljs-function">ActionResult <span class="hljs-title">Delete</span><span class="hljs-params">(<span class="hljs-keyword">int</span>? id)</span>
         </span>{
@@ -638,6 +704,7 @@ public ActionResult Create<span class="hljs-list">(<span class="hljs-keyword">To
 </ul>
 </li>
 </ul>
+<p><br><br></p>
 <pre><code class="lang-cs">        <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">override</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Dispose</span><span class="hljs-params">(<span class="hljs-keyword">bool</span> disposing)</span>
         </span>{
             <span class="hljs-keyword">if</span> (disposing)
@@ -651,7 +718,9 @@ public ActionResult Create<span class="hljs-list">(<span class="hljs-keyword">To
 </code></pre>
 <p><code>Dispose</code> は終了処理です。
 <code>db.Dispose()</code> で保持している <code>Context</code> を開放しています。</p>
+<p><br><br></p>
 <hr>
+<p><br><br></p>
 <h5 id="view">View</h5>
 <p>まず、<code>Index.cshtml</code> の内容について順に解説していきます。</p>
 <ul>
@@ -666,6 +735,7 @@ public ActionResult Create<span class="hljs-list">(<span class="hljs-keyword">To
 <code>@@</code> とすることでエスケープして表示されます。</p>
 <p>また、コメントを記載する場合は <code>@* ... *@</code> と記述します。<br>HTMLのコメントと異なり、サーバーサイドでコメントとして処理されるため、ブラウザでソースを表示しても
 <code>@* ... *@</code> は出力されません。</p>
+<p><br><br></p>
 <pre><code class="lang-html">@{
     ViewBag.<span class="hljs-variable">Title =</span> <span class="hljs-string">"Index"</span>;
     <span class="hljs-variable">Layout =</span> <span class="hljs-string">"~/Views/_LayoutPage1.cshtml"</span>;
@@ -676,6 +746,7 @@ public ActionResult Create<span class="hljs-list">(<span class="hljs-keyword">To
 <ul>
 <li><a href="https://msdn.microsoft.com/ja-jp/library/gg512039.aspx">WebViewPage.ViewBagプロパティ</a></li>
 </ul>
+<p><br><br></p>
 <pre><code class="lang-html"><span class="hljs-variable">&lt;h2&gt;</span>Index<span class="hljs-variable">&lt;/h2&gt;</span>
 
 <span class="hljs-variable">&lt;p&gt;</span>
@@ -684,6 +755,7 @@ public ActionResult Create<span class="hljs-list">(<span class="hljs-keyword">To
 </code></pre>
 <p><code>@Html</code>から始まるメソッドは <em>HTMLヘルパー</em> と呼ばれ、HTMLの生成をカプセル化します。</p>
 <p><code>@Html.ActionLink()</code> はリンクを生成します。<br>上記の場合は <code>TodoesController</code>の<code>Create</code>アクションへのリンクが生成されます。</p>
+<p><br><br></p>
 <pre><code class="lang-html"><span class="hljs-variable">&lt;table class="table"&gt;</span>
     <span class="hljs-variable">&lt;tr&gt;</span>
         <span class="hljs-variable">&lt;th&gt;</span>
@@ -703,6 +775,7 @@ public ActionResult Create<span class="hljs-list">(<span class="hljs-keyword">To
 </code></pre>
 <p><code>@Html.DisplayNameFor()</code> はモデルの定義に応じて、プロパティの表示名を表示します。</p>
 <p><code>&lt;label&gt;</code>タグとして出力したい場合は<code>@Html.LabelFor()</code>を使用すると、表示名をラベルに整形して出力します。</p>
+<p><br><br></p>
 <pre><code class="lang-html"><span class="hljs-annotation">@foreach</span> (<span class="hljs-keyword">var</span> item <span class="hljs-keyword">in</span> Model) {
     &lt;tr&gt;
         &lt;td&gt;
@@ -730,8 +803,14 @@ public ActionResult Create<span class="hljs-list">(<span class="hljs-keyword">To
 <p>制御構文内は自動的にコードブロックとして認識されます。
 <code>foreach</code> だけでなく、<code>if</code> や <code>switch</code> などC#の制御構文がそのまま使用できます。</p>
 <p><code>@Html.DisplayFor()</code> はモデル定義に応じて出力される内容が変わります。</p>
-<p>string型であればそのまま文字列が表示されます。<br>bool型であれば、チェックボックスが表示され、trueの場合はチェックがONとなります。<br><code>DisplayFor</code>はプロパティの内容を表示するだけなので、チェックボックスはreadonlyとなります。</p>
+<ul>
+<li>string型であればそのまま文字列が表示されます。</li>
+<li>bool型であれば、チェックボックスが表示され、trueの場合はチェックがONとなります。</li>
+</ul>
+<p><code>DisplayFor</code>はプロパティの内容を表示するだけなので、チェックボックスはreadonlyとなります。</p>
+<p><br><br></p>
 <hr>
+<p><br><br></p>
 <p>つづいて、編集画面の例として <code>Edit.cshtml</code> の解説をしていきます。</p>
 <ul>
 <li><a href="https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/blob/master/projects/step2/WebApplication1/WebApplication1/Views/Todoes/Edit.cshtml">Edit.cshtml</a></li>
@@ -748,12 +827,14 @@ public ActionResult Create<span class="hljs-list">(<span class="hljs-keyword">To
 <p>ここまでは <code>Index.cshtml</code> と同様です。</p>
 <p>コントローラでは 1つの項目を取得して Viewにセットされてきますので、
 <code>@model</code> では単純に <code>Todo</code>モデルを受け取るように指定しています。</p>
+<p><br><br></p>
 <pre><code class="lang-html"><span class="hljs-at_rule">@<span class="hljs-keyword">using</span> (Html.<span class="hljs-function">BeginForm</span>())
 </span>{
     <span class="hljs-at_rule">@<span class="hljs-keyword">Html.AntiForgeryToken()</span></span>
 </code></pre>
 <p><code>@using (Html.BeginForm()) { ... }</code> はブロック内を <code>&lt;form&gt;</code> で括ります。</p>
 <p><code>@Html.AntiForgeryToken()</code> は CSRF対策の <code>&lt;hidden&gt;</code> タグを埋め込みます。</p>
+<p><br><br></p>
 <pre><code class="lang-html">    &lt;div <span class="hljs-class"><span class="hljs-keyword">class</span>=</span><span class="hljs-string">"form-horizontal"</span>&gt;
         &lt;h4&gt;<span class="hljs-type">Todo</span>&lt;/h4&gt;
         &lt;hr /&gt;
@@ -810,6 +891,7 @@ public ActionResult Create<span class="hljs-list">(<span class="hljs-keyword">To
 <li><code>@Html.EditorFor()</code>: モデル定義に応じたタグを生成します。</li>
 <li><code>@Html.ValidationMessageFor()</code>: 各エディタでのvalidationのエラーメッセージが表示されます。</li>
 </ul>
+<p><br><br></p>
 <pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>
     @Html.ActionLink("Back to List", "Index")
 <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
@@ -819,6 +901,7 @@ public ActionResult Create<span class="hljs-list">(<span class="hljs-keyword">To
 <span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"~/Scripts/jquery.validate.unobtrusive.min.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
 </code></pre>
 <p>最後に <code>jQuery</code>の読み込みを行っています。<br>これらのJavaScriptはvalidationで使用されています。</p>
+<p><br><br></p>
 <hr>
 <p><br>
 <br></p>
