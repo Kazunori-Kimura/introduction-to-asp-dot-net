@@ -51,14 +51,6 @@
 * ToDoをクリックすると詳細を表示 (edit)
   - 詳細ページで更新/削除
 
-### Todoリストの項目
-
-* id: Todoを一意に特定する数値。
-* summary: 概要。文字列。
-* detail: 詳細。文字列。
-* limit: 期限。日時。
-* done: 完了フラグ。真偽値。
-
 <br>
 
 ---
@@ -141,6 +133,8 @@ rubyのgemやpythonのpipのようなツール。
 
 <br><br>
 
+------
+
 ### 用語解説: Entity Framework の コード ファースト開発
 
 データ構造を表現する `POCO` (Plain Old Clr Object: 特別なクラスやインターフェイスを継承していないクラス(のオブジェクト)) と
@@ -150,6 +144,10 @@ POCOを管理する Contextクラスを定義することで、Entity Framework�
 コード ファースト開発は `Entity Framework 4.1` から提供された機能です。
 
 詳細については [Entity Framework (EF) の概要](http://msdn.microsoft.com/ja-jp/data/ee712907) を参照してください。
+
+------
+
+<br><br>
 
 ### Modelの作成
 
@@ -191,6 +189,14 @@ namespace WebApplication1.Models
     }
 }
 ```
+
+* Todoリストの項目
+  - id: Todoを一意に特定する数値。
+  - summary: 概要。文字列。
+  - detail: 詳細。文字列。
+  - limit: 期限。日時。
+  - done: 完了フラグ。真偽値。
+
 
 モデルの定義にあたって抑えるポイントは以下の3点です。
 
@@ -304,6 +310,7 @@ Todoのコレクションを管理するので、`Todoes`という`DbSet<Todo>`�
 `Razor` は HTMLにC#/VBのコードを埋め込むための仕組み (ビューエンジン) です。  
 `@`で始まる箇所がサーバーサイドで実行され、クライアントに生成したHTMLが返されます。
 
+<br>
 
 ### 用語解説: Bootstrap
 
@@ -386,6 +393,8 @@ namespace WebApplication1
 
 <br><br>
 
+------
+
 ### 用語解説: ルーティング
 
 ルーティングとは、リクエストURIに応じて処理を受け渡し先を決定することを言います。
@@ -401,6 +410,9 @@ namespace WebApplication1
 また、`defaults`でデフォルトのコントローラー、アクションを指定しているので、`http://localhost/` という
 リクエストが来た場合は `http://localhost/Todoes/Index`というリクエストとして処理されます。
 
+------
+
+<br><br>
 
 ### デバッグ実行
 
@@ -425,7 +437,7 @@ ToDoの追加、変更、削除が行えることを確認します。
 
 * ポイント
   - コントローラークラスの名前は必ず`Controller`で終わる必要があります。
-  - コントローラーは`Controller`クラスを継承します。
+  - コントローラーは`Controller`クラスを継承します。(Controllerクラスを継承した独自のControllerクラスでも構いません)
   - 具体的な処理を記述するのは *アクションメソッド*
   - アクションメソッドの戻り値は `ActionResult`オブジェクト
 
@@ -455,6 +467,8 @@ namespace WebApplication1.Controllers
 
 データベースへのアクセスは`TodoesContext`を介して行います。
 
+<br><br>
+
 ```cs
         // GET: Todoes
         public ActionResult Index()
@@ -476,7 +490,56 @@ namespace WebApplication1.Controllers
 
 ### 用語解説: ActionResult
 
-TODO: ActionResultとその継承クラスについて説明する
+アクションメソッドは、戻り値となる `ActionResult` の派生オブジェクトを介してアクションの結果 (その後に行うべき挙動) を通知します。
+
+代表的なActionResultの派生クラスは以下の通りです。
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>クラス名</th>
+      <th>ヘルパーメソッド</th>
+      <th>概要</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ViewResult</td>
+      <td>View</td>
+      <td>アクションメソッドに対応したViewを出力</td>
+    </tr>
+    <tr>
+      <td>RedirectToRouteResult</td>
+      <td>RedirectToAction</td>
+      <td>指定のアクションメソッドに処理を転送</td>
+    </tr>
+    <tr>
+      <td>ContentResult</td>
+      <td>Content</td>
+      <td>指定されたテキストを出力</td>
+    </tr>
+    <tr>
+      <td>FileContentResult</td>
+      <td>File</td>
+      <td>指定されたファイルを出力</td>
+    </tr>
+    <tr>
+      <td>JsonResult</td>
+      <td>Json</td>
+      <td>指定されたオブジェクトをJSON形式で出力</td>
+    </tr>
+    <tr>
+      <td>HttpNotFoundResult</td>
+      <td>HttpNotFound</td>
+      <td>404ページを出力</td>
+    </tr>
+    <tr>
+      <td>EmptyResult</td>
+      <td>-</td>
+      <td>なにも行わない</td>
+    </tr>
+  </tbody>
+</table>
 
 ------
 
@@ -518,6 +581,7 @@ TODO: ActionResultとその継承クラスについて説明する
 
 一致するデータが存在すれば、それを`View`にセットして返します。
 
+<br><br>
 
 ```cs
         // GET: Todoes/Create
@@ -528,6 +592,8 @@ TODO: ActionResultとその継承クラスについて説明する
 ```
 
 新規登録時は `View` を表示するだけです。
+
+<br><br>
 
 ```cs
         // POST: Todoes/Create
@@ -552,8 +618,18 @@ TODO: ActionResultとその継承クラスについて説明する
 
 `ValidateAntiForgeryToken` は *クロスサイト・リクエスト・フォージェリ攻撃* を防ぐための記述です。
 
+<br><br>
+
+------
+
+### 用語解説: クロスサイトリクエストフォージェリ (CSRF)
+
 > クロスサイトリクエストフォージェリ（Cross site request forgeries、略記：CSRF、またはXSRF）は、WWW における攻撃手法のひとつである。 具体的な被害としては、掲示板に意図しない書き込みをさせられたり、オンラインショップで買い物をさせられたりするなどが挙げられる。
 > [クロスサイトリクエストフォージェリ](https://ja.wikipedia.org/wiki/%E3%82%AF%E3%83%AD%E3%82%B9%E3%82%B5%E3%82%A4%E3%83%88%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%E3%83%95%E3%82%A9%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%AA)
+
+------
+
+<br><br>
 
 [Bind](https://msdn.microsoft.com/ja-jp/library/system.web.mvc.bindattribute.aspx) は POSTされたデータを
 `Todo`モデルに紐付けます。
@@ -568,10 +644,11 @@ TODO: ActionResultとその継承クラスについて説明する
 - `SaveChanges` で `DbSet` の変更をデータベースに反映します。
 - `RedirectToAction` は 指定されたアクションメソッドに転送します。
 
+<br><br>
 
 ------
 
-* モデルバインド と 過多ポスティング攻撃について
+### モデルバインド と 過多ポスティング攻撃について
 
 ASP.NET MVCでは、クライアントからの入力値を自動的にモデルに割り当てる *モデルバインド* という機能があります。  
 上記の `Create` は以下のように書くこともできます。
@@ -619,6 +696,7 @@ public class Account
 
 ------
 
+<br><br>
 
 ```cs
         // GET: Todoes/Edit/5
@@ -654,6 +732,8 @@ public class Account
 ```
 
 `Edit`メソッドは `Details` と `Create` の処理を組み合わせた内容です。
+
+<br><br>
 
 ```cs
         // GET: Todoes/Delete/5
@@ -691,6 +771,8 @@ public class Account
   - 該当IDの項目を検索し削除
   - `Index` を返す
 
+<br><br>
+
 ```cs
         protected override void Dispose(bool disposing)
         {
@@ -707,7 +789,11 @@ public class Account
 `Dispose` は終了処理です。
 `db.Dispose()` で保持している `Context` を開放しています。
 
+<br><br>
+
 ------
+
+<br><br>
 
 ##### View
 
@@ -734,6 +820,7 @@ HTML内にRazorの式としてではなく、`@`をそのまま表示したい�
 HTMLのコメントと異なり、サーバーサイドでコメントとして処理されるため、ブラウザでソースを表示しても
 `@* ... *@` は出力されません。
 
+<br><br>
 
 ```html
 @{
@@ -749,6 +836,7 @@ HTMLのコメントと異なり、サーバーサイドでコメントとして�
 
 * [WebViewPage.ViewBagプロパティ](https://msdn.microsoft.com/ja-jp/library/gg512039.aspx)
 
+<br><br>
 
 ```html
 <h2>Index</h2>
@@ -763,6 +851,8 @@ HTMLのコメントと異なり、サーバーサイドでコメントとして�
 
 `@Html.ActionLink()` はリンクを生成します。  
 上記の場合は `TodoesController`の`Create`アクションへのリンクが生成されます。
+
+<br><br>
 
 ```html
 <table class="table">
@@ -787,6 +877,7 @@ HTMLのコメントと異なり、サーバーサイドでコメントとして�
 
 `<label>`タグとして出力したい場合は`@Html.LabelFor()`を使用すると、表示名をラベルに整形して出力します。
 
+<br><br>
 
 ```html
 @foreach (var item in Model) {
@@ -819,11 +910,16 @@ HTMLのコメントと異なり、サーバーサイドでコメントとして�
 
 `@Html.DisplayFor()` はモデル定義に応じて出力される内容が変わります。
 
-string型であればそのまま文字列が表示されます。  
-bool型であれば、チェックボックスが表示され、trueの場合はチェックがONとなります。  
+* string型であればそのまま文字列が表示されます。
+* bool型であれば、チェックボックスが表示され、trueの場合はチェックがONとなります。
+
 `DisplayFor`はプロパティの内容を表示するだけなので、チェックボックスはreadonlyとなります。
 
+<br><br>
+
 ------
+
+<br><br>
 
 つづいて、編集画面の例として `Edit.cshtml` の解説をしていきます。
 
@@ -845,6 +941,7 @@ bool型であれば、チェックボックスが表示され、trueの場合は
 コントローラでは 1つの項目を取得して Viewにセットされてきますので、
 `@model` では単純に `Todo`モデルを受け取るように指定しています。
 
+<br><br>
 
 ```html
 @using (Html.BeginForm())
@@ -856,6 +953,7 @@ bool型であれば、チェックボックスが表示され、trueの場合は
 
 `@Html.AntiForgeryToken()` は CSRF対策の `<hidden>` タグを埋め込みます。
 
+<br><br>
 
 ```html
     <div class="form-horizontal">
@@ -915,6 +1013,7 @@ HTMLヘルパーで入力フォームを生成しています。
 * `@Html.EditorFor()`: モデル定義に応じたタグを生成します。
 * `@Html.ValidationMessageFor()`: 各エディタでのvalidationのエラーメッセージが表示されます。
 
+<br><br>
 
 ```html
 <div>
@@ -929,6 +1028,7 @@ HTMLヘルパーで入力フォームを生成しています。
 最後に `jQuery`の読み込みを行っています。  
 これらのJavaScriptはvalidationで使用されています。
 
+<br><br>
 
 ------
 
