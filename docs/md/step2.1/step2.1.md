@@ -1,13 +1,17 @@
 # 3. `ASP.NET MVC`によるWebアプリケーション開発 - 応用編
 
-## 認証と認可
+<br>
+
+## ASP.NETの認証機能について
 
 ### メンバーシップ フレームワーク
 
-ASP.NET 2.0 以降から採用された認証ライブラリです。比較的シンプルに実装できるため、広く利用されています。
+ASP.NET 2.0 以降から採用された認証ライブラリです。比較的シンプルに実装できるため、広く利用されています。  
+今回はメンバーシップフレームワークによる認証・認可機能の実装方法を解説します。
 
-今回はメンバーシップフレームワークによる認証・認可機能の実装方法を解説しますが、
-最新の認証ライブラリについてもご紹介いたします。
+<br>
+<hr>
+<br>
 
 ### 【用語解説】ASP.NET Identity
 
@@ -22,6 +26,8 @@ ASP.NET Identity は Visual Studio 2013 から新たに搭載された認証ラ�
 Visual Studio 2013 で ASP.NETプロジェクトを作成するときに生成されるソースコードには、ASP.NET Identityによる認証機能が予め実装されています。
 
 <br>
+<hr>
+<br>
 
 ## 基本的なフォーム認証の実装
 
@@ -34,12 +40,20 @@ Visual Studio 2013 で ASP.NETプロジェクトを作成するときに生成�
   - ホーム画面 (全ユーザー共通の画面)
   - 管理画面 (管理者アカウントのみ表示可能)
 
+<br>
+
 * 画面遷移
 
     ログイン画面 -(ログイン成功)-> ホーム画面 -(管理者のみ)-> 管理画面
 
+<br>
+<br>
 
 ### 1. Providerクラスの実装
+
+さっそく、認証機能を司る `Provider` クラスを作成していきます。
+
+<br>
 
 (1) MembershipProviderの実装
 
@@ -50,7 +64,7 @@ Visual Studio 2013 で ASP.NETプロジェクトを作成するときに生成�
 
 - `ValidateUser` は `username` と `password` を受け取って認証の成否を返します。
 
-このアプリケーションでは認証の動作を確認するため、 `username` 、 `password` は固定としています。
+認証の動作を確認するため、ひとまず `username` 、 `password` は固定としています。
 
 <br>
 
@@ -78,6 +92,7 @@ namespace AuthTest.Models
         // 〜〜略〜〜
 ```
 
+<br>
 
 (2) RoleProviderの実装
 
@@ -122,6 +137,9 @@ namespace AuthTest.Models
         // 〜〜略〜〜
 ```
 
+<br>
+<br>
+
 ### 2. ViewModelの実装
 
 `ViewModel` は実際のModel (テーブルの形) と画面に表示する項目との違いを吸収するために使用するテクニックです。
@@ -133,6 +151,8 @@ namespace AuthTest.Models
 
 
 今回はログイン画面の入力項目を `LoginViewModel` として定義します。
+
+<br>
 
 * LoginViewModel.cs
 
@@ -196,7 +216,8 @@ namespace AuthTest.Controllers
 }
 ```
 
-`[AllowAnonymous]` は `LoginController` へのアクセス時に認証が不要とします。
+* `[AllowAnonymous]` は `LoginController` 全体へのアクセスで、認証を不要とします。
+* `[HttpPost] Index` で認証処理を行います。
 
 ログイン画面で入力された内容は `LoginViewModel` に格納されます。
 
@@ -208,13 +229,11 @@ namespace AuthTest.Controllers
 
 認証後、Home画面にリダイレクトしています。
 
-
-`SignOut` メソッドで認証クッキーが削除され、ログアウトした状態となります。
+* `SignOut` メソッドで認証クッキーが削除され、ログアウトした状態となります。
 
 <br>
 
 (2) HomeControllerの実装
-
 
 * HomeController.cs
 
@@ -241,6 +260,7 @@ namespace AuthTest.Controllers
 
 (3) AdminControllerの実装
 
+```cs
 namespace AuthTest.Controllers
 {
     [Authorize(Roles="Administrators")]
@@ -253,9 +273,14 @@ namespace AuthTest.Controllers
         }
     }
 }
+```
 
 `[Authorize(Roles="Administrators")]` は `AdminController` に `Administrators` ロールに属するユーザーのみアクセス可能であることを示します。
+
 それ以外のユーザーが該当画面にアクセスした場合、ログイン画面にリダイレクトされます。
+
+<br>
+<br>
 
 ### 3. Viewの作成
 
@@ -264,11 +289,17 @@ namespace AuthTest.Controllers
   - `Shared` フォルダの作成
   - レイアウトページの作成
 
+後半のパートで使用しますので、共通レイアウトを定義しておきます。
+
+<br>
+
 (2) `/Views/Login/Index.cshtml` の作成
 
   - `LoginController`を右クリック -> `Add View` を選択
   - `LoginViewModel` の `Create` として `Index.cshtml` を作成
   - 不要な項目の削除、ボタンのラベルを `SignIn` に変更
+
+<br>
 
 ```html
 @model AuthTest.Models.LoginViewModel
@@ -279,7 +310,6 @@ namespace AuthTest.Controllers
 }
 
 <h2>SignIn</h2>
-
 
 @using (Html.BeginForm())
 {
@@ -316,7 +346,10 @@ namespace AuthTest.Controllers
 <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
 ```
 
+<br>
+
 (3) HomeViewの作成
+
 (4) AdminViewの作成
 
   - `Title` に `Home`, `Admin` と表記 (どちらの画面を表示しているかわかりやすいように)
@@ -324,7 +357,9 @@ namespace AuthTest.Controllers
 
 <br>
 
-### 4. web.Configの設定
+### 4. web.configの設定
+
+最後に、フォーム認証を行うように `web.config` に設定を追加します。
 
 ```xml
 <system.web>
@@ -356,6 +391,8 @@ namespace AuthTest.Controllers
 * `roleManager` タグの追加
   - `CustomRoleProvider` クラスを指定
 
+<br>
+<br>
 
 ### 5. デバッグ実行して動作確認
 
@@ -370,18 +407,23 @@ namespace AuthTest.Controllers
 - URLを指定して ~/Home/Index を指定してもログイン画面に戻されることを確認
 - URLを指定して ~/Admin/Index を指定してもログイン画面に戻されることを確認
 
+<br>
+<br>
+
+ASP.NET MVCでのフォーム認証の基本的な実装について解説しました。
 
 <br>
+<hr>
 <br>
 
 ## (まともな) Todo管理アプリケーションの作成
 
-ユーザー管理機能のついた Todo管理アプリケーションを作成します。
+つづいて、ユーザー管理機能のついた Todo管理アプリケーションを作成します。
 
 * ユーザー毎に個別のTodoを管理
 * 管理者のみユーザーアカウントの管理画面を表示
 
-先ほど作成した認証機能だけのWebアプリケーションに、機能を肉付けしていきます。
+先ほど作成した認証機能だけのWebアプリケーションに必要な機能を肉付けしていきます。
 
 <br>
 
@@ -400,7 +442,7 @@ namespace AuthTest.Controllers
 
 ### 1. Modelの実装
 
-* User Model
+* Models/User.cs
 
 ```cs
 public class User
@@ -429,7 +471,7 @@ public class User
 
 <br>
 
-* Role Model
+* Models/Role.cs
 
 ```cs
 public class Role
@@ -446,7 +488,7 @@ public class Role
 
 <br>
 
-* Todo Model
+* Models/Todo.cs
 
 ```cs
 public class Todo
@@ -471,6 +513,8 @@ public class Todo
 そのTodoを担当するユーザーをプロパティとして定義します。
 ユーザーとTodoは 1:n とします。
 
+<br>
+
 * AppContext
 
 ```cs
@@ -481,6 +525,9 @@ public class AppContext : DbContext
     public DbSet<Todo> Todoes { get; set; }
 }
 ```
+
+DbContext クラスです。
+データベースと紐付ける Modelクラス の DbSet を定義します。
 
 <br>
 
@@ -502,6 +549,8 @@ public class LoginViewModel
 ```
 
 <br>
+<hr>
+<br>
 
 ### 【用語解説】ナビゲーションプロパティ
 
@@ -516,12 +565,15 @@ public class LoginViewModel
 `UserRoles` テーブルが生成されます。
 
 <br>
+<hr>
 <br>
 
 ### 2. Providerの実装
 
 固定文字列で認証等の判定を行っていたところを
 EntityFrameworkを通してデータベースに問い合わせた結果と入力内容を比較するように修正します。
+
+<br>
 
 * CustomMembershipProvider
 
@@ -547,6 +599,8 @@ public override bool ValidateUser(string username, string password)
 
 username, passwordを元にユーザーを取得し、ユーザーが取得できた場合は
 認証OKとして Session にユーザーのId を格納しています。
+
+<br>
 
 `FirstOrDefault` メソッドは `Where` でヒットした要素のうちの先頭のモノを返します。
 0件の場合は `null` を返します。
@@ -599,13 +653,15 @@ public override string[] GetRolesForUser(string UserId)
 ```
 
 <br>
+<hr>
+<br>
 
 ### 【用語解説】LINQ to Entities
 
-*L* anguage *IN* tegrated *Q* uery (統合言語クエリー)
+*L*anguage *IN*tegrated *Q*uery (統合言語クエリー)
 
 オブジェクトやデータベース、データセット、エンティティ、XMLなどアプリケーションで扱う
-様々なデータソースに対して、統一的な手段でアクセスする仕組み
+様々なデータソースに対して、統一的な手段でアクセスする仕組みです。
 
 LINQによる問い合わせはクエリー式構文とメソッド構文の2通りの書き方ができます。
 
@@ -629,6 +685,7 @@ var users = db.Users
 個人的にメソッド構文の方が分かりやすいので、この勉強会ではメソッド構文を使用していきます。
 
 <br>
+<hr>
 <br>
 
 ### 3. 初期データの登録
@@ -652,6 +709,7 @@ Code First Migrations enabled for project AuthTest.
 
 `Migrations/Configuration.cs` というファイルが生成されます。
 
+<br>
 
 (2) イニシャライザーの登録
 
@@ -685,6 +743,8 @@ public Configuration()
 
 `AutomaticMigrationDataLossAllowed` はデータが失われるような変更 (列が削除されるなど) の自動マイグレーションを許可するかどうかのオプションです。
 
+<br>
+<hr>
 <br>
 
 ### 【解説】手動マイグレーションの方法について
@@ -720,6 +780,7 @@ Update-Database -Verbose
 正常にデバッグ実行できることを確認します。
 
 <br>
+<hr>
 <br>
 
 (4) 初期データの登録
@@ -760,23 +821,8 @@ protected override void Seed(AuthTest.Models.AppContext context)
 }
 ```  
 
-### 動作確認
-
-ここまで実装したら、一度
-
-
-
-以降の実装で不要となるフォルダ・ファイルを削除しておきます。
-
-- Controllers/HomeController.cs
-- Controllers/AdminController.cs
-- Views/Home
-- Views/Admin
-
 <br>
 <br>
-
-
 
 ### 4. コントローラー
 
@@ -823,6 +869,27 @@ public class LoginController : Controller
 `ValidateUser` メソッドで認証OKだった場合、SessionからユーザーIDを取得して
 認証Cookieに登録します。
 
+<br>
+<hr>
+<br>
+
+### 動作確認
+
+ここまで実装したら、一度デバッグ実行して認証機能が正常に動作するか確認します。
+
+修正前と変りなく、認証機能が動作することを確認します。
+
+<br>
+
+動作確認したら、以降の実装で不要となるフォルダ・ファイルを削除しておきます。
+
+- Controllers/HomeController.cs
+- Controllers/AdminController.cs
+- Views/Home
+- Views/Admin
+
+<br>
+<hr>
 <br>
 
 (2) HomeController
@@ -1087,3 +1154,41 @@ public class UsersController : Controller
 </body>
 </html>
 ```
+
+<br>
+<br>
+
+### 動作確認
+
+以上で、ひと通りの機能の実装が完了しました。ざっと動作確認してみましょう。
+
+1. まず、管理者アカウント (上記コードでは `kimura`) でログインして、新しいユーザーアカウントを作成してみます。
+2. 一旦サインアウトし、作成したユーザーアカウントでログインし直します。
+3. Todoを登録します。
+4. ログアウトし、管理者アカウントでログインし直します。
+
+
+<br>
+<hr>
+<br>
+
+ユーザー管理機能を持った、少し複雑なWebアプリケーションの実装手順について解説しました。
+
+しかしながら、このアプリケーションには以下の様な問題点・改善点があります。
+
+* パスワード管理
+
+今回の例ではパスワードをそのままデータベースに保存していますが
+実際には salt を付けて sha256 などでハッシュ化・ストレッチングを行い、
+素のパスワードはそのまま保存しないように考慮しなければなりません。
+
+<br>
+
+* 認証状態の保存  
+ログイン画面によくある、「次回から自動的にログイン」とか「ログインしたままにする」といった機能を実装する。
+* 管理者アカウントの追加・変更
+* 一般ユーザーが使用できるパスワードリセット・再発行画面
+
+上記のような機能を、どのように実装すればよいか、考えてみてください。
+
+<br>
