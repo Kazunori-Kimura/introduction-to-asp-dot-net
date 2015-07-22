@@ -33,6 +33,9 @@ Visual Studio 2013 で ASP.NETプロジェクトを作成するときに生成�
 
 簡単なWebアプリケーションの作成を題材に、フォーム認証の実装方法について解説します。
 
+実際のソースコードは [こちら](https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/tree/master/projects/step2/AuthTest) で確認できます。
+<br>
+
 ### 概要
 
 * 画面構成
@@ -425,6 +428,8 @@ ASP.NET MVCでのフォーム認証の基本的な実装について解説しま
 
 先ほど作成した認証機能だけのWebアプリケーションに必要な機能を肉付けしていきます。
 
+<br>
+実際のソースコードは [こちら](https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/tree/master/projects/step2/AuthTest_2) で確認できます。
 <br>
 
 ### システム仕様
@@ -1166,7 +1171,6 @@ public class UsersController : Controller
 2. 一旦サインアウトし、作成したユーザーアカウントでログインし直します。
 3. Todoを登録します。
 4. ログアウトし、管理者アカウントでログインし直します。
-
 
 <br>
 <hr>
