@@ -79,21 +79,1012 @@
   <div class="container contents">
     <!-- contents -->
     <h1 id="3-asp-net-mvc-web-">3. <code>ASP.NET MVC</code>によるWebアプリケーション開発 - 応用編</h1>
-<h2 id="-model-">複数Modelの使用</h2>
-<h3 id="-">データモデル作成</h3>
-<h3 id="linq-to-entities">LINQ to Entities</h3>
-<h3 id="-">初期データの登録</h3>
+<p><br></p>
+<h2 id="asp-net-">ASP.NETの認証機能について</h2>
+<h3 id="-">メンバーシップ フレームワーク</h3>
+<p>ASP.NET 2.0 以降から採用された認証ライブラリです。比較的シンプルに実装できるため、広く利用されています。<br>今回はメンバーシップフレームワークによる認証・認可機能の実装方法を解説します。</p>
+<p><br></p>
+<p><hr>
+<br></p>
+<h3 id="-asp-net-identity">【用語解説】ASP.NET Identity</h3>
+<p>ASP.NET Identity は Visual Studio 2013 から新たに搭載された認証ライブラリです。</p>
+<p>以下の様な特徴があります。</p>
 <ul>
-<li>イニシャライザー</li>
+<li>Entity Framework を基板としているため、アカウント情報の管理に関する実装が容易である</li>
+<li>ActiveDirectoryによる認証に対応</li>
+<li>Twitter, Facebook, Googleなどのソーシャルアカウントによる認証に対応</li>
 </ul>
-<h3 id="-">マイグレーション</h3>
-<h2 id="-">認証と認可</h2>
-<h3 id="-">フォーム認証</h3>
-<h3 id="-">フィルターの作成</h3>
-<h3 id="role-">Roleによって表示を切り替える</h3>
-<h2 id="-view">部分View</h2>
-<h3 id="-">メニュー部分を別ファイルに切り出す</h3>
-<h2 id="windows-azure-">Windows Azureで公開する</h2>
+<p>Visual Studio 2013 で ASP.NETプロジェクトを作成するときに生成されるソースコードには、ASP.NET Identityによる認証機能が予め実装されています。</p>
+<p><br></p>
+<p><hr>
+<br></p>
+<h2 id="-">基本的なフォーム認証の実装</h2>
+<p>簡単なWebアプリケーションの作成を題材に、フォーム認証の実装方法について解説します。</p>
+<p>実際のソースコードは <a href="https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/tree/master/projects/step2/AuthTest">こちら</a> で確認できます。
+<br></p>
+<h3 id="-">概要</h3>
+<ul>
+<li>画面構成<ul>
+<li>ログイン画面</li>
+<li>ホーム画面 (全ユーザー共通の画面)</li>
+<li>管理画面 (管理者アカウントのみ表示可能)</li>
+</ul>
+</li>
+</ul>
+<p><br></p>
+<ul>
+<li><p>画面遷移</p>
+<p>  ログイン画面 -(ログイン成功)-&gt; ホーム画面 -(管理者のみ)-&gt; 管理画面</p>
+</li>
+</ul>
+<p><br>
+<br></p>
+<h3 id="1-provider-">1. Providerクラスの実装</h3>
+<p>さっそく、認証機能を司る <code>Provider</code> クラスを作成していきます。</p>
+<p><br></p>
+<p>(1) MembershipProviderの実装</p>
+<p><code>MembershipProvider</code> クラスを継承したクラスを実装します。</p>
+<p>幾つか <code>override</code> しないといけないメソッドがありますが、
+今回使用するのは <code>ValidateUser</code> メソッドだけなので、このメソッドのみ実装します。</p>
+<ul>
+<li><code>ValidateUser</code> は <code>username</code> と <code>password</code> を受け取って認証の成否を返します。</li>
+</ul>
+<p>認証の動作を確認するため、ひとまず <code>username</code> 、 <code>password</code> は固定としています。</p>
+<p><br></p>
+<ul>
+<li><code>CustomMembershipProvider.cs</code></li>
+</ul>
+<pre><code class="lang-cs"><span class="hljs-keyword">namespace</span> AuthTest.Models
+{
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> CustomMembershipProvider : MembershipProvider
+    {
+        <span class="hljs-function"><span class="hljs-keyword">public</span> override <span class="hljs-keyword">bool</span> <span class="hljs-title">ValidateUser</span><span class="hljs-params">(<span class="hljs-built_in">string</span> username, <span class="hljs-built_in">string</span> password)</span>
+        </span>{
+            <span class="hljs-comment">// とりあえず固定で認証</span>
+            <span class="hljs-keyword">if</span> (<span class="hljs-string">"administrator"</span>.Equals(username) &amp;&amp; <span class="hljs-string">"password"</span>.Equals(password))
+            {
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+            }
+            <span class="hljs-keyword">if</span> (<span class="hljs-string">"user"</span>.Equals(username) &amp;&amp; <span class="hljs-string">"password"</span>.Equals(password))
+            {
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+            }
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+        }
+
+        <span class="hljs-comment">// 〜〜略〜〜</span>
+</code></pre>
+<p><br></p>
+<p>(2) RoleProviderの実装</p>
+<p>つづいて、 <code>RoleProvider</code> クラスを継承したクラスを実装します。</p>
+<p><code>MembershipProvider</code> と同様、今回使用するメソッドのみ中身を実装します。</p>
+<ul>
+<li><code>IsUserInRole</code> メソッドは 指定されたユーザーが、該当するロールに所属しているかどうかを返します。</li>
+<li><code>GetRolesForUser</code> メソッドは 指定されたユーザーが所属するロールの配列を返します。</li>
+</ul>
+<p><br></p>
+<ul>
+<li>CustomRoleProvider.cs</li>
+</ul>
+<pre><code class="lang-cs"><span class="hljs-keyword">namespace</span> AuthTest.Models
+{
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> CustomRoleProvider : RoleProvider
+    {
+        <span class="hljs-function"><span class="hljs-keyword">public</span> override <span class="hljs-keyword">bool</span> <span class="hljs-title">IsUserInRole</span><span class="hljs-params">(<span class="hljs-built_in">string</span> username, <span class="hljs-built_in">string</span> roleName)</span>
+        </span>{
+            <span class="hljs-keyword">if</span> (<span class="hljs-string">"administrator"</span>.Equals(username) &amp;&amp; <span class="hljs-string">"Administrators"</span>.Equals(roleName))
+            {
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+            }
+            <span class="hljs-keyword">if</span> (<span class="hljs-string">"user"</span>.Equals(username) &amp;&amp; <span class="hljs-string">"Users"</span>.Equals(roleName))
+            {
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+            }
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+        }
+
+        <span class="hljs-keyword">public</span> override <span class="hljs-built_in">string</span>[] GetRolesForUser(<span class="hljs-built_in">string</span> username)
+        {
+            <span class="hljs-keyword">if</span> (<span class="hljs-string">"administrator"</span>.Equals(username))
+            {
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">string</span>[] { <span class="hljs-string">"Administrators"</span> };
+            }
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">string</span>[] { <span class="hljs-string">"Users"</span> };
+        }
+
+        <span class="hljs-comment">// 〜〜略〜〜</span>
+</code></pre>
+<p><br>
+<br></p>
+<h3 id="2-viewmodel-">2. ViewModelの実装</h3>
+<p><code>ViewModel</code> は実際のModel (テーブルの形) と画面に表示する項目との違いを吸収するために使用するテクニックです。</p>
+<p>画面とコントローラとのやりとりは <code>ViewModel</code> を介して行います。</p>
+<p>画面からの入力内容をデータベースに反映する場合に コントローラにて <code>ViewModel</code> からデータを取得し、
+<code>Model</code> にデータを格納して、データベースに保存します。</p>
+<p>今回はログイン画面の入力項目を <code>LoginViewModel</code> として定義します。</p>
+<p><br></p>
+<ul>
+<li>LoginViewModel.cs</li>
+</ul>
+<pre><code class="lang-cs"><span class="hljs-class"><span class="hljs-keyword">namespace</span> <span class="hljs-title">AuthTest</span>.<span class="hljs-title">Models</span>
+</span>{
+    <span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">LoginViewModel</span>
+    </span>{
+        [Required]
+        [DisplayName(<span class="hljs-string">"ユーザー名"</span>)]
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> UserName { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
+        [Required]
+        [DisplayName(<span class="hljs-string">"パスワード"</span>)]
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> Password { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+    }
+}
+</code></pre>
+<p><br></p>
+<h3 id="3-controller-">3. Controllerの実装</h3>
+<p>(1) LoginControllerの実装</p>
+<pre><code class="lang-cs"><span class="hljs-keyword">namespace</span> AuthTest.Controllers
+{
+    [AllowAnonymous]
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> LoginController : Controller
+    {
+        readonly CustomMembershipProvider membershipProvider = <span class="hljs-keyword">new</span> CustomMembershipProvider();
+
+        <span class="hljs-comment">// GET: Login</span>
+        <span class="hljs-function"><span class="hljs-keyword">public</span> ActionResult <span class="hljs-title">Index</span><span class="hljs-params">()</span>
+        </span>{
+            FormsAuthentication.SignOut();
+            <span class="hljs-keyword">return</span> View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        <span class="hljs-function"><span class="hljs-keyword">public</span> ActionResult <span class="hljs-title">Index</span><span class="hljs-params">([Bind(Include="UserName,Password")</span>] LoginViewModel model)
+        </span>{
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.membershipProvider.ValidateUser(model.UserName, model.Password))
+            {
+                FormsAuthentication.SetAuthCookie(model.UserName, <span class="hljs-keyword">false</span>);
+                <span class="hljs-keyword">return</span> RedirectToAction(<span class="hljs-string">"Index"</span>, <span class="hljs-string">"Home"</span>);
+            }
+
+            ViewBag.Message = <span class="hljs-string">"ログインに失敗しました。"</span>;
+            <span class="hljs-keyword">return</span> View(model);
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> ActionResult <span class="hljs-title">SignOut</span><span class="hljs-params">()</span>
+        </span>{
+            FormsAuthentication.SignOut();
+            <span class="hljs-keyword">return</span> RedirectToAction(<span class="hljs-string">"Index"</span>);
+        }
+    }
+}
+</code></pre>
+<ul>
+<li><code>[AllowAnonymous]</code> は <code>LoginController</code> 全体へのアクセスで、認証を不要とします。</li>
+<li><code>[HttpPost] Index</code> で認証処理を行います。</li>
+</ul>
+<p>ログイン画面で入力された内容は <code>LoginViewModel</code> に格納されます。</p>
+<p>送られてきたユーザー名、パスワードを <code>MembershipProvider</code> でチェックし、認証OKであれば
+<code>FormsAuthentication.SetAuthCookie</code> メソッドを実行します。</p>
+<p>第2引数の boolean は、認証クッキーを残すかどうかのフラグです。
+ログイン画面によくある、「次回から自動的にログイン」とか「ログインしたままにする」といったチェックボックスの機能です。</p>
+<p>認証後、Home画面にリダイレクトしています。</p>
+<ul>
+<li><code>SignOut</code> メソッドで認証クッキーが削除され、ログアウトした状態となります。</li>
+</ul>
+<p><br></p>
+<p>(2) HomeControllerの実装</p>
+<ul>
+<li>HomeController.cs</li>
+</ul>
+<pre><code class="lang-cs"><span class="hljs-class"><span class="hljs-keyword">namespace</span> <span class="hljs-title">AuthTest</span>.<span class="hljs-title">Controllers</span>
+</span>{
+    [Authorize]
+    <span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HomeController</span> : <span class="hljs-title">Controller</span>
+    </span>{
+        <span class="hljs-comment">// GET: Home</span>
+        <span class="hljs-keyword">public</span> ActionResult Index()
+        {
+            <span class="hljs-keyword">return</span> View();
+        }
+    }
+}
+</code></pre>
+<p><code>[Authorize]</code> は <code>HomeController</code> にアクセスするために認証が必要であることを示します。</p>
+<p>認証されていない状態でアクセスすると、ログイン画面にリダイレクトされます。</p>
+<p><br></p>
+<p>(3) AdminControllerの実装</p>
+<pre><code class="lang-cs"><span class="hljs-class"><span class="hljs-keyword">namespace</span> <span class="hljs-title">AuthTest</span>.<span class="hljs-title">Controllers</span>
+</span>{
+    [Authorize(Roles=<span class="hljs-string">"Administrators"</span>)]
+    <span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AdminController</span> : <span class="hljs-title">Controller</span>
+    </span>{
+        <span class="hljs-comment">// GET: Admin</span>
+        <span class="hljs-keyword">public</span> ActionResult Index()
+        {
+            <span class="hljs-keyword">return</span> View();
+        }
+    }
+}
+</code></pre>
+<p><code>[Authorize(Roles=&quot;Administrators&quot;)]</code> は <code>AdminController</code> に <code>Administrators</code> ロールに属するユーザーのみアクセス可能であることを示します。</p>
+<p>それ以外のユーザーが該当画面にアクセスした場合、ログイン画面にリダイレクトされます。</p>
+<p><br>
+<br></p>
+<h3 id="3-view-">3. Viewの作成</h3>
+<p>(1) <code>/Views/Shared/_LayoutPage1.cshtml</code> の作成</p>
+<ul>
+<li><code>Shared</code> フォルダの作成</li>
+<li>レイアウトページの作成</li>
+</ul>
+<p>後半のパートで使用しますので、共通レイアウトを定義しておきます。</p>
+<p><br></p>
+<p>(2) <code>/Views/Login/Index.cshtml</code> の作成</p>
+<ul>
+<li><code>LoginController</code>を右クリック -&gt; <code>Add View</code> を選択</li>
+<li><code>LoginViewModel</code> の <code>Create</code> として <code>Index.cshtml</code> を作成</li>
+<li>不要な項目の削除、ボタンのラベルを <code>SignIn</code> に変更</li>
+</ul>
+<p><br></p>
+<pre><code class="lang-html"><span class="hljs-annotation">@model</span> <span class="hljs-type">AuthTest</span>.<span class="hljs-type">Models</span>.<span class="hljs-type">LoginViewModel</span>
+
+@{
+    <span class="hljs-type">ViewBag</span>.<span class="hljs-type">Title</span> = <span class="hljs-string">"Index"</span>;
+    <span class="hljs-type">Layout</span> = <span class="hljs-string">"~/Views/Shared/_LayoutPage1.cshtml"</span>;
+}
+
+&lt;h2&gt;<span class="hljs-type">SignIn</span>&lt;/h2&gt;
+
+<span class="hljs-annotation">@using</span> (<span class="hljs-type">Html</span>.<span class="hljs-type">BeginForm</span>())
+{
+    <span class="hljs-annotation">@Html</span>.<span class="hljs-type">AntiForgeryToken</span>()
+
+    &lt;div <span class="hljs-class"><span class="hljs-keyword">class</span>=</span><span class="hljs-string">"form-horizontal"</span>&gt;
+        <span class="hljs-annotation">@Html</span>.<span class="hljs-type">ValidationSummary</span>(<span class="hljs-literal">true</span>, <span class="hljs-string">""</span>, <span class="hljs-keyword">new</span> { <span class="hljs-annotation">@class</span> = <span class="hljs-string">"text-danger"</span> })
+        &lt;div <span class="hljs-class"><span class="hljs-keyword">class</span>=</span><span class="hljs-string">"form-group"</span>&gt;
+            <span class="hljs-annotation">@Html</span>.<span class="hljs-type">LabelFor</span>(model =&gt; model.<span class="hljs-type">UserName</span>, htmlAttributes: <span class="hljs-keyword">new</span> { <span class="hljs-annotation">@class</span> = <span class="hljs-string">"control-label col-md-2"</span> })
+            &lt;div <span class="hljs-class"><span class="hljs-keyword">class</span>=</span><span class="hljs-string">"col-md-10"</span>&gt;
+                <span class="hljs-annotation">@Html</span>.<span class="hljs-type">EditorFor</span>(model =&gt; model.<span class="hljs-type">UserName</span>, <span class="hljs-keyword">new</span> { htmlAttributes = <span class="hljs-keyword">new</span> { <span class="hljs-annotation">@class</span> = <span class="hljs-string">"form-control"</span> } })
+                <span class="hljs-annotation">@Html</span>.<span class="hljs-type">ValidationMessageFor</span>(model =&gt; model.<span class="hljs-type">UserName</span>, <span class="hljs-string">""</span>, <span class="hljs-keyword">new</span> { <span class="hljs-annotation">@class</span> = <span class="hljs-string">"text-danger"</span> })
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div <span class="hljs-class"><span class="hljs-keyword">class</span>=</span><span class="hljs-string">"form-group"</span>&gt;
+            <span class="hljs-annotation">@Html</span>.<span class="hljs-type">LabelFor</span>(model =&gt; model.<span class="hljs-type">Password</span>, htmlAttributes: <span class="hljs-keyword">new</span> { <span class="hljs-annotation">@class</span> = <span class="hljs-string">"control-label col-md-2"</span> })
+            &lt;div <span class="hljs-class"><span class="hljs-keyword">class</span>=</span><span class="hljs-string">"col-md-10"</span>&gt;
+                <span class="hljs-annotation">@Html</span>.<span class="hljs-type">EditorFor</span>(model =&gt; model.<span class="hljs-type">Password</span>, <span class="hljs-keyword">new</span> { htmlAttributes = <span class="hljs-keyword">new</span> { <span class="hljs-annotation">@class</span> = <span class="hljs-string">"form-control"</span> } })
+                <span class="hljs-annotation">@Html</span>.<span class="hljs-type">ValidationMessageFor</span>(model =&gt; model.<span class="hljs-type">Password</span>, <span class="hljs-string">""</span>, <span class="hljs-keyword">new</span> { <span class="hljs-annotation">@class</span> = <span class="hljs-string">"text-danger"</span> })
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div <span class="hljs-class"><span class="hljs-keyword">class</span>=</span><span class="hljs-string">"form-group"</span>&gt;
+            &lt;div <span class="hljs-class"><span class="hljs-keyword">class</span>=</span><span class="hljs-string">"col-md-offset-2 col-md-10"</span>&gt;
+                &lt;input <span class="hljs-class"><span class="hljs-keyword">type</span>=</span><span class="hljs-string">"submit"</span> value=<span class="hljs-string">"SignIn"</span> <span class="hljs-class"><span class="hljs-keyword">class</span>=</span><span class="hljs-string">"btn btn-default"</span> /&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+}
+
+&lt;script src=<span class="hljs-string">"~/Scripts/jquery-1.10.2.min.js"</span>&gt;&lt;/script&gt;
+&lt;script src=<span class="hljs-string">"~/Scripts/jquery.validate.min.js"</span>&gt;&lt;/script&gt;
+&lt;script src=<span class="hljs-string">"~/Scripts/jquery.validate.unobtrusive.min.js"</span>&gt;&lt;/script&gt;
+</code></pre>
+<p><br></p>
+<p>(3) HomeViewの作成</p>
+<p>(4) AdminViewの作成</p>
+<ul>
+<li><code>Title</code> に <code>Home</code>, <code>Admin</code> と表記 (どちらの画面を表示しているかわかりやすいように)</li>
+<li><code>Home</code> と <code>Admin</code> を相互に遷移できるようにリンクを追加</li>
+</ul>
+<p><br></p>
+<h3 id="4-web-config-">4. web.configの設定</h3>
+<p>最後に、フォーム認証を行うように <code>web.config</code> に設定を追加します。</p>
+<pre><code class="lang-xml"><span class="hljs-tag">&lt;<span class="hljs-title">system.web</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-title">compilation</span> <span class="hljs-attribute">debug</span>=<span class="hljs-value">"true"</span> <span class="hljs-attribute">targetFramework</span>=<span class="hljs-value">"4.5.1"</span>/&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-title">httpRuntime</span> <span class="hljs-attribute">targetFramework</span>=<span class="hljs-value">"4.5.1"</span>/&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-title">authentication</span> <span class="hljs-attribute">mode</span>=<span class="hljs-value">"Forms"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">forms</span> <span class="hljs-attribute">loginUrl</span>=<span class="hljs-value">"~/Login/Index"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">forms</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-title">authentication</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-title">membership</span> <span class="hljs-attribute">defaultProvider</span>=<span class="hljs-value">"CustomMembershipProvider"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">providers</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-title">clear</span>/&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-title">add</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"CustpmMembershipProvider"</span> <span class="hljs-attribute">type</span>=<span class="hljs-value">"AuthTest.Models.CustomMembershipProvider"</span>/&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-title">providers</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-title">membership</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-title">roleManager</span> <span class="hljs-attribute">enabled</span>=<span class="hljs-value">"true"</span> <span class="hljs-attribute">defaultProvider</span>=<span class="hljs-value">"CustomRoleProvider"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">providers</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-title">clear</span>/&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-title">add</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"CustomRoleProvider"</span> <span class="hljs-attribute">type</span>=<span class="hljs-value">"AuthTest.Models.CustomRoleProvider"</span>/&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-title">providers</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-title">roleManager</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">system.web</span>&gt;</span>
+</code></pre>
+<ul>
+<li><code>authentication</code> タグの追加<ul>
+<li><code>mode=&quot;Forms&quot;</code> でフォーム認証を行うことを指定</li>
+<li><code>forms</code> タグでログイン画面を指定</li>
+</ul>
+</li>
+<li><code>membership</code> タグの追加<ul>
+<li><code>CustomMembershipProvider</code> クラスを指定</li>
+</ul>
+</li>
+<li><code>roleManager</code> タグの追加<ul>
+<li><code>CustomRoleProvider</code> クラスを指定</li>
+</ul>
+</li>
+</ul>
+<p><br>
+<br></p>
+<h3 id="5-">5. デバッグ実行して動作確認</h3>
+<ul>
+<li>ログイン画面が表示されることを確認</li>
+<li>user / password でログインし ホーム画面に遷移することを確認</li>
+<li>Adminリンクをクリックするとログイン画面に戻されることを確認</li>
+<li>URLを指定して ~/Home/Index を指定してもログイン画面に戻されることを確認</li>
+<li>URLを指定して ~/Admin/Index を指定してもログイン画面に戻されることを確認</li>
+<li>administrator / password でログインし ホーム画面に遷移することを確認</li>
+<li>Adminリンクをクリックして管理画面に遷移することを確認</li>
+<li>SignOutリンクをクリックしてログイン画面に遷移することを確認</li>
+<li>URLを指定して ~/Home/Index を指定してもログイン画面に戻されることを確認</li>
+<li>URLを指定して ~/Admin/Index を指定してもログイン画面に戻されることを確認</li>
+</ul>
+<p><br>
+<br></p>
+<p>ASP.NET MVCでのフォーム認証の基本的な実装について解説しました。</p>
+<p><br></p>
+<p><hr>
+<br></p>
+<h2 id="-todo-">(まともな) Todo管理アプリケーションの作成</h2>
+<p>つづいて、ユーザー管理機能のついた Todo管理アプリケーションを作成します。</p>
+<ul>
+<li>ユーザー毎に個別のTodoを管理</li>
+<li>管理者のみユーザーアカウントの管理画面を表示</li>
+</ul>
+<p>先ほど作成した認証機能だけのWebアプリケーションに必要な機能を肉付けしていきます。</p>
+<p><br>
+実際のソースコードは <a href="https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/tree/master/projects/step2/AuthTest_2">こちら</a> で確認できます。
+<br></p>
+<h3 id="-">システム仕様</h3>
+<ol>
+<li>画面遷移</li>
+</ol>
+<p><img src="./images/image1.png" alt="image1"></p>
+<ol>
+<li>モデル関連</li>
+</ol>
+<p><img src="./images/image2.png" alt="image2"></p>
+<p><br></p>
+<h3 id="1-model-">1. Modelの実装</h3>
+<ul>
+<li>Models/User.cs</li>
+</ul>
+<pre><code class="lang-cs"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">User</span>
+{
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> Id { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
+    [DisplayName(<span class="hljs-string">"名前"</span>)]
+    [Required]
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> UserName { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
+    [DisplayName(<span class="hljs-string">"パスワード"</span>)]
+    [Required]
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> Password { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
+    [DisplayName(<span class="hljs-string">"役割"</span>)]
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">virtual</span> ICollection&lt;Role&gt; Roles { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
+    [DisplayName(<span class="hljs-string">"Todo"</span>)]
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">virtual</span> ICollection&lt;Todo&gt; Todoes { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+}
+</code></pre>
+<p>ユーザー名とパスワードに加えて、
+ユーザーが所属する <code>Role</code> のリスト (将来の拡張を見越して、1ユーザーは複数ロールに所属可能とする) と
+そのユーザーが持つ <code>Todo</code> のリストをプロパティとして定義します。</p>
+<p><br></p>
+<ul>
+<li>Models/Role.cs</li>
+</ul>
+<pre><code class="lang-cs"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Role</span>
+{
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> Id { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> RoleName { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">virtual</span> ICollection&lt;User&gt; Users { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+}
+</code></pre>
+<p>ロール名に加えて、そのロールに所属するユーザーのリストをプロパティとして定義します。</p>
+<p><br></p>
+<ul>
+<li>Models/Todo.cs</li>
+</ul>
+<pre><code class="lang-cs"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span>
+{
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> Id { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
+    [DisplayName(<span class="hljs-string">"タイトル"</span>)]
+    [Required]
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> Title { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
+    [DisplayName(<span class="hljs-string">"内容"</span>)]
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> Detail { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
+    [DisplayName(<span class="hljs-string">"完了"</span>)]
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">bool</span> Done { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
+    [DisplayName(<span class="hljs-string">"担当者"</span>)]
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">virtual</span> User User { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+}
+</code></pre>
+<p>そのTodoを担当するユーザーをプロパティとして定義します。
+ユーザーとTodoは 1:n とします。</p>
+<p><br></p>
+<ul>
+<li>AppContext</li>
+</ul>
+<pre><code class="lang-cs"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AppContext</span> : <span class="hljs-typename">DbContext</span></span>
+{
+    <span class="hljs-keyword">public</span> DbSet<span class="hljs-type">&lt;User&gt;</span> Users { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+    <span class="hljs-keyword">public</span> DbSet<span class="hljs-type">&lt;Role&gt;</span> Roles { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+    <span class="hljs-keyword">public</span> DbSet<span class="hljs-type">&lt;Todo&gt;</span> Todoes { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+}
+</code></pre>
+<p>DbContext クラスです。
+データベースと紐付ける Modelクラス の DbSet を定義します。</p>
+<p><br></p>
+<ul>
+<li>LoginViewModel</li>
+</ul>
+<p>元から変更ありません。</p>
+<pre><code class="lang-cs"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">LoginViewModel</span>
+{
+    [Required]
+    [DisplayName(<span class="hljs-string">"ユーザー名"</span>)]
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> UserName { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
+    [Required]
+    [DisplayName(<span class="hljs-string">"パスワード"</span>)]
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> Password { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+}
+</code></pre>
+<p><br></p>
+<p><hr>
+<br></p>
+<h3 id="-">【用語解説】ナビゲーションプロパティ</h3>
+<p><code>User</code> モデルの <code>public virtual ICollection&lt;Role&gt; Roles</code> や
+<code>Todo</code> モデルの <code>public virtual User User</code> は <em>ナビゲーションプロパティ</em> と呼ばれ、
+モデル間の関連を表します。</p>
+<p><code>User</code> と <code>Todo</code> のような <em>1:n</em> の関係の場合、 <em>ナビゲーションプロパティ</em> によって
+<code>Todoes</code> テーブルに <code>User_Id</code> という外部キーが作成されます。</p>
+<p><code>User</code> と <code>Role</code> のような <em>m:n</em> の関係の場合、 <em>ナビゲーションプロパティ</em> によって
+<code>UserRoles</code> テーブルが生成されます。</p>
+<p><br></p>
+<p><hr>
+<br></p>
+<h3 id="2-provider-">2. Providerの実装</h3>
+<p>固定文字列で認証等の判定を行っていたところを
+EntityFrameworkを通してデータベースに問い合わせた結果と入力内容を比較するように修正します。</p>
+<p><br></p>
+<ul>
+<li>CustomMembershipProvider</li>
+</ul>
+<pre><code class="lang-cs"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">override</span> <span class="hljs-keyword">bool</span> <span class="hljs-title">ValidateUser</span><span class="hljs-params">(<span class="hljs-keyword">string</span> username, <span class="hljs-keyword">string</span> password)</span>
+</span>{
+    <span class="hljs-keyword">using</span> (<span class="hljs-keyword">var</span> db = <span class="hljs-keyword">new</span> AppContext())
+    {
+        <span class="hljs-keyword">var</span> user = db.Users
+            .Where(u =&gt; u.UserName == username &amp;&amp; u.Password == password)
+            .FirstOrDefault();
+
+        <span class="hljs-keyword">if</span> (user != <span class="hljs-keyword">null</span>)
+        {
+            <span class="hljs-comment">// 認証OK</span>
+            HttpContext.Current.Session[<span class="hljs-string">"AuthUserId"</span>] = user.Id;
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+        }
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+}
+</code></pre>
+<p>username, passwordを元にユーザーを取得し、ユーザーが取得できた場合は
+認証OKとして Session にユーザーのId を格納しています。</p>
+<p><br></p>
+<p><code>FirstOrDefault</code> メソッドは <code>Where</code> でヒットした要素のうちの先頭のモノを返します。
+0件の場合は <code>null</code> を返します。</p>
+<p><code>First</code> メソッドを使用すると、0件だった際に例外が発生します。</p>
+<p>どちらを使用するかは好みの問題だと思いますが、私はむやみに例外を発生させるのは好きではないので
+このような処理にしています。</p>
+<p><br></p>
+<ul>
+<li>CustomRoleProvider</li>
+</ul>
+<pre><code class="lang-cs"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">override</span> <span class="hljs-keyword">bool</span> <span class="hljs-title">IsUserInRole</span><span class="hljs-params">(<span class="hljs-keyword">string</span> UserId, <span class="hljs-keyword">string</span> roleName)</span>
+</span>{
+    <span class="hljs-keyword">using</span> (<span class="hljs-keyword">var</span> db = <span class="hljs-keyword">new</span> AppContext())
+    {
+        <span class="hljs-keyword">var</span> user = db.Users
+            .Where(u =&gt; u.Id == <span class="hljs-keyword">int</span>.Parse(UserId))
+            .FirstOrDefault();
+
+        <span class="hljs-keyword">string</span>[] roles = user.Roles.Select(r =&gt; r.RoleName).ToArray();
+
+        <span class="hljs-keyword">if</span> (roles.Contains(roleName))
+        {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+        }
+    }
+
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+}
+</code></pre>
+<pre><code class="lang-cs">public override <span class="hljs-built_in">string</span><span class="hljs-literal">[]</span> <span class="hljs-type">GetRolesForUser</span>(<span class="hljs-built_in">string</span> <span class="hljs-type">UserId</span>)
+{
+    using (var db = <span class="hljs-keyword">new</span> <span class="hljs-type">AppContext</span><span class="hljs-literal">()</span>)
+    {
+        <span class="hljs-built_in">int</span> id = <span class="hljs-built_in">int</span>.<span class="hljs-type">Parse</span>(<span class="hljs-type">UserId</span>);
+        var user = db.<span class="hljs-type">Users</span>
+            .<span class="hljs-type">Where</span>(u =&gt; u.<span class="hljs-type">Id</span> == id)
+            .<span class="hljs-type">FirstOrDefault</span><span class="hljs-literal">()</span>;
+
+        <span class="hljs-built_in">string</span><span class="hljs-literal">[]</span> roles = user.<span class="hljs-type">Roles</span>.<span class="hljs-type">Select</span>(r =&gt; r.<span class="hljs-type">RoleName</span>).<span class="hljs-type">ToArray</span><span class="hljs-literal">()</span>;
+
+        return roles;
+    }
+}
+</code></pre>
+<p><br></p>
+<p><hr>
+<br></p>
+<h3 id="-linq-to-entities">【用語解説】LINQ to Entities</h3>
+<p><em>L</em>anguage <em>IN</em>tegrated <em>Q</em>uery (統合言語クエリー)</p>
+<p>オブジェクトやデータベース、データセット、エンティティ、XMLなどアプリケーションで扱う
+様々なデータソースに対して、統一的な手段でアクセスする仕組みです。</p>
+<p>LINQによる問い合わせはクエリー式構文とメソッド構文の2通りの書き方ができます。</p>
+<ul>
+<li>クエリ構文</li>
+</ul>
+<pre><code class="lang-cs"><span class="hljs-keyword">var</span> users = from <span class="hljs-keyword">u</span> <span class="hljs-keyword">in</span> <span class="hljs-keyword">db</span>.Users
+  where <span class="hljs-keyword">u</span>.UserName == model.UserName &amp;&amp; <span class="hljs-keyword">u</span>.Password == model.Password
+  select <span class="hljs-keyword">u</span>;
+</code></pre>
+<ul>
+<li>メソッド構文</li>
+</ul>
+<pre><code class="lang-cs"><span class="hljs-keyword">var</span> users = <span class="hljs-keyword">db</span>.Users
+  .Where(<span class="hljs-keyword">u</span> =&gt; <span class="hljs-keyword">u</span>.UserName == model.UserName &amp;&amp; <span class="hljs-keyword">u</span>.Password == model.Password)
+  .Select();
+</code></pre>
+<p>クエリ構文だけでは表現できない機能 (FirstOrDefaultメソッドなど) もあります。
+個人的にメソッド構文の方が分かりやすいので、この勉強会ではメソッド構文を使用していきます。</p>
+<p><br></p>
+<p><hr>
+<br></p>
+<h3 id="3-">3. 初期データの登録</h3>
+<p>(1) マイグレーションの有効化</p>
+<p><em>マイグレーション</em> とは、モデルの内容に合わせてデータベースを作成・変更するための仕組みです。</p>
+<p>EntityFrameworkのマイグレーション機能により、モデルの変更を自動的に検知し、テーブルレイアウトを変更してくれます。</p>
+<ul>
+<li>TOOLS -&gt; NuGet Package Manager -&gt; Package Manager Console を選択します。</li>
+</ul>
+<p><code>Package Manager Console</code> が表示されるので、以下のコマンド (1行目) を入力します。</p>
+<pre><code>PM&gt; Enable-Migrations -ContextTypeName AuthTest<span class="hljs-class">.Models</span><span class="hljs-class">.AppContext</span>
+Checking <span class="hljs-keyword">if</span> the context targets an existing database...
+Code First Migrations enabled <span class="hljs-keyword">for</span> project AuthTest.
+</code></pre><p><code>Migrations/Configuration.cs</code> というファイルが生成されます。</p>
+<p><br></p>
+<p>(2) イニシャライザーの登録</p>
+<p>実行時に <code>Configuration.cs</code> の <code>Seed</code> メソッドが実行されるように
+<code>Global.asax.cs</code> に追記します。</p>
+<pre><code class="lang-cs"><span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">Application_Start</span><span class="hljs-params">()</span>
+</span>{
+    AreaRegistration.RegisterAllAreas();
+    RouteConfig.RegisterRoutes(RouteTable.Routes);
+
+    Database.SetInitializer(<span class="hljs-keyword">new</span> MigrateDatabaseToLatestVersion&lt;AppContext, Configuration&gt;());
+}
+</code></pre>
+<p><br></p>
+<p>(3) 自動マイグレーションの有効化</p>
+<p><code>Migrations/Configuration.cs</code> の <code>Configuration</code> メソッドにて
+自動マイグレーションを有効にします。</p>
+<pre><code class="lang-cs"><span class="hljs-title">public</span> Configuration()
+{
+    <span class="hljs-title">AutomaticMigrationsEnabled</span> = <span class="hljs-built_in">true</span>;
+    <span class="hljs-title">AutomaticMigrationDataLossAllowed</span> = <span class="hljs-built_in">true</span>;
+}
+</code></pre>
+<p><code>AutomaticMigrationDataLossAllowed</code> はデータが失われるような変更 (列が削除されるなど) の自動マイグレーションを許可するかどうかのオプションです。</p>
+<p><br></p>
+<p><hr>
+<br></p>
+<h3 id="-">【解説】手動マイグレーションの方法について</h3>
+<p>自動マイグレーションを無効化した状態でモデルに変更を加えると、
+次のデバッグ実行時に「Code First Migrations を使用したデータベースの更新を検討してください」といったエラーメッセージが表示されます。</p>
+<p>以下のコマンドで手動マイグレーションファイルを作成します。</p>
+<pre><code><span class="hljs-keyword">Add</span>-Migration AddPropertiesToModel
+</code></pre><p><code>AddPropertiesToModel</code> は任意の文字列で構いませんが
+後から、モデルにどのような変更を行った時のマイグレーションファイルなのか分かるように名前を付けます。</p>
+<p>コマンドを実行すると、 <code>Migrations/XXXXXXXXXX_AddPropertiesToModel.cs</code> というファイルが生成されます。
+XXXXXXXXXXはコマンド実行時のタイムスタンプです。</p>
+<p>マイグレーションファイルは、前回のマイグレーション以降にモデルに対して加えられた変更を自動的に認識しコードを生成します。</p>
+<p>自動生成されたファイルはそのまま使用しても構いませんし、初期値を設定するなどの修正を加えても構いません。</p>
+<p>マイグレーションファイルの準備ができたら、以下のコマンドを実行します。</p>
+<pre><code><span class="hljs-keyword">Update</span>-Database -<span class="hljs-keyword">Verbose</span>
+</code></pre><p><code>-Verbose</code> はマイグレーション実行時の詳細なログを表示するためのオプションなので、必要なければ外して構いません。</p>
+<p>以上で、手動でのマイグレーションは完了です。
+正常にデバッグ実行できることを確認します。</p>
+<p><br></p>
+<p><hr>
+<br></p>
+<p>(4) 初期データの登録</p>
+<p>アプリ実行後、管理者アカウントの登録およびRoleの定義を行うように <code>Seed</code> メソッドに処理を書いていきます。</p>
+<pre><code class="lang-cs">protected override void Seed(AuthTest.Models.AppContext context)
+{
+    User <span class="hljs-variable">user1 =</span> new User()
+    {
+        <span class="hljs-variable">Id =</span> <span class="hljs-number">1</span>,
+        <span class="hljs-variable">UserName =</span> <span class="hljs-string">"kimura"</span>,
+        <span class="hljs-variable">Password =</span> <span class="hljs-string">"password"</span>,
+        <span class="hljs-variable">Roles =</span> new List&lt;Role&gt;(),
+        <span class="hljs-variable">Todoes =</span> new List&lt;Todo&gt;()
+    };
+
+    Role <span class="hljs-variable">role1 =</span> new Role()
+    {
+        <span class="hljs-variable">Id =</span> <span class="hljs-number">1</span>,
+        <span class="hljs-variable">RoleName =</span> <span class="hljs-string">"Administrators"</span>,
+        <span class="hljs-variable">Users =</span> new List&lt;User&gt;()
+    };
+    Role <span class="hljs-variable">role2 =</span> new Role()
+    {
+        <span class="hljs-variable">Id =</span> <span class="hljs-number">2</span>,
+        <span class="hljs-variable">RoleName =</span> <span class="hljs-string">"Users"</span>,
+        <span class="hljs-variable">Users =</span> new List&lt;User&gt;()
+    };
+
+    user1.Roles.Add(role1);
+    role1.Users.Add(user1);
+
+    context.Users.AddOrUpdate(<span class="hljs-variable">u =</span>&gt; u.Id, user1);
+
+    context.Roles.AddOrUpdate(<span class="hljs-variable">r =</span>&gt; r.Id, role1, role2);
+}
+</code></pre>
+<p><br>
+<br></p>
+<h3 id="4-">4. コントローラー</h3>
+<p>(1) LoginController</p>
+<pre><code class="lang-cs"><span class="hljs-list">[<span class="hljs-keyword">AllowAnonymous</span>]
+public class LoginController : Controller
+{
+    readonly CustomMembershipProvider membershipProvider = new CustomMembershipProvider<span class="hljs-list">()</span><span class="hljs-comment">;</span>
+
+    // GET: Login
+    public ActionResult Index<span class="hljs-list">()</span>
+    {
+        FormsAuthentication.SignOut<span class="hljs-list">()</span><span class="hljs-comment">;</span>
+        return View<span class="hljs-list">()</span><span class="hljs-comment">;</span>
+    }
+
+    <span class="hljs-list">[<span class="hljs-keyword">HttpPost</span>]
+    <span class="hljs-list">[<span class="hljs-keyword">ValidateAntiForgeryToken</span>]
+    public ActionResult Index<span class="hljs-list">(<span class="hljs-list">[<span class="hljs-keyword">Bind</span><span class="hljs-list">(<span class="hljs-keyword">Include=</span><span class="hljs-string">"UserName,Password"</span>)</span>] LoginViewModel model)
+    {
+        if <span class="hljs-list">(<span class="hljs-keyword">this.membershipProvider.ValidateUser</span><span class="hljs-list">(<span class="hljs-keyword">model.UserName</span>, model.Password)</span>)</span>
+        {
+            // Sessionからユーザー情報を取得
+            int userId = <span class="hljs-list">(<span class="hljs-keyword">int</span>)</span>Session<span class="hljs-list">[<span class="hljs-string">"AuthUserId"</span>]<span class="hljs-comment">;</span>
+            // 認証Cookieを登録
+            FormsAuthentication.SetAuthCookie<span class="hljs-list">(<span class="hljs-keyword">userId.ToString</span><span class="hljs-list">()</span>, false)</span><span class="hljs-comment">;</span>
+            return RedirectToAction<span class="hljs-list">(<span class="hljs-string">"Index"</span>, <span class="hljs-string">"Home"</span>)</span><span class="hljs-comment">;</span>
+        }
+
+        ViewBag.Message = <span class="hljs-string">"ログインに失敗しました。"</span><span class="hljs-comment">;</span>
+        return View<span class="hljs-list">(<span class="hljs-keyword">model</span>)</span><span class="hljs-comment">;</span>
+    }
+
+    public ActionResult SignOut<span class="hljs-list">()</span>
+    {
+        FormsAuthentication.SignOut<span class="hljs-list">()</span><span class="hljs-comment">;</span>
+        return RedirectToAction<span class="hljs-list">(<span class="hljs-string">"Index"</span>)</span><span class="hljs-comment">;</span>
+    }
+}</span></span></span></span></span></span>
+</code></pre>
+<p><code>ValidateUser</code> メソッドで認証OKだった場合、SessionからユーザーIDを取得して
+認証Cookieに登録します。</p>
+<p><br></p>
+<p><hr>
+<br></p>
+<h3 id="-">動作確認</h3>
+<p>ここまで実装したら、一度デバッグ実行して認証機能が正常に動作するか確認します。</p>
+<p>修正前と変りなく、認証機能が動作することを確認します。</p>
+<p><br></p>
+<p>動作確認したら、以降の実装で不要となるフォルダ・ファイルを削除しておきます。</p>
+<ul>
+<li>Controllers/HomeController.cs</li>
+<li>Controllers/AdminController.cs</li>
+<li>Views/Home</li>
+<li>Views/Admin</li>
+</ul>
+<p><br></p>
+<p><hr>
+<br></p>
+<p>(2) HomeController</p>
+<ul>
+<li>EntityFrameworkの機能で <code>Todo</code> Modelを元に <code>HomeController</code> と View を生成します。</li>
+<li>生成したファイルを修正していきます。</li>
+</ul>
+<pre><code class="lang-cs"><span class="hljs-list">[<span class="hljs-keyword">Authorize</span>]
+public class HomeController : Controller
+{
+    private AppContext db = new AppContext<span class="hljs-list">()</span><span class="hljs-comment">;</span>
+
+    // GET: Home
+    public ActionResult Index<span class="hljs-list">()</span>
+    {
+        int userId = <span class="hljs-list">(<span class="hljs-keyword">int</span>)</span>Session<span class="hljs-list">[<span class="hljs-string">"AuthUserId"</span>]<span class="hljs-comment">;</span>
+        var loginUser = db.Users.Where<span class="hljs-list">(<span class="hljs-keyword">u</span> =&gt; u.Id == userId)</span>.First<span class="hljs-list">()</span><span class="hljs-comment">;</span>
+        var todoes = loginUser.Todoes<span class="hljs-comment">;</span>
+        if <span class="hljs-list">(<span class="hljs-keyword">todoes</span> == null)</span>
+        {
+            todoes = new List&lt;Todo&gt;<span class="hljs-list">()</span><span class="hljs-comment">;</span>
+        }
+        return View<span class="hljs-list">(<span class="hljs-keyword">todoes.ToArray</span><span class="hljs-list">()</span>)</span><span class="hljs-comment">;</span>
+    }
+
+    // 〜〜中略〜〜
+
+    <span class="hljs-list">[<span class="hljs-keyword">HttpPost</span>]
+    <span class="hljs-list">[<span class="hljs-keyword">ValidateAntiForgeryToken</span>]
+    public ActionResult Create<span class="hljs-list">(<span class="hljs-list">[<span class="hljs-keyword">Bind</span><span class="hljs-list">(<span class="hljs-keyword">Include</span> = <span class="hljs-string">"Id,Title,Detail,Done"</span>)</span>] Todo todo)
+    {
+        if <span class="hljs-list">(<span class="hljs-keyword">ModelState.IsValid</span>)</span>
+        {
+            // ログインユーザーを登録
+            int userId = <span class="hljs-list">(<span class="hljs-keyword">int</span>)</span>Session<span class="hljs-list">[<span class="hljs-string">"AuthUserId"</span>]<span class="hljs-comment">;</span>
+            var user = db.Users.Where<span class="hljs-list">(<span class="hljs-keyword">u</span> =&gt; u.Id == userId)</span>.FirstOrDefault<span class="hljs-list">()</span><span class="hljs-comment">;</span>
+            if <span class="hljs-list">(<span class="hljs-keyword">user</span> != null)</span>
+            {
+                todo.User = user<span class="hljs-comment">;</span>
+            }
+
+            db.Todoes.Add<span class="hljs-list">(<span class="hljs-keyword">todo</span>)</span><span class="hljs-comment">;</span>
+            db.SaveChanges<span class="hljs-list">()</span><span class="hljs-comment">;</span>
+            return RedirectToAction<span class="hljs-list">(<span class="hljs-string">"Index"</span>)</span><span class="hljs-comment">;</span>
+        }
+
+        return View<span class="hljs-list">(<span class="hljs-keyword">todo</span>)</span><span class="hljs-comment">;</span>
+    }</span></span></span></span></span></span></span>
+</code></pre>
+<ol>
+<li><code>[Authorize]</code> を追加し、HomeController全体に対して認証が必要とします。</li>
+<li><code>[HttpGet] Index</code> メソッドにて、Sessionに登録されたユーザーIDを元に ログインユーザー を取得し、そのユーザーのTodoesを返すように修正します。</li>
+<li><code>[HttpPost] Create</code> メソッドにて、Sessionに登録されたユーザーIDを元に ログインユーザー を取得し、作成されたTodoの担当者として登録します。</li>
+</ol>
+<p><br></p>
+<p>(3) UsersController</p>
+<pre><code class="lang-cs"><span class="hljs-list">[<span class="hljs-keyword">Authorize</span><span class="hljs-list">(<span class="hljs-keyword">Roles=</span><span class="hljs-string">"Administrators"</span>)</span>]
+public class UsersController : Controller
+{
+
+    // 〜〜中略〜〜
+
+    <span class="hljs-list">[<span class="hljs-keyword">HttpPost</span>]
+    <span class="hljs-list">[<span class="hljs-keyword">ValidateAntiForgeryToken</span>]
+    public ActionResult Create<span class="hljs-list">(<span class="hljs-list">[<span class="hljs-keyword">Bind</span><span class="hljs-list">(<span class="hljs-keyword">Include</span> = <span class="hljs-string">"Id,UserName,Password"</span>)</span>] User user)
+    {
+        if <span class="hljs-list">(<span class="hljs-keyword">ModelState.IsValid</span>)</span>
+        {
+            // Users
+            var role = db.Roles.Where<span class="hljs-list">(<span class="hljs-keyword">r</span> =&gt; r.Id == <span class="hljs-number">2</span>)</span>.FirstOrDefault<span class="hljs-list">()</span><span class="hljs-comment">;</span>
+            if <span class="hljs-list">(<span class="hljs-keyword">role</span> != null)</span>
+            {
+                user.Roles = new List&lt;Role&gt;<span class="hljs-list">()</span><span class="hljs-comment">;</span>
+                user.Roles.Add<span class="hljs-list">(<span class="hljs-keyword">role</span>)</span><span class="hljs-comment">;</span>
+                role.Users.Add<span class="hljs-list">(<span class="hljs-keyword">user</span>)</span><span class="hljs-comment">;</span>
+            }
+
+            db.Users.Add<span class="hljs-list">(<span class="hljs-keyword">user</span>)</span><span class="hljs-comment">;</span>
+            db.SaveChanges<span class="hljs-list">()</span><span class="hljs-comment">;</span>
+            return RedirectToAction<span class="hljs-list">(<span class="hljs-string">"Index"</span>)</span><span class="hljs-comment">;</span>
+        }
+
+        return View<span class="hljs-list">(<span class="hljs-keyword">user</span>)</span><span class="hljs-comment">;</span>
+    }</span></span></span></span></span>
+</code></pre>
+<ol>
+<li><code>[Authorize(Roles=&quot;Administrators&quot;)]</code> を追加し、UsersController全体に対して <code>Administrators</code> ロールに所属するユーザーのみアクセスできるようにします。</li>
+<li><code>[HttpPost] Create</code> メソッドにて 作成するユーザーが <code>Users</code> ロールに所属するよう修正します。</li>
+</ol>
+<p><br>
+<br></p>
+<h3 id="5-">5. ビュー</h3>
+<p>(1) メニューバーの作成</p>
+<p>全画面共通で画面上部に表示されるメニューバーを作成します。</p>
+<ul>
+<li>Shared/_PartialPage1.cshtml</li>
+</ul>
+<pre><code class="lang-html">@{
+    <span class="hljs-keyword">int</span> userId = (<span class="hljs-keyword">int</span>)Session[<span class="hljs-string">"AuthUserId"</span>];
+    <span class="hljs-keyword">string</span>[] roles = <span class="hljs-keyword">new</span> <span class="hljs-keyword">string</span>[] { };
+    <span class="hljs-keyword">using</span> (<span class="hljs-keyword">var</span> db = <span class="hljs-keyword">new</span> AuthTest.Models.AppContext())
+    {
+        <span class="hljs-keyword">var</span> user = db.Users.Where(u =&gt; u.Id == userId).FirstOrDefault();
+        <span class="hljs-keyword">if</span> (user != <span class="hljs-keyword">null</span>)
+        {
+            roles = user.Roles.Select(r =&gt; r.RoleName).ToArray();
+        }
+    }
+}
+&lt;nav <span class="hljs-keyword">class</span>=<span class="hljs-string">"navbar navbar-inverse navbar-fixed-top"</span>&gt;
+    &lt;div <span class="hljs-keyword">class</span>=<span class="hljs-string">"container-fluid"</span>&gt;
+        &lt;div <span class="hljs-keyword">class</span>=<span class="hljs-string">"navbar-header"</span>&gt;
+            &lt;a <span class="hljs-keyword">class</span>=<span class="hljs-string">"navbar-brand"</span> href=<span class="hljs-string">"#"</span>&gt;
+                TodoApp
+            &lt;/a&gt;
+        &lt;/div&gt;
+        &lt;ul <span class="hljs-keyword">class</span>=<span class="hljs-string">"nav navbar-nav navbar-right"</span>&gt;
+            @<span class="hljs-keyword">if</span> (roles.Contains(<span class="hljs-string">"Administrators"</span>))
+            {
+                &lt;li&gt;@Html.ActionLink(<span class="hljs-string">"Users"</span>, <span class="hljs-string">"Index"</span>, <span class="hljs-string">"Users"</span>)&lt;/li&gt;
+            }
+            &lt;li&gt;@Html.ActionLink(<span class="hljs-string">"SignOut"</span>, <span class="hljs-string">"SignOut"</span>, <span class="hljs-string">"Login"</span>)&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+&lt;/nav&gt;
+</code></pre>
+<ol>
+<li>C#のコード部分は、ログインユーザーのロール名を配列として取得する処理です。</li>
+<li><code>Administrators</code> ロールに所属している場合、UsersController の Index へのリンクを表示します。</li>
+<li><code>SignOut</code> リンクをメニューバーに表示するようにします。</li>
+</ol>
+<p><br></p>
+<p>(2) Shared/_LayoutPage1.cshtml</p>
+<pre><code class="lang-html"><span class="hljs-doctype">&lt;!DOCTYPE html&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-title">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">meta</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"viewport"</span> <span class="hljs-attribute">content</span>=<span class="hljs-value">"width=device-width"</span> /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">title</span>&gt;</span>@ViewBag.Title<span class="hljs-tag">&lt;/<span class="hljs-title">title</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">link</span> <span class="hljs-attribute">rel</span>=<span class="hljs-value">"stylesheet"</span> <span class="hljs-attribute">href</span>=<span class="hljs-value">"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">style</span>&gt;</span><span class="css">
+        <span class="hljs-tag">body</span> <span class="hljs-rules">{
+            <span class="hljs-rule"><span class="hljs-attribute">padding-top</span>:<span class="hljs-value"> <span class="hljs-number">70px</span></span></span>;
+        }</span>
+    </span><span class="hljs-tag">&lt;/<span class="hljs-title">style</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">body</span>&gt;</span>
+    @Html.Partial("_PartialPage1")
+
+    <span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"container"</span>&gt;</span>
+        @RenderBody()
+    <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">html</span>&gt;</span>
+</code></pre>
+<ol>
+<li><code>link</code> タグで Bootstrap を読み込みます。</li>
+<li><code>style</code> タグで 画面上部のメニューバー表示領域に <code>padding</code> を設定します。</li>
+<li><code>@Html.Partial(&quot;_PartialPage1&quot;)</code> でメニューバーを読み込みます。</li>
+</ol>
+<p><br></p>
+<p>(3) Login/Index.cshtml</p>
+<p><code>Login/Index.cshtml</code> の見た目をログイン画面っぽく修正します。</p>
+<pre><code class="lang-html">@model AuthTest.Models.LoginViewModel
+
+@{
+    ViewBag.Title = "Index";
+    Layout = null;
+}
+
+<span class="hljs-doctype">&lt;!DOCTYPE html&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-title">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">meta</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"viewport"</span> <span class="hljs-attribute">content</span>=<span class="hljs-value">"width=device-width"</span> /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">title</span>&gt;</span>@ViewBag.Title<span class="hljs-tag">&lt;/<span class="hljs-title">title</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">link</span> <span class="hljs-attribute">rel</span>=<span class="hljs-value">"stylesheet"</span> <span class="hljs-attribute">href</span>=<span class="hljs-value">"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">style</span>&gt;</span><span class="css">
+        <span class="hljs-tag">body</span> <span class="hljs-rules">{
+            <span class="hljs-rule"><span class="hljs-attribute">padding-top</span>:<span class="hljs-value"> <span class="hljs-number">40px</span></span></span>;
+            <span class="hljs-rule"><span class="hljs-attribute">padding-bottom</span>:<span class="hljs-value"> <span class="hljs-number">40px</span></span></span>;
+            <span class="hljs-rule"><span class="hljs-attribute">background-color</span>:<span class="hljs-value"> <span class="hljs-hexcolor">#eee</span></span></span>;
+        }</span>
+
+        <span class="hljs-class">.form-signin</span> <span class="hljs-rules">{
+            <span class="hljs-rule"><span class="hljs-attribute">max-width</span>:<span class="hljs-value"> <span class="hljs-number">330px</span></span></span>;
+            <span class="hljs-rule"><span class="hljs-attribute">padding</span>:<span class="hljs-value"> <span class="hljs-number">15px</span></span></span>;
+            <span class="hljs-rule"><span class="hljs-attribute">margin</span>:<span class="hljs-value"> <span class="hljs-number">0</span> auto</span></span>;
+        }</span>
+
+        <span class="hljs-class">.form-signin</span> <span class="hljs-class">.form-signin-heading</span>,
+        <span class="hljs-class">.form-signin</span> <span class="hljs-class">.checkbox</span> <span class="hljs-rules">{
+            <span class="hljs-rule"><span class="hljs-attribute">margin-bottom</span>:<span class="hljs-value"> <span class="hljs-number">10px</span></span></span>;
+        }</span>
+
+        <span class="hljs-class">.form-signin</span> <span class="hljs-class">.form-control</span> <span class="hljs-rules">{
+            <span class="hljs-rule"><span class="hljs-attribute">position</span>:<span class="hljs-value"> relative</span></span>;
+            <span class="hljs-rule"><span class="hljs-attribute">height</span>:<span class="hljs-value"> auto</span></span>;
+            <span class="hljs-rule"><span class="hljs-attribute">-webkit-box-sizing</span>:<span class="hljs-value"> border-box</span></span>;
+            <span class="hljs-rule"><span class="hljs-attribute">-moz-box-sizing</span>:<span class="hljs-value"> border-box</span></span>;
+            <span class="hljs-rule"><span class="hljs-attribute">box-sizing</span>:<span class="hljs-value"> border-box</span></span>;
+            <span class="hljs-rule"><span class="hljs-attribute">padding</span>:<span class="hljs-value"> <span class="hljs-number">10px</span></span></span>;
+            <span class="hljs-rule"><span class="hljs-attribute">font-size</span>:<span class="hljs-value"> <span class="hljs-number">16px</span></span></span>;
+        }</span>
+
+        <span class="hljs-class">.form-signin</span> <span class="hljs-rule"><span class="hljs-attribute">.form-control</span>:<span class="hljs-value">focus {
+            z-index: <span class="hljs-number">2</span></span></span>;
+        }
+
+        <span class="hljs-class">.form-signin</span> <span class="hljs-tag">input</span><span class="hljs-class">.username</span> <span class="hljs-rules">{
+            <span class="hljs-rule"><span class="hljs-attribute">margin-bottom</span>:<span class="hljs-value"> -<span class="hljs-number">1px</span></span></span>;
+            <span class="hljs-rule"><span class="hljs-attribute">border-bottom-right-radius</span>:<span class="hljs-value"> <span class="hljs-number">0</span></span></span>;
+            <span class="hljs-rule"><span class="hljs-attribute">border-bottom-left-radius</span>:<span class="hljs-value"> <span class="hljs-number">0</span></span></span>;
+        }</span>
+
+        <span class="hljs-class">.form-signin</span> <span class="hljs-tag">input</span><span class="hljs-class">.password</span> <span class="hljs-rules">{
+            <span class="hljs-rule"><span class="hljs-attribute">margin-bottom</span>:<span class="hljs-value"> <span class="hljs-number">10px</span></span></span>;
+            <span class="hljs-rule"><span class="hljs-attribute">border-top-left-radius</span>:<span class="hljs-value"> <span class="hljs-number">0</span></span></span>;
+            <span class="hljs-rule"><span class="hljs-attribute">border-top-right-radius</span>:<span class="hljs-value"> <span class="hljs-number">0</span></span></span>;
+        }</span>
+    </span><span class="hljs-tag">&lt;/<span class="hljs-title">style</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"container"</span>&gt;</span>
+        @using (Html.BeginForm("Index", "Login", null, FormMethod.Post, new { @class = "form-signin" }))
+        {
+            @Html.AntiForgeryToken()
+            <span class="hljs-tag">&lt;<span class="hljs-title">h2</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"form-signin-heading"</span>&gt;</span>Please sign in<span class="hljs-tag">&lt;/<span class="hljs-title">h2</span>&gt;</span>
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            @Html.LabelFor(model =&gt; model.UserName, htmlAttributes: new { @class = "sr-only" })
+            @Html.EditorFor(model =&gt; model.UserName, new { htmlAttributes = new { @class = "form-control username", placeholder = "User Name" } })
+            @Html.ValidationMessageFor(model =&gt; model.UserName, "", new { @class = "text-danger" })
+
+            @Html.LabelFor(model =&gt; model.Password, htmlAttributes: new { @class = "sr-only" })
+            @Html.EditorFor(model =&gt; model.Password, new { htmlAttributes = new { @class = "form-control password", placeholder = "Password" } })
+            @Html.ValidationMessageFor(model =&gt; model.Password, "", new { @class = "text-danger" })
+
+            <span class="hljs-tag">&lt;<span class="hljs-title">input</span> <span class="hljs-attribute">type</span>=<span class="hljs-value">"submit"</span> <span class="hljs-attribute">value</span>=<span class="hljs-value">"SignIn"</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"btn btn-lg btn-primary btn-block"</span> /&gt;</span>
+        }
+    <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"~/Scripts/jquery-1.10.2.min.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"~/Scripts/jquery.validate.min.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"~/Scripts/jquery.validate.unobtrusive.min.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">html</span>&gt;</span>
+</code></pre>
+<p><br>
+<br></p>
+<h3 id="-">動作確認</h3>
+<p>以上で、ひと通りの機能の実装が完了しました。ざっと動作確認してみましょう。</p>
+<ol>
+<li>まず、管理者アカウント (上記コードでは <code>kimura</code>) でログインして、新しいユーザーアカウントを作成してみます。</li>
+<li>一旦サインアウトし、作成したユーザーアカウントでログインし直します。</li>
+<li>Todoを登録します。</li>
+<li>ログアウトし、管理者アカウントでログインし直します。</li>
+</ol>
+<p><br></p>
+<p><hr>
+<br></p>
+<p>ユーザー管理機能を持った、少し複雑なWebアプリケーションの実装手順について解説しました。</p>
+<p>しかしながら、このアプリケーションには以下の様な問題点・改善点があります。</p>
+<ul>
+<li>パスワード管理</li>
+</ul>
+<p>今回の例ではパスワードをそのままデータベースに保存していますが
+実際には salt を付けて sha256 などでハッシュ化・ストレッチングを行い、
+素のパスワードはそのまま保存しないように考慮しなければなりません。</p>
+<p><br></p>
+<ul>
+<li>認証状態の保存<br>ログイン画面によくある、「次回から自動的にログイン」とか「ログインしたままにする」といった機能を実装する。</li>
+<li>管理者アカウントの追加・変更</li>
+<li>一般ユーザーが使用できるパスワードリセット・再発行画面</li>
+</ul>
+<p>上記のような機能を、どのように実装すればよいか、考えてみてください。</p>
+<p><br></p>
   </div>
 
   <footer class="footer">
