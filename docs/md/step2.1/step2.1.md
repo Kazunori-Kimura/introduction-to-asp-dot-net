@@ -9,7 +9,7 @@ ASP.NET 2.0 以降から採用された認証ライブラリです。比較的�
 今回はメンバーシップフレームワークによる認証・認可機能の実装方法を解説しますが、
 最新の認証ライブラリについてもご紹介いたします。
 
-### 【解説】ASP.NET Identity
+### 【用語解説】ASP.NET Identity
 
 ASP.NET Identity は Visual Studio 2013 から新たに搭載された認証ライブラリです。
 
@@ -381,58 +381,709 @@ namespace AuthTest.Controllers
 * ユーザー毎に個別のTodoを管理
 * 管理者のみユーザーアカウントの管理画面を表示
 
+先ほど作成した認証機能だけのWebアプリケーションに、機能を肉付けしていきます。
+
+<br>
+
+### システム仕様
+
+1. 画面遷移
+
+![image1](./images/image1.png)
 
 
-### データモデル作成
+2. モデル関連
 
-* Userモデル
+![image2](./images/image2.png)
 
+<br>
 
-### LINQ to Entities
+### 1. Modelの実装
+
+* User Model
+
+```cs
+public class User
+{
+    public int Id { get; set; }
+
+    [DisplayName("名前")]
+    [Required]
+    public string UserName { get; set; }
+
+    [DisplayName("パスワード")]
+    [Required]
+    public string Password { get; set; }
+
+    [DisplayName("役割")]
+    public virtual ICollection<Role> Roles { get; set; }
+
+    [DisplayName("Todo")]
+    public virtual ICollection<Todo> Todoes { get; set; }
+}
+```
+
+ユーザー名とパスワードに加えて、
+ユーザーが所属する `Role` のリスト (将来の拡張を見越して、1ユーザーは複数ロールに所属可能とする) と
+そのユーザーが持つ `Todo` のリストをプロパティとして定義します。
+
+<br>
+
+* Role Model
+
+```cs
+public class Role
+{
+    public int Id { get; set; }
+
+    public string RoleName { get; set; }
+
+    public virtual ICollection<User> Users { get; set; }
+}
+```
+
+ロール名に加えて、そのロールに所属するユーザーのリストをプロパティとして定義します。
+
+<br>
+
+* Todo Model
+
+```cs
+public class Todo
+{
+    public int Id { get; set; }
+
+    [DisplayName("タイトル")]
+    [Required]
+    public string Title { get; set; }
+
+    [DisplayName("内容")]
+    public string Detail { get; set; }
+
+    [DisplayName("完了")]
+    public bool Done { get; set; }
+
+    [DisplayName("担当者")]
+    public virtual User User { get; set; }
+}
+```
+
+そのTodoを担当するユーザーをプロパティとして定義します。
+ユーザーとTodoは 1:n とします。
+
+* AppContext
+
+```cs
+public class AppContext : DbContext
+{
+    public DbSet<User> Users { get; set; }
+    public DbSet<Role> Roles { get; set; }
+    public DbSet<Todo> Todoes { get; set; }
+}
+```
+
+<br>
+
+* LoginViewModel
+
+元から変更ありません。
+
+```cs
+public class LoginViewModel
+{
+    [Required]
+    [DisplayName("ユーザー名")]
+    public string UserName { get; set; }
+
+    [Required]
+    [DisplayName("パスワード")]
+    public string Password { get; set; }
+}
+```
+
+<br>
+
+### 【用語解説】ナビゲーションプロパティ
+
+`User` モデルの `public virtual ICollection<Role> Roles` や
+`Todo` モデルの `public virtual User User` は *ナビゲーションプロパティ* と呼ばれ、
+モデル間の関連を表します。
+
+`User` と `Todo` のような *1:n* の関係の場合、 *ナビゲーションプロパティ* によって
+`Todoes` テーブルに `User_Id` という外部キーが作成されます。
+
+`User` と `Role` のような *m:n* の関係の場合、 *ナビゲーションプロパティ* によって
+`UserRoles` テーブルが生成されます。
+
+<br>
+<br>
+
+### 2. Providerの実装
+
+固定文字列で認証等の判定を行っていたところを
+EntityFrameworkを通してデータベースに問い合わせた結果と入力内容を比較するように修正します。
+
+* CustomMembershipProvider
+
+```cs
+public override bool ValidateUser(string username, string password)
+{
+    using (var db = new AppContext())
+    {
+        var user = db.Users
+            .Where(u => u.UserName == username && u.Password == password)
+            .FirstOrDefault();
+
+        if (user != null)
+        {
+            // 認証OK
+            HttpContext.Current.Session["AuthUserId"] = user.Id;
+            return true;
+        }
+    }
+    return false;
+}
+```
+
+username, passwordを元にユーザーを取得し、ユーザーが取得できた場合は
+認証OKとして Session にユーザーのId を格納しています。
+
+`FirstOrDefault` メソッドは `Where` でヒットした要素のうちの先頭のモノを返します。
+0件の場合は `null` を返します。
+
+`First` メソッドを使用すると、0件だった際に例外が発生します。
+
+どちらを使用するかは好みの問題だと思いますが、私はむやみに例外を発生させるのは好きではないので
+このような処理にしています。
+
+<br>
+
+* CustomRoleProvider
+
+```cs
+public override bool IsUserInRole(string UserId, string roleName)
+{
+    using (var db = new AppContext())
+    {
+        var user = db.Users
+            .Where(u => u.Id == int.Parse(UserId))
+            .FirstOrDefault();
+
+        string[] roles = user.Roles.Select(r => r.RoleName).ToArray();
+
+        if (roles.Contains(roleName))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+```
+
+```cs
+public override string[] GetRolesForUser(string UserId)
+{
+    using (var db = new AppContext())
+    {
+        int id = int.Parse(UserId);
+        var user = db.Users
+            .Where(u => u.Id == id)
+            .FirstOrDefault();
+
+        string[] roles = user.Roles.Select(r => r.RoleName).ToArray();
+
+        return roles;
+    }
+}
+```
+
+<br>
+
+### 【用語解説】LINQ to Entities
+
+*L* anguage *IN* tegrated *Q* uery (統合言語クエリー)
+
+オブジェクトやデータベース、データセット、エンティティ、XMLなどアプリケーションで扱う
+様々なデータソースに対して、統一的な手段でアクセスする仕組み
+
+LINQによる問い合わせはクエリー式構文とメソッド構文の2通りの書き方ができます。
 
 * クエリ構文
 
+```cs
+var users = from u in db.Users
+  where u.UserName == model.UserName && u.Password == model.Password
+  select u;
+```
+
 * メソッド構文
 
-* 遅延実行
+```cs
+var users = db.Users
+  .Where(u => u.UserName == model.UserName && u.Password == model.Password)
+  .Select();
+```
+
+クエリ構文だけでは表現できない機能 (FirstOrDefaultメソッドなど) もあります。
+個人的にメソッド構文の方が分かりやすいので、この勉強会ではメソッド構文を使用していきます。
+
+<br>
+<br>
+
+### 3. 初期データの登録
+
+(1) マイグレーションの有効化
+
+*マイグレーション* とは、モデルの内容に合わせてデータベースを作成・変更するための仕組みです。
+
+EntityFrameworkのマイグレーション機能により、モデルの変更を自動的に検知し、テーブルレイアウトを変更してくれます。
 
 
-### 初期データの登録
+* TOOLS -> NuGet Package Manager -> Package Manager Console を選択します。
 
-* イニシャライザー
+`Package Manager Console` が表示されるので、以下のコマンド (1行目) を入力します。
 
-### マイグレーション
-
-## 認証と認可
-
-
-## 部分View
-
-### メニュー部分を別ファイルに切り出す
-
-## Windows Azureで公開する
-
-
--------------
-
-
-### partial class
-
-クラスや構造体、インターフェイスやメソッドの定義を、複数のソース ファイルに分割できます。 各ソース ファイルには、型やメソッドの定義のセクションが含まれ、分割されたすべての部分はアプリケーションのコンパイル時に結合されます。
-
-自動生成ソースを使用する際に、ソース ファイルを再作成せずにコードをクラスに追加できます。 Visual Studio では、Windows フォームや Web サービス ラッパー コードなどを作成するときにこのアプローチを使用します。 Visual Studio によって作成されたファイルを変更せずに、これらのクラスを使用するコードを作成できます。
-
-https://msdn.microsoft.com/ja-jp/library/wa80x488.aspx
-
-### [?? 演算子](https://msdn.microsoft.com/ja-jp/library/ms173224.aspx)
-
-?? 演算子は、null 合体演算子と呼ばれます。左側のオペランドが null 値でない場合には左側のオペランドを返し、
-null 値である場合には右側のオペランドを返します。
-
--------------
-
-```ps
-PM> Enable-Migrations -ContextTypeName TodoApp.Models.TodoesContext
+```
+PM> Enable-Migrations -ContextTypeName AuthTest.Models.AppContext
 Checking if the context targets an existing database...
-Code First Migrations enabled for project TodoApp.
+Code First Migrations enabled for project AuthTest.
+```
+
+`Migrations/Configuration.cs` というファイルが生成されます。
+
+
+(2) イニシャライザーの登録
+
+実行時に `Configuration.cs` の `Seed` メソッドが実行されるように
+`Global.asax.cs` に追記します。
+
+```cs
+protected void Application_Start()
+{
+    AreaRegistration.RegisterAllAreas();
+    RouteConfig.RegisterRoutes(RouteTable.Routes);
+
+    Database.SetInitializer(new MigrateDatabaseToLatestVersion<AppContext, Configuration>());
+}
+```
+
+<br>
+
+(3) 自動マイグレーションの有効化
+
+`Migrations/Configuration.cs` の `Configuration` メソッドにて
+自動マイグレーションを有効にします。
+
+```cs
+public Configuration()
+{
+    AutomaticMigrationsEnabled = true;
+    AutomaticMigrationDataLossAllowed = true;
+}
+```
+
+`AutomaticMigrationDataLossAllowed` はデータが失われるような変更 (列が削除されるなど) の自動マイグレーションを許可するかどうかのオプションです。
+
+<br>
+
+### 【解説】手動マイグレーションの方法について
+
+自動マイグレーションを無効化した状態でモデルに変更を加えると、
+次のデバッグ実行時に「Code First Migrations を使用したデータベースの更新を検討してください」といったエラーメッセージが表示されます。
+
+以下のコマンドで手動マイグレーションファイルを作成します。
+
+```
+Add-Migration AddPropertiesToModel
+```
+
+`AddPropertiesToModel` は任意の文字列で構いませんが
+後から、モデルにどのような変更を行った時のマイグレーションファイルなのか分かるように名前を付けます。
+
+コマンドを実行すると、 `Migrations/XXXXXXXXXX_AddPropertiesToModel.cs` というファイルが生成されます。
+XXXXXXXXXXはコマンド実行時のタイムスタンプです。
+
+マイグレーションファイルは、前回のマイグレーション以降にモデルに対して加えられた変更を自動的に認識しコードを生成します。
+
+自動生成されたファイルはそのまま使用しても構いませんし、初期値を設定するなどの修正を加えても構いません。
+
+マイグレーションファイルの準備ができたら、以下のコマンドを実行します。
+
+```
+Update-Database -Verbose
+```
+
+`-Verbose` はマイグレーション実行時の詳細なログを表示するためのオプションなので、必要なければ外して構いません。
+
+以上で、手動でのマイグレーションは完了です。
+正常にデバッグ実行できることを確認します。
+
+<br>
+<br>
+
+(4) 初期データの登録
+
+アプリ実行後、管理者アカウントの登録およびRoleの定義を行うように `Seed` メソッドに処理を書いていきます。
+
+```cs
+protected override void Seed(AuthTest.Models.AppContext context)
+{
+    User user1 = new User()
+    {
+        Id = 1,
+        UserName = "kimura",
+        Password = "password",
+        Roles = new List<Role>(),
+        Todoes = new List<Todo>()
+    };
+
+    Role role1 = new Role()
+    {
+        Id = 1,
+        RoleName = "Administrators",
+        Users = new List<User>()
+    };
+    Role role2 = new Role()
+    {
+        Id = 2,
+        RoleName = "Users",
+        Users = new List<User>()
+    };
+
+    user1.Roles.Add(role1);
+    role1.Users.Add(user1);
+
+    context.Users.AddOrUpdate(u => u.Id, user1);
+
+    context.Roles.AddOrUpdate(r => r.Id, role1, role2);
+}
+```  
+
+### 動作確認
+
+ここまで実装したら、一度
+
+
+
+以降の実装で不要となるフォルダ・ファイルを削除しておきます。
+
+- Controllers/HomeController.cs
+- Controllers/AdminController.cs
+- Views/Home
+- Views/Admin
+
+<br>
+<br>
+
+
+
+### 4. コントローラー
+
+(1) LoginController
+
+```cs
+[AllowAnonymous]
+public class LoginController : Controller
+{
+    readonly CustomMembershipProvider membershipProvider = new CustomMembershipProvider();
+
+    // GET: Login
+    public ActionResult Index()
+    {
+        FormsAuthentication.SignOut();
+        return View();
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public ActionResult Index([Bind(Include="UserName,Password")] LoginViewModel model)
+    {
+        if (this.membershipProvider.ValidateUser(model.UserName, model.Password))
+        {
+            // Sessionからユーザー情報を取得
+            int userId = (int)Session["AuthUserId"];
+            // 認証Cookieを登録
+            FormsAuthentication.SetAuthCookie(userId.ToString(), false);
+            return RedirectToAction("Index", "Home");
+        }
+
+        ViewBag.Message = "ログインに失敗しました。";
+        return View(model);
+    }
+
+    public ActionResult SignOut()
+    {
+        FormsAuthentication.SignOut();
+        return RedirectToAction("Index");
+    }
+}
+```
+
+`ValidateUser` メソッドで認証OKだった場合、SessionからユーザーIDを取得して
+認証Cookieに登録します。
+
+<br>
+
+(2) HomeController
+
+* EntityFrameworkの機能で `Todo` Modelを元に `HomeController` と View を生成します。
+* 生成したファイルを修正していきます。
+
+```cs
+[Authorize]
+public class HomeController : Controller
+{
+    private AppContext db = new AppContext();
+
+    // GET: Home
+    public ActionResult Index()
+    {
+        int userId = (int)Session["AuthUserId"];
+        var loginUser = db.Users.Where(u => u.Id == userId).First();
+        var todoes = loginUser.Todoes;
+        if (todoes == null)
+        {
+            todoes = new List<Todo>();
+        }
+        return View(todoes.ToArray());
+    }
+
+    // 〜〜中略〜〜
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public ActionResult Create([Bind(Include = "Id,Title,Detail,Done")] Todo todo)
+    {
+        if (ModelState.IsValid)
+        {
+            // ログインユーザーを登録
+            int userId = (int)Session["AuthUserId"];
+            var user = db.Users.Where(u => u.Id == userId).FirstOrDefault();
+            if (user != null)
+            {
+                todo.User = user;
+            }
+
+            db.Todoes.Add(todo);
+            db.SaveChanges();
+            return RedirectToAction("Index");
+        }
+
+        return View(todo);
+    }
+```
+
+1. `[Authorize]` を追加し、HomeController全体に対して認証が必要とします。
+2. `[HttpGet] Index` メソッドにて、Sessionに登録されたユーザーIDを元に ログインユーザー を取得し、そのユーザーのTodoesを返すように修正します。
+3. `[HttpPost] Create` メソッドにて、Sessionに登録されたユーザーIDを元に ログインユーザー を取得し、作成されたTodoの担当者として登録します。
+
+<br>
+
+(3) UsersController
+
+```cs
+[Authorize(Roles="Administrators")]
+public class UsersController : Controller
+{
+
+    // 〜〜中略〜〜
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public ActionResult Create([Bind(Include = "Id,UserName,Password")] User user)
+    {
+        if (ModelState.IsValid)
+        {
+            // Users
+            var role = db.Roles.Where(r => r.Id == 2).FirstOrDefault();
+            if (role != null)
+            {
+                user.Roles = new List<Role>();
+                user.Roles.Add(role);
+                role.Users.Add(user);
+            }
+
+            db.Users.Add(user);
+            db.SaveChanges();
+            return RedirectToAction("Index");
+        }
+
+        return View(user);
+    }
+
+```
+
+1. `[Authorize(Roles="Administrators")]` を追加し、UsersController全体に対して `Administrators` ロールに所属するユーザーのみアクセスできるようにします。
+2. `[HttpPost] Create` メソッドにて 作成するユーザーが `Users` ロールに所属するよう修正します。
+
+<br>
+<br>
+
+### 5. ビュー
+
+(1) メニューバーの作成
+
+全画面共通で画面上部に表示されるメニューバーを作成します。
+
+* Shared/_PartialPage1.cshtml
+
+```html
+@{
+    int userId = (int)Session["AuthUserId"];
+    string[] roles = new string[] { };
+    using (var db = new AuthTest.Models.AppContext())
+    {
+        var user = db.Users.Where(u => u.Id == userId).FirstOrDefault();
+        if (user != null)
+        {
+            roles = user.Roles.Select(r => r.RoleName).ToArray();
+        }
+    }
+}
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">
+                TodoApp
+            </a>
+        </div>
+        <ul class="nav navbar-nav navbar-right">
+            @if (roles.Contains("Administrators"))
+            {
+                <li>@Html.ActionLink("Users", "Index", "Users")</li>
+            }
+            <li>@Html.ActionLink("SignOut", "SignOut", "Login")</li>
+        </ul>
+    </div>
+</nav>
+```
+
+1. C#のコード部分は、ログインユーザーのロール名を配列として取得する処理です。
+2. `Administrators` ロールに所属している場合、UsersController の Index へのリンクを表示します。
+3. `SignOut` リンクをメニューバーに表示するようにします。
+
+<br>
+
+(2) Shared/_LayoutPage1.cshtml
+
+```html
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 70px;
+        }
+    </style>
+</head>
+<body>
+    @Html.Partial("_PartialPage1")
+
+    <div class="container">
+        @RenderBody()
+    </div>
+</body>
+</html>
+```
+
+1. `link` タグで Bootstrap を読み込みます。
+2. `style` タグで 画面上部のメニューバー表示領域に `padding` を設定します。
+3. `@Html.Partial("_PartialPage1")` でメニューバーを読み込みます。
+
+<br>
+
+(3) Login/Index.cshtml
+
+`Login/Index.cshtml` の見た目をログイン画面っぽく修正します。
+
+```html
+@model AuthTest.Models.LoginViewModel
+
+@{
+    ViewBag.Title = "Index";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-color: #eee;
+        }
+
+        .form-signin {
+            max-width: 330px;
+            padding: 15px;
+            margin: 0 auto;
+        }
+
+        .form-signin .form-signin-heading,
+        .form-signin .checkbox {
+            margin-bottom: 10px;
+        }
+
+        .form-signin .form-control {
+            position: relative;
+            height: auto;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        .form-signin .form-control:focus {
+            z-index: 2;
+        }
+
+        .form-signin input.username {
+            margin-bottom: -1px;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .form-signin input.password {
+            margin-bottom: 10px;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        @using (Html.BeginForm("Index", "Login", null, FormMethod.Post, new { @class = "form-signin" }))
+        {
+            @Html.AntiForgeryToken()
+            <h2 class="form-signin-heading">Please sign in</h2>
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            @Html.LabelFor(model => model.UserName, htmlAttributes: new { @class = "sr-only" })
+            @Html.EditorFor(model => model.UserName, new { htmlAttributes = new { @class = "form-control username", placeholder = "User Name" } })
+            @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+
+            @Html.LabelFor(model => model.Password, htmlAttributes: new { @class = "sr-only" })
+            @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control password", placeholder = "Password" } })
+            @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+
+            <input type="submit" value="SignIn" class="btn btn-lg btn-primary btn-block" />
+        }
+    </div>
+
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+</body>
+</html>
 ```
