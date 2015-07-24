@@ -33,7 +33,7 @@ Visual Studio 2013 で ASP.NETプロジェクトを作成するときに生成�
 
 簡単なWebアプリケーションの作成を題材に、フォーム認証の実装方法について解説します。
 
-実際のソースコードは [こちら](https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/tree/master/projects/step2/AuthTest) で確認できます。
+実際のソースコードは [こちら](https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/tree/master/projects/step2/TodoApp) で確認できます。
 <br>
 
 ### 概要
@@ -74,7 +74,7 @@ Visual Studio 2013 で ASP.NETプロジェクトを作成するときに生成�
 * `CustomMembershipProvider.cs`
 
 ```cs
-namespace AuthTest.Models
+namespace TodoApp.Models
 {
     public class CustomMembershipProvider : MembershipProvider
     {
@@ -111,7 +111,7 @@ namespace AuthTest.Models
 * CustomRoleProvider.cs
 
 ```cs
-namespace AuthTest.Models
+namespace TodoApp.Models
 {
     public class CustomRoleProvider : RoleProvider
     {
@@ -160,7 +160,7 @@ namespace AuthTest.Models
 * LoginViewModel.cs
 
 ```cs
-namespace AuthTest.Models
+namespace TodoApp.Models
 {
     public class LoginViewModel
     {
@@ -182,7 +182,7 @@ namespace AuthTest.Models
 (1) LoginControllerの実装
 
 ```cs
-namespace AuthTest.Controllers
+namespace TodoApp.Controllers
 {
     [AllowAnonymous]
     public class LoginController : Controller
@@ -192,7 +192,6 @@ namespace AuthTest.Controllers
         // GET: Login
         public ActionResult Index()
         {
-            FormsAuthentication.SignOut();
             return View();
         }
 
@@ -200,12 +199,14 @@ namespace AuthTest.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Index([Bind(Include="UserName,Password")] LoginViewModel model)
         {
-            if (this.membershipProvider.ValidateUser(model.UserName, model.Password))
+            if (ModelState.IsValid)
             {
-                FormsAuthentication.SetAuthCookie(model.UserName, false);
-                return RedirectToAction("Index", "Home");
+                if (this.membershipProvider.ValidateUser(model.UserName, model.Password))
+                {
+                    FormsAuthentication.SetAuthCookie(model.UserName, false);
+                    return RedirectToAction("Index", "Home");
+                }
             }
-
             ViewBag.Message = "ログインに失敗しました。";
             return View(model);
         }
@@ -241,7 +242,7 @@ namespace AuthTest.Controllers
 * HomeController.cs
 
 ```cs
-namespace AuthTest.Controllers
+namespace TodoApp.Controllers
 {
     [Authorize]
     public class HomeController : Controller
@@ -264,7 +265,7 @@ namespace AuthTest.Controllers
 (3) AdminControllerの実装
 
 ```cs
-namespace AuthTest.Controllers
+namespace TodoApp.Controllers
 {
     [Authorize(Roles="Administrators")]
     public class AdminController : Controller
@@ -300,12 +301,13 @@ namespace AuthTest.Controllers
 
   - `LoginController`を右クリック -> `Add View` を選択
   - `LoginViewModel` の `Create` として `Index.cshtml` を作成
-  - 不要な項目の削除、ボタンのラベルを `SignIn` に変更
+  - 不要な項目の削除 (フォームのタイトル部分)
+  - ボタンのラベルを `SignIn` に変更
 
 <br>
 
 ```html
-@model AuthTest.Models.LoginViewModel
+@model TodoApp.Models.LoginViewModel
 
 @{
     ViewBag.Title = "Index";
@@ -374,13 +376,13 @@ namespace AuthTest.Controllers
   <membership defaultProvider="CustomMembershipProvider">
     <providers>
       <clear/>
-      <add name="CustpmMembershipProvider" type="AuthTest.Models.CustomMembershipProvider"/>
+      <add name="CustpmMembershipProvider" type="TodoApp.Models.CustomMembershipProvider"/>
     </providers>
   </membership>
   <roleManager enabled="true" defaultProvider="CustomRoleProvider">
     <providers>
       <clear/>
-      <add name="CustomRoleProvider" type="AuthTest.Models.CustomRoleProvider"/>
+      <add name="CustomRoleProvider" type="TodoApp.Models.CustomRoleProvider"/>
     </providers>
   </roleManager>
 </system.web>
@@ -429,7 +431,7 @@ ASP.NET MVCでのフォーム認証の基本的な実装について解説しま
 先ほど作成した認証機能だけのWebアプリケーションに必要な機能を肉付けしていきます。
 
 <br>
-実際のソースコードは [こちら](https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/tree/master/projects/step2/AuthTest_2) で確認できます。
+実際のソースコードは [こちら](https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/tree/master/projects/step2/TodoApp_2) で確認できます。
 <br>
 
 ### システム仕様
@@ -482,9 +484,7 @@ public class User
 public class Role
 {
     public int Id { get; set; }
-
     public string RoleName { get; set; }
-
     public virtual ICollection<User> Users { get; set; }
 }
 ```
@@ -707,9 +707,9 @@ EntityFrameworkのマイグレーション機能により、モデルの変更�
 `Package Manager Console` が表示されるので、以下のコマンド (1行目) を入力します。
 
 ```
-PM> Enable-Migrations -ContextTypeName AuthTest.Models.AppContext
+PM> Enable-Migrations -ContextTypeName TodoApp.Models.AppContext
 Checking if the context targets an existing database...
-Code First Migrations enabled for project AuthTest.
+Code First Migrations enabled for project TodoApp.
 ```
 
 `Migrations/Configuration.cs` というファイルが生成されます。
@@ -793,7 +793,7 @@ Update-Database -Verbose
 アプリ実行後、管理者アカウントの登録およびRoleの定義を行うように `Seed` メソッドに処理を書いていきます。
 
 ```cs
-protected override void Seed(AuthTest.Models.AppContext context)
+protected override void Seed(TodoApp.Models.AppContext context)
 {
     User user1 = new User()
     {
@@ -842,7 +842,6 @@ public class LoginController : Controller
     // GET: Login
     public ActionResult Index()
     {
-        FormsAuthentication.SignOut();
         return View();
     }
 
@@ -912,12 +911,7 @@ public class HomeController : Controller
     public ActionResult Index()
     {
         int userId = (int)Session["AuthUserId"];
-        var loginUser = db.Users.Where(u => u.Id == userId).First();
-        var todoes = loginUser.Todoes;
-        if (todoes == null)
-        {
-            todoes = new List<Todo>();
-        }
+        var user = db.Users.Where(u => u.Id == userId).First();
         return View(todoes.ToArray());
     }
 
@@ -1004,7 +998,7 @@ public class UsersController : Controller
 @{
     int userId = (int)Session["AuthUserId"];
     string[] roles = new string[] { };
-    using (var db = new AuthTest.Models.AppContext())
+    using (var db = new TodoApp.Models.AppContext())
     {
         var user = db.Users.Where(u => u.Id == userId).FirstOrDefault();
         if (user != null)
@@ -1074,7 +1068,7 @@ public class UsersController : Controller
 `Login/Index.cshtml` の見た目をログイン画面っぽく修正します。
 
 ```html
-@model AuthTest.Models.LoginViewModel
+@model TodoApp.Models.LoginViewModel
 
 @{
     ViewBag.Title = "Index";
