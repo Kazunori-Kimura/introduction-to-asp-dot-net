@@ -104,7 +104,7 @@
 <br></p>
 <h2 id="-">基本的なフォーム認証の実装</h2>
 <p>簡単なWebアプリケーションの作成を題材に、フォーム認証の実装方法について解説します。</p>
-<p>実際のソースコードは <a href="https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/tree/master/projects/step2/AuthTest">こちら</a> で確認できます。
+<p>実際のソースコードは <a href="https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/tree/master/projects/step2/TodoApp">こちら</a> で確認できます。
 <br></p>
 <h3 id="-">概要</h3>
 <ul>
@@ -138,7 +138,7 @@
 <ul>
 <li><code>CustomMembershipProvider.cs</code></li>
 </ul>
-<pre><code class="lang-cs"><span class="hljs-keyword">namespace</span> AuthTest.Models
+<pre><code class="lang-cs"><span class="hljs-keyword">namespace</span> TodoApp.Models
 {
     <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> CustomMembershipProvider : MembershipProvider
     {
@@ -170,7 +170,7 @@
 <ul>
 <li>CustomRoleProvider.cs</li>
 </ul>
-<pre><code class="lang-cs"><span class="hljs-keyword">namespace</span> AuthTest.Models
+<pre><code class="lang-cs"><span class="hljs-keyword">namespace</span> TodoApp.Models
 {
     <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> CustomRoleProvider : RoleProvider
     {
@@ -210,7 +210,7 @@
 <ul>
 <li>LoginViewModel.cs</li>
 </ul>
-<pre><code class="lang-cs"><span class="hljs-class"><span class="hljs-keyword">namespace</span> <span class="hljs-title">AuthTest</span>.<span class="hljs-title">Models</span>
+<pre><code class="lang-cs"><span class="hljs-class"><span class="hljs-keyword">namespace</span> <span class="hljs-title">TodoApp</span>.<span class="hljs-title">Models</span>
 </span>{
     <span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">LoginViewModel</span>
     </span>{
@@ -227,7 +227,7 @@
 <p><br></p>
 <h3 id="3-controller-">3. Controllerの実装</h3>
 <p>(1) LoginControllerの実装</p>
-<pre><code class="lang-cs"><span class="hljs-keyword">namespace</span> AuthTest.Controllers
+<pre><code class="lang-cs"><span class="hljs-keyword">namespace</span> TodoApp.Controllers
 {
     [AllowAnonymous]
     <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> LoginController : Controller
@@ -237,7 +237,6 @@
         <span class="hljs-comment">// GET: Login</span>
         <span class="hljs-function"><span class="hljs-keyword">public</span> ActionResult <span class="hljs-title">Index</span><span class="hljs-params">()</span>
         </span>{
-            FormsAuthentication.SignOut();
             <span class="hljs-keyword">return</span> View();
         }
 
@@ -245,12 +244,14 @@
         [ValidateAntiForgeryToken]
         <span class="hljs-function"><span class="hljs-keyword">public</span> ActionResult <span class="hljs-title">Index</span><span class="hljs-params">([Bind(Include="UserName,Password")</span>] LoginViewModel model)
         </span>{
-            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.membershipProvider.ValidateUser(model.UserName, model.Password))
+            <span class="hljs-keyword">if</span> (ModelState.IsValid)
             {
-                FormsAuthentication.SetAuthCookie(model.UserName, <span class="hljs-keyword">false</span>);
-                <span class="hljs-keyword">return</span> RedirectToAction(<span class="hljs-string">"Index"</span>, <span class="hljs-string">"Home"</span>);
+                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.membershipProvider.ValidateUser(model.UserName, model.Password))
+                {
+                    FormsAuthentication.SetAuthCookie(model.UserName, <span class="hljs-keyword">false</span>);
+                    <span class="hljs-keyword">return</span> RedirectToAction(<span class="hljs-string">"Index"</span>, <span class="hljs-string">"Home"</span>);
+                }
             }
-
             ViewBag.Message = <span class="hljs-string">"ログインに失敗しました。"</span>;
             <span class="hljs-keyword">return</span> View(model);
         }
@@ -281,7 +282,7 @@
 <ul>
 <li>HomeController.cs</li>
 </ul>
-<pre><code class="lang-cs"><span class="hljs-class"><span class="hljs-keyword">namespace</span> <span class="hljs-title">AuthTest</span>.<span class="hljs-title">Controllers</span>
+<pre><code class="lang-cs"><span class="hljs-class"><span class="hljs-keyword">namespace</span> <span class="hljs-title">TodoApp</span>.<span class="hljs-title">Controllers</span>
 </span>{
     [Authorize]
     <span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HomeController</span> : <span class="hljs-title">Controller</span>
@@ -298,7 +299,7 @@
 <p>認証されていない状態でアクセスすると、ログイン画面にリダイレクトされます。</p>
 <p><br></p>
 <p>(3) AdminControllerの実装</p>
-<pre><code class="lang-cs"><span class="hljs-class"><span class="hljs-keyword">namespace</span> <span class="hljs-title">AuthTest</span>.<span class="hljs-title">Controllers</span>
+<pre><code class="lang-cs"><span class="hljs-class"><span class="hljs-keyword">namespace</span> <span class="hljs-title">TodoApp</span>.<span class="hljs-title">Controllers</span>
 </span>{
     [Authorize(Roles=<span class="hljs-string">"Administrators"</span>)]
     <span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AdminController</span> : <span class="hljs-title">Controller</span>
@@ -327,10 +328,11 @@
 <ul>
 <li><code>LoginController</code>を右クリック -&gt; <code>Add View</code> を選択</li>
 <li><code>LoginViewModel</code> の <code>Create</code> として <code>Index.cshtml</code> を作成</li>
-<li>不要な項目の削除、ボタンのラベルを <code>SignIn</code> に変更</li>
+<li>不要な項目の削除 (フォームのタイトル部分)</li>
+<li>ボタンのラベルを <code>SignIn</code> に変更</li>
 </ul>
 <p><br></p>
-<pre><code class="lang-html"><span class="hljs-annotation">@model</span> <span class="hljs-type">AuthTest</span>.<span class="hljs-type">Models</span>.<span class="hljs-type">LoginViewModel</span>
+<pre><code class="lang-html"><span class="hljs-annotation">@model</span> <span class="hljs-type">TodoApp</span>.<span class="hljs-type">Models</span>.<span class="hljs-type">LoginViewModel</span>
 
 @{
     <span class="hljs-type">ViewBag</span>.<span class="hljs-type">Title</span> = <span class="hljs-string">"Index"</span>;
@@ -392,13 +394,13 @@
   <span class="hljs-tag">&lt;<span class="hljs-title">membership</span> <span class="hljs-attribute">defaultProvider</span>=<span class="hljs-value">"CustomMembershipProvider"</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-title">providers</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-title">clear</span>/&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">add</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"CustpmMembershipProvider"</span> <span class="hljs-attribute">type</span>=<span class="hljs-value">"AuthTest.Models.CustomMembershipProvider"</span>/&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-title">add</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"CustpmMembershipProvider"</span> <span class="hljs-attribute">type</span>=<span class="hljs-value">"TodoApp.Models.CustomMembershipProvider"</span>/&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-title">providers</span>&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-title">membership</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-title">roleManager</span> <span class="hljs-attribute">enabled</span>=<span class="hljs-value">"true"</span> <span class="hljs-attribute">defaultProvider</span>=<span class="hljs-value">"CustomRoleProvider"</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-title">providers</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-title">clear</span>/&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">add</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"CustomRoleProvider"</span> <span class="hljs-attribute">type</span>=<span class="hljs-value">"AuthTest.Models.CustomRoleProvider"</span>/&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-title">add</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"CustomRoleProvider"</span> <span class="hljs-attribute">type</span>=<span class="hljs-value">"TodoApp.Models.CustomRoleProvider"</span>/&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-title">providers</span>&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-title">roleManager</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-title">system.web</span>&gt;</span>
@@ -447,7 +449,7 @@
 </ul>
 <p>先ほど作成した認証機能だけのWebアプリケーションに必要な機能を肉付けしていきます。</p>
 <p><br>
-実際のソースコードは <a href="https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/tree/master/projects/step2/AuthTest_2">こちら</a> で確認できます。
+実際のソースコードは <a href="https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/tree/master/projects/step2/TodoApp_2">こちら</a> で確認できます。
 <br></p>
 <h3 id="-">システム仕様</h3>
 <ol>
@@ -492,9 +494,7 @@
 <pre><code class="lang-cs"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Role</span>
 {
     <span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> Id { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
-
     <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> RoleName { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
-
     <span class="hljs-keyword">public</span> <span class="hljs-keyword">virtual</span> ICollection&lt;User&gt; Users { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
 }
 </code></pre>
@@ -672,9 +672,9 @@ EntityFrameworkを通してデータベースに問い合わせた結果と入�
 <li>TOOLS -&gt; NuGet Package Manager -&gt; Package Manager Console を選択します。</li>
 </ul>
 <p><code>Package Manager Console</code> が表示されるので、以下のコマンド (1行目) を入力します。</p>
-<pre><code>PM&gt; Enable-Migrations -ContextTypeName AuthTest<span class="hljs-class">.Models</span><span class="hljs-class">.AppContext</span>
+<pre><code>PM&gt; Enable-Migrations -ContextTypeName TodoApp<span class="hljs-class">.Models</span><span class="hljs-class">.AppContext</span>
 Checking <span class="hljs-keyword">if</span> the context targets an existing database...
-Code First Migrations enabled <span class="hljs-keyword">for</span> project AuthTest.
+Code First Migrations enabled <span class="hljs-keyword">for</span> project TodoApp.
 </code></pre><p><code>Migrations/Configuration.cs</code> というファイルが生成されます。</p>
 <p><br></p>
 <p>(2) イニシャライザーの登録</p>
@@ -723,7 +723,7 @@ XXXXXXXXXXはコマンド実行時のタイムスタンプです。</p>
 <br></p>
 <p>(4) 初期データの登録</p>
 <p>アプリ実行後、管理者アカウントの登録およびRoleの定義を行うように <code>Seed</code> メソッドに処理を書いていきます。</p>
-<pre><code class="lang-cs">protected override void Seed(AuthTest.Models.AppContext context)
+<pre><code class="lang-cs">protected override void Seed(TodoApp.Models.AppContext context)
 {
     User <span class="hljs-variable">user1 =</span> new User()
     {
@@ -767,7 +767,6 @@ public class LoginController : Controller
     // GET: Login
     public ActionResult Index<span class="hljs-list">()</span>
     {
-        FormsAuthentication.SignOut<span class="hljs-list">()</span><span class="hljs-comment">;</span>
         return View<span class="hljs-list">()</span><span class="hljs-comment">;</span>
     }
 
@@ -828,12 +827,7 @@ public class HomeController : Controller
     public ActionResult Index<span class="hljs-list">()</span>
     {
         int userId = <span class="hljs-list">(<span class="hljs-keyword">int</span>)</span>Session<span class="hljs-list">[<span class="hljs-string">"AuthUserId"</span>]<span class="hljs-comment">;</span>
-        var loginUser = db.Users.Where<span class="hljs-list">(<span class="hljs-keyword">u</span> =&gt; u.Id == userId)</span>.First<span class="hljs-list">()</span><span class="hljs-comment">;</span>
-        var todoes = loginUser.Todoes<span class="hljs-comment">;</span>
-        if <span class="hljs-list">(<span class="hljs-keyword">todoes</span> == null)</span>
-        {
-            todoes = new List&lt;Todo&gt;<span class="hljs-list">()</span><span class="hljs-comment">;</span>
-        }
+        var user = db.Users.Where<span class="hljs-list">(<span class="hljs-keyword">u</span> =&gt; u.Id == userId)</span>.First<span class="hljs-list">()</span><span class="hljs-comment">;</span>
         return View<span class="hljs-list">(<span class="hljs-keyword">todoes.ToArray</span><span class="hljs-list">()</span>)</span><span class="hljs-comment">;</span>
     }
 
@@ -912,7 +906,7 @@ public class UsersController : Controller
 <pre><code class="lang-html">@{
     <span class="hljs-keyword">int</span> userId = (<span class="hljs-keyword">int</span>)Session[<span class="hljs-string">"AuthUserId"</span>];
     <span class="hljs-keyword">string</span>[] roles = <span class="hljs-keyword">new</span> <span class="hljs-keyword">string</span>[] { };
-    <span class="hljs-keyword">using</span> (<span class="hljs-keyword">var</span> db = <span class="hljs-keyword">new</span> AuthTest.Models.AppContext())
+    <span class="hljs-keyword">using</span> (<span class="hljs-keyword">var</span> db = <span class="hljs-keyword">new</span> TodoApp.Models.AppContext())
     {
         <span class="hljs-keyword">var</span> user = db.Users.Where(u =&gt; u.Id == userId).FirstOrDefault();
         <span class="hljs-keyword">if</span> (user != <span class="hljs-keyword">null</span>)
@@ -975,7 +969,7 @@ public class UsersController : Controller
 <p><br></p>
 <p>(3) Login/Index.cshtml</p>
 <p><code>Login/Index.cshtml</code> の見た目をログイン画面っぽく修正します。</p>
-<pre><code class="lang-html">@model AuthTest.Models.LoginViewModel
+<pre><code class="lang-html">@model TodoApp.Models.LoginViewModel
 
 @{
     ViewBag.Title = "Index";
