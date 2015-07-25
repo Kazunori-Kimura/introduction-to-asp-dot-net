@@ -624,8 +624,9 @@ public override bool IsUserInRole(string UserId, string roleName)
 {
     using (var db = new AppContext())
     {
+        int id = int.Parse(UserId);
         var user = db.Users
-            .Where(u => u.Id == int.Parse(UserId))
+            .Where(u => u.Id == id)
             .FirstOrDefault();
 
         string[] roles = user.Roles.Select(r => r.RoleName).ToArray();
@@ -912,7 +913,7 @@ public class HomeController : Controller
     {
         int userId = (int)Session["AuthUserId"];
         var user = db.Users.Where(u => u.Id == userId).First();
-        return View(todoes.ToArray());
+        return View(user.Todoes.ToArray());
     }
 
     // 〜〜中略〜〜

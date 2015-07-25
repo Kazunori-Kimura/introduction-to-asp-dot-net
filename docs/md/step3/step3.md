@@ -1,4 +1,4 @@
-# 3. `ASP.NET Web API`によるREST API開発
+# 4. `ASP.NET Web API`によるREST API開発
 
 ## Web API とは？
 
@@ -88,7 +88,7 @@ HTTPが喋れるツールであれば何でも良いのですが、今回は `cU
 #### cURL
 
 > cURL（カール）は、さまざまなプロトコルを用いてデータを転送するライブラリとコマンドラインツールを提供するプロジェクトである。
-> 
+>
 > [cURL](http://ja.wikipedia.org/wiki/CURL)
 
 
@@ -509,5 +509,3 @@ ASP.NET Web APIの開発手順について解説しました。
 
 
 次回は 今回作成したAPIを操作する WebアプリケーションのView部分を作成します。
-
-
