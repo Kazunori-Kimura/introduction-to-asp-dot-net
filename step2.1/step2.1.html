@@ -607,8 +607,9 @@ EntityFrameworkを通してデータベースに問い合わせた結果と入�
 </span>{
     <span class="hljs-keyword">using</span> (<span class="hljs-keyword">var</span> db = <span class="hljs-keyword">new</span> AppContext())
     {
+        <span class="hljs-keyword">int</span> id = <span class="hljs-keyword">int</span>.Parse(UserId);
         <span class="hljs-keyword">var</span> user = db.Users
-            .Where(u =&gt; u.Id == <span class="hljs-keyword">int</span>.Parse(UserId))
+            .Where(u =&gt; u.Id == id)
             .FirstOrDefault();
 
         <span class="hljs-keyword">string</span>[] roles = user.Roles.Select(r =&gt; r.RoleName).ToArray();
@@ -828,7 +829,7 @@ public class HomeController : Controller
     {
         int userId = <span class="hljs-list">(<span class="hljs-keyword">int</span>)</span>Session<span class="hljs-list">[<span class="hljs-string">"AuthUserId"</span>]<span class="hljs-comment">;</span>
         var user = db.Users.Where<span class="hljs-list">(<span class="hljs-keyword">u</span> =&gt; u.Id == userId)</span>.First<span class="hljs-list">()</span><span class="hljs-comment">;</span>
-        return View<span class="hljs-list">(<span class="hljs-keyword">todoes.ToArray</span><span class="hljs-list">()</span>)</span><span class="hljs-comment">;</span>
+        return View<span class="hljs-list">(<span class="hljs-keyword">user.Todoes.ToArray</span><span class="hljs-list">()</span>)</span><span class="hljs-comment">;</span>
     }
 
     // 〜〜中略〜〜
