@@ -10,7 +10,7 @@
 
 <br>
 
-### Web API のメリットは？
+## Web API のメリットは？
 
 * HTTP が使用できるものであれば、どのようなクライアントからも利用できる
   - Webブラウザ向けのシステムをモバイル向けに作り直す、といった時も Web API は変更しなくてよい
@@ -24,13 +24,10 @@
 
 * Web API のソフトウェアアーキテクチャのスタイルのひとつ。
   - REST の原則に従っているシステムは `RESTful`なシステム、 といわれます。
-  - REST をとても熱心に支持する *RESTafarians* と呼ばれる人たちがいます。  
-このような人たちに、適当な設計のWebアプリケーションを「REST APIです」と紹介すると、すごいマサカリが飛んできます。
 
+## RESTの原則
 
-### 原則
-
-* ステートレスなクライアント/サーバープロトコル
+* *ステートレス* なクライアント/サーバープロトコル
 
 セッションやクッキーによるセッション状態の管理を行わず、
 一度のリクエスト/レスポンスで問い合わせが完了する。
@@ -73,7 +70,10 @@
 
 ## Getting Started with ASP.NET Web API
 
-参考: [Getting Started with ASP.NET Web API 2](http://www.asp.net/web-api/overview/getting-started-with-aspnet-web-api/tutorial-your-first-web-api)
+### 参考
+
+- [Getting Started with ASP.NET Web API 2](http://www.asp.net/web-api/overview/getting-started-with-aspnet-web-api/tutorial-your-first-web-api)
+- [Using Web API 2 with Entity Framework 6](http://www.asp.net/web-api/overview/data/using-web-api-with-entity-framework/part-1)
 
 <br>
 
@@ -85,28 +85,30 @@
 HTTPが喋れるツールであれば何でも良いのですが、今回は `cURL` を使用します。
 
 
-#### cURL
+### 【用語解説】cURL
 
 > cURL（カール）は、さまざまなプロトコルを用いてデータを転送するライブラリとコマンドラインツールを提供するプロジェクトである。
 >
 > [cURL](http://ja.wikipedia.org/wiki/CURL)
 
 
-#### Chocolatey
+### 【用語解説】Chocolatey
 
 自分で`cURL`のバイナリを探してきてダウンロード・インストールするのは面倒臭いので、
 パッケージ管理ツールを使用します。
 
-[Chocolatey](https://chocolatey.org/) は `apt-get` のようなパッケージ管理ツールです。
-(`Chocolatey` の背後では NuGet が動いているようです。)
+[Chocolatey](https://chocolatey.org/) は Linuxでいう `yum` や `apt-get` のようなパッケージ管理ツールです。
+
+* Chocolateyのインストール
 
 コマンドプロンプトを `管理者として実行` し、以下のコマンドをコピー&ペーストします。
+(Chocolateyのサイトにコマンドが記載されているので、それをコピーしてください。)
 
 ```bat
 @powershell -NoProfile -ExecutionPolicy unrestricted -Command "iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))" && SET PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin
 ```
 
-#### cURLのインストール
+* cURLのインストール
 
 `Chocolatey` を使用して、`cURL`をインストールします。
 
@@ -152,7 +154,9 @@ choco install curl
 | Delete | /api/Todoes/{id} | delete | 指定したTodoを削除 |
 
 
-#### Todoリストの項目
+### Todoリストの項目
+
+Todoは以下のプロパティを持つものとします。
 
 * id: Todoを一意に特定する数値。
 * summary: 概要。文字列。
@@ -160,13 +164,17 @@ choco install curl
 * limit: 期限。日時。
 * done: 完了フラグ。真偽値。
 
-    前回作成した MVC の Todo管理アプリケーションと同じ内容です。
+    第2回で作成した MVC の Todo管理アプリケーションと同じ内容です。
 
 ------
 
-### 開発手順
+それでは、実際に開発を進めていきます。
 
-#### プロジェクトの作成
+[こちら](https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/tree/master/projects/step3/TodoApi) に実際にVisual Studio 2013で作成したプロジェクトがあります。
+
+* 画面キャプチャは Visual Studio 2013 ですが、Visual Studio 2015 でも同様の手順で開発できます。
+
+### (1) プロジェクトの作成
 
 * 新しいプロジェクトの作成
   - 名前は `TodoApi` とします。
@@ -179,25 +187,27 @@ choco install curl
 
 <br>
 
-#### EntityFrameworkを追加
+### (2) EntityFrameworkを追加
 
 * プロジェクトを右クリック→「NuGet パッケージの管理」
 
 ![NuGet パッケージの管理-1](./images/WS000002.JPG)
 
-* EntityFrameworkを選択して「インストール」
+* *EntityFramework* を選択して「インストール」
 
 ![NuGet パッケージの管理-2](./images/WS000003.JPG)
 
+今回は EntityFramework 6 を使用します。
+
 <br>
 
-#### Modelクラスの追加
+### (3) Modelクラスの追加
 
-* `Models`を右クリック→「追加」→「クラス」を選択
+* `Models`を右クリック→「追加」→「クラス」を選択します。
 
 ![Todoクラスの追加-1](./images/WS000005.JPG)
 
-* 名前を `Todo.cs` として「追加」
+* 名前を `Todo.cs` として「追加」します。
 
 ![Todoクラスの追加-2](./images/WS000006.JPG)
 
@@ -214,6 +224,7 @@ namespace TodoApi.Models
     public class Todo
     {
         public int id { get; set; }
+        [Required]
         public string summary { get; set; }
         public string detail { get; set; }
         public DateTime limit { get; set; }
@@ -222,7 +233,7 @@ namespace TodoApi.Models
 }
 ```
 
-* 続いて `TodoesContext.cs` を追加
+* 続いて `TodoesContext.cs` を追加します。
 
 `TodoesContext.cs`
 
@@ -242,7 +253,7 @@ namespace TodoApi.Models
 }
 ```
 
-ここまで作成したら、一旦ソリューション全体をビルドする。
+ここまで作成したら、一旦ソリューション全体をビルドしてください。
 
 <br>
 
@@ -262,9 +273,12 @@ namespace TodoApi.Models
 
 ![コントローラーの追加-3](./images/WS000009.JPG)
 
-* 以下の様なコードが自動生成されます。
+以下の様なコードが自動生成されます。
 
-`TodoesController.cs`
+Web APIとして公開されるメソッドは `Public` になっています。
+また、それぞれの命名規則は `HTTPメソッド名 + Model名` となっています。
+
+* [TodoesController.cs](https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/blob/master/projects/step3/TodoApi/TodoApi/Controllers/TodoesController.cs)
 
 ```cs
 using System;
@@ -283,6 +297,13 @@ namespace TodoApi.Controllers
 {
     public class TodoesController : ApiController
     {
+```
+
+Web APIのコントローラーは `ApiController` クラスを継承します。  
+`ApiController` は MVCの `Controller` クラスを継承していますので、
+MVCの場合と非常によく似た内容になります。
+
+```cs
         private TodoesContext db = new TodoesContext();
 
         // GET: api/Todoes
@@ -290,7 +311,14 @@ namespace TodoApi.Controllers
         {
             return db.Todoes;
         }
+```
 
+`GetTodoes` は GETメソッドで `api/Todoes` にアクセスされた場合に実行されるアクションメソッドです。
+すべてのTodoをリストで返します。
+
+StatusCodeの指定がない場合は、常に 200 (Ok) を返します。
+
+```cs
         // GET: api/Todoes/5
         [ResponseType(typeof(Todo))]
         public IHttpActionResult GetTodo(int id)
@@ -303,7 +331,16 @@ namespace TodoApi.Controllers
 
             return Ok(todo);
         }
+```
 
+IDを指定された場合は、IDが一致するTodoを返します。
+
+Todoが見つかった場合はそのデータを返します。  
+`Ok` メソッドはStatusCode 200 を返します。
+
+Todoが見つからない場合、 StatusCode 404 (Not Found) を返します。
+
+```cs
         // PUT: api/Todoes/5
         [ResponseType(typeof(void))]
         public IHttpActionResult PutTodo(int id, Todo todo)
@@ -338,7 +375,16 @@ namespace TodoApi.Controllers
 
             return StatusCode(HttpStatusCode.NoContent);
         }
+```
 
+PUT で該当IDの項目を更新 (Update) します。
+
+例外がthrowされた場合は 500 (Internal Server Error) が返されます。  
+また、該当IDの項目が無ければ 404 (Not Found) が返されます。
+
+更新完了後は特に返却するものは無いので、StatusCode 204 (No Content) を返します。
+
+```cs
         // POST: api/Todoes
         [ResponseType(typeof(Todo))]
         public IHttpActionResult PostTodo(Todo todo)
@@ -353,7 +399,16 @@ namespace TodoApi.Controllers
 
             return CreatedAtRoute("DefaultApi", new { id = todo.id }, todo);
         }
+```
 
+POST で新しいTodoを作成 (Create) します。
+
+postされた内容が `todo` にセットされます。
+`ModelState.IsValid` で内容を検査し、問題があれば 400 (BadRequest) を返します。
+
+問題なければ、DBを更新し、 201 (Created) を返します。
+
+```cs
         // DELETE: api/Todoes/5
         [ResponseType(typeof(Todo))]
         public IHttpActionResult DeleteTodo(int id)
@@ -369,7 +424,17 @@ namespace TodoApi.Controllers
 
             return Ok(todo);
         }
+```
 
+DELETE で該当のTodoを削除 (Delete) します。
+
+該当IDの項目が無ければ 404 (Not Found) が返されます。
+削除後は削除されたTodoをそのまま返しています。
+
+(個人的には StatusCode 204 (No Content) を返しても良いと思います)
+
+
+```cs
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -387,12 +452,9 @@ namespace TodoApi.Controllers
 }
 ```
 
-Web APIとして公開されるメソッドは `Public` になっています。
-
-また、それぞれの命名規則は `HTTPメソッド名 + Model名` となっています。
 
 
-#### 動作確認
+### 動作確認
 
 Visual Studioで F5キーを押下 (あるいは `|>`ボタンをクリック) してデバッグ実行します。
 
