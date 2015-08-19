@@ -92,7 +92,7 @@
 </ul>
 <p>プログラムからのHTTPリクエストに対し、<code>XML</code> や <code>JSON</code> などのデータを返すWebアプリケーションを <em>Web API</em> と呼びます。</p>
 <p><br></p>
-<h3 id="web-api-">Web API のメリットは？</h3>
+<h2 id="web-api-">Web API のメリットは？</h2>
 <ul>
 <li>HTTP が使用できるものであれば、どのようなクライアントからも利用できる<ul>
 <li>Webブラウザ向けのシステムをモバイル向けに作り直す、といった時も Web API は変更しなくてよい</li>
@@ -109,13 +109,12 @@
 <ul>
 <li>Web API のソフトウェアアーキテクチャのスタイルのひとつ。<ul>
 <li>REST の原則に従っているシステムは <code>RESTful</code>なシステム、 といわれます。</li>
-<li>REST をとても熱心に支持する <em>RESTafarians</em> と呼ばれる人たちがいます。<br>このような人たちに、適当な設計のWebアプリケーションを「REST APIです」と紹介すると、すごいマサカリが飛んできます。</li>
 </ul>
 </li>
 </ul>
-<h3 id="-">原則</h3>
+<h2 id="rest-">RESTの原則</h2>
 <ul>
-<li>ステートレスなクライアント/サーバープロトコル</li>
+<li><em>ステートレス</em> なクライアント/サーバープロトコル</li>
 </ul>
 <p>セッションやクッキーによるセッション状態の管理を行わず、
 一度のリクエスト/レスポンスで問い合わせが完了する。</p>
@@ -198,26 +197,35 @@
 <hr>
 <p><br></p>
 <h2 id="getting-started-with-asp-net-web-api">Getting Started with ASP.NET Web API</h2>
-<p>参考: <a href="http://www.asp.net/web-api/overview/getting-started-with-aspnet-web-api/tutorial-your-first-web-api">Getting Started with ASP.NET Web API 2</a></p>
+<h3 id="-">参考</h3>
+<ul>
+<li><a href="http://www.asp.net/web-api/overview/getting-started-with-aspnet-web-api/tutorial-your-first-web-api">Getting Started with ASP.NET Web API 2</a></li>
+<li><a href="http://www.asp.net/web-api/overview/data/using-web-api-with-entity-framework/part-1">Using Web API 2 with Entity Framework 6</a></li>
+</ul>
 <p><br></p>
 <h3 id="-">クライアント環境のインストール</h3>
 <p>今回はクライアント側のプログラムは作成しないので、Web APIに問い合わせを行う
 クライアントアプリケーションを用意します。</p>
 <p>HTTPが喋れるツールであれば何でも良いのですが、今回は <code>cURL</code> を使用します。</p>
-<h4 id="curl">cURL</h4>
+<h3 id="-curl">【用語解説】cURL</h3>
 <blockquote>
 <p>cURL（カール）は、さまざまなプロトコルを用いてデータを転送するライブラリとコマンドラインツールを提供するプロジェクトである。</p>
 <p><a href="http://ja.wikipedia.org/wiki/CURL">cURL</a></p>
 </blockquote>
-<h4 id="chocolatey">Chocolatey</h4>
+<h3 id="-chocolatey">【用語解説】Chocolatey</h3>
 <p>自分で<code>cURL</code>のバイナリを探してきてダウンロード・インストールするのは面倒臭いので、
 パッケージ管理ツールを使用します。</p>
-<p><a href="https://chocolatey.org/">Chocolatey</a> は <code>apt-get</code> のようなパッケージ管理ツールです。
-(<code>Chocolatey</code> の背後では NuGet が動いているようです。)</p>
-<p>コマンドプロンプトを <code>管理者として実行</code> し、以下のコマンドをコピー&amp;ペーストします。</p>
+<p><a href="https://chocolatey.org/">Chocolatey</a> は Linuxでいう <code>yum</code> や <code>apt-get</code> のようなパッケージ管理ツールです。</p>
+<ul>
+<li>Chocolateyのインストール</li>
+</ul>
+<p>コマンドプロンプトを <code>管理者として実行</code> し、以下のコマンドをコピー&amp;ペーストします。
+(Chocolateyのサイトにコマンドが記載されているので、それをコピーしてください。)</p>
 <pre><code class="lang-bat"><span class="hljs-variable">@powershell</span> -NoProfile -ExecutionPolicy unrestricted -Command <span class="hljs-string">"iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))"</span> &amp;&amp; SET PATH=<span class="hljs-variable">%PATH</span><span class="hljs-variable">%;</span><span class="hljs-variable">%ALLUSERSPROFILE</span><span class="hljs-variable">%\</span>chocolatey\bin
 </code></pre>
-<h4 id="curl-">cURLのインストール</h4>
+<ul>
+<li>cURLのインストール</li>
+</ul>
 <p><code>Chocolatey</code> を使用して、<code>cURL</code>をインストールします。</p>
 <pre><code class="lang-bat">choco <span class="hljs-keyword">install</span> curl
 </code></pre>
@@ -283,19 +291,24 @@
 </tr>
 </tbody>
 </table>
-<h4 id="todo-">Todoリストの項目</h4>
+<h3 id="todo-">Todoリストの項目</h3>
+<p>Todoは以下のプロパティを持つものとします。</p>
 <ul>
 <li>id: Todoを一意に特定する数値。</li>
 <li>summary: 概要。文字列。</li>
 <li>detail: 詳細。文字列。</li>
 <li>limit: 期限。日時。</li>
 <li><p>done: 完了フラグ。真偽値。</p>
-<p>  前回作成した MVC の Todo管理アプリケーションと同じ内容です。</p>
+<p>  第2回で作成した MVC の Todo管理アプリケーションと同じ内容です。</p>
 </li>
 </ul>
 <hr>
-<h3 id="-">開発手順</h3>
-<h4 id="-">プロジェクトの作成</h4>
+<p>それでは、実際に開発を進めていきます。</p>
+<p><a href="https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/tree/master/projects/step3/TodoApi">こちら</a> に実際にVisual Studio 2013で作成したプロジェクトがあります。</p>
+<ul>
+<li>画面キャプチャは Visual Studio 2013 ですが、Visual Studio 2015 でも同様の手順で開発できます。</li>
+</ul>
+<h3 id="-1-">(1) プロジェクトの作成</h3>
 <ul>
 <li>新しいプロジェクトの作成<ul>
 <li>名前は <code>TodoApi</code> とします。</li>
@@ -308,23 +321,24 @@
 </ul>
 <p><img src="./images/WS000001.JPG" alt="新規 ASP.NET プロジェクト"></p>
 <p><br></p>
-<h4 id="entityframework-">EntityFrameworkを追加</h4>
+<h3 id="-2-entityframework-">(2) EntityFrameworkを追加</h3>
 <ul>
 <li>プロジェクトを右クリック→「NuGet パッケージの管理」</li>
 </ul>
 <p><img src="./images/WS000002.JPG" alt="NuGet パッケージの管理-1"></p>
 <ul>
-<li>EntityFrameworkを選択して「インストール」</li>
+<li><em>EntityFramework</em> を選択して「インストール」</li>
 </ul>
 <p><img src="./images/WS000003.JPG" alt="NuGet パッケージの管理-2"></p>
+<p>今回は EntityFramework 6 を使用します。</p>
 <p><br></p>
-<h4 id="model-">Modelクラスの追加</h4>
+<h3 id="-3-model-">(3) Modelクラスの追加</h3>
 <ul>
-<li><code>Models</code>を右クリック→「追加」→「クラス」を選択</li>
+<li><code>Models</code>を右クリック→「追加」→「クラス」を選択します。</li>
 </ul>
 <p><img src="./images/WS000005.JPG" alt="Todoクラスの追加-1"></p>
 <ul>
-<li>名前を <code>Todo.cs</code> として「追加」</li>
+<li>名前を <code>Todo.cs</code> として「追加」します。</li>
 </ul>
 <p><img src="./images/WS000006.JPG" alt="Todoクラスの追加-2"></p>
 <p><code>Todo.cs</code></p>
@@ -338,6 +352,7 @@
     <span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span>
     </span>{
         <span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> id { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+        [Required]
         <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> summary { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
         <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> detail { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
         <span class="hljs-keyword">public</span> DateTime limit { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
@@ -346,7 +361,7 @@
 }
 </code></pre>
 <ul>
-<li>続いて <code>TodoesContext.cs</code> を追加</li>
+<li>続いて <code>TodoesContext.cs</code> を追加します。</li>
 </ul>
 <p><code>TodoesContext.cs</code></p>
 <pre><code class="lang-cs"><span class="hljs-keyword">using</span> System;
@@ -363,7 +378,7 @@
     }
 }
 </code></pre>
-<p>ここまで作成したら、一旦ソリューション全体をビルドする。</p>
+<p>ここまで作成したら、一旦ソリューション全体をビルドしてください。</p>
 <p><br></p>
 <h4 id="controller-">Controllerクラスの追加</h4>
 <ul>
@@ -382,10 +397,12 @@
 </li>
 </ul>
 <p><img src="./images/WS000009.JPG" alt="コントローラーの追加-3"></p>
+<p>以下の様なコードが自動生成されます。</p>
+<p>Web APIとして公開されるメソッドは <code>Public</code> になっています。
+また、それぞれの命名規則は <code>HTTPメソッド名 + Model名</code> となっています。</p>
 <ul>
-<li>以下の様なコードが自動生成されます。</li>
+<li><a href="https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/blob/master/projects/step3/TodoApi/TodoApi/Controllers/TodoesController.cs">TodoesController.cs</a></li>
 </ul>
-<p><code>TodoesController.cs</code></p>
 <pre><code class="lang-cs"><span class="hljs-keyword">using</span> System;
 <span class="hljs-keyword">using</span> System.Collections.Generic;
 <span class="hljs-keyword">using</span> System.Data;
@@ -398,43 +415,52 @@
 <span class="hljs-keyword">using</span> System.Web.Http.Description;
 <span class="hljs-keyword">using</span> TodoApi.Models;
 
-<span class="hljs-keyword">namespace</span> TodoApi.Controllers
-{
-    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> TodoesController : ApiController
-    {
-        <span class="hljs-keyword">private</span> TodoesContext db = <span class="hljs-keyword">new</span> TodoesContext();
+<span class="hljs-class"><span class="hljs-keyword">namespace</span> <span class="hljs-title">TodoApi</span>.<span class="hljs-title">Controllers</span>
+</span>{
+    <span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoesController</span> : <span class="hljs-title">ApiController</span>
+    </span>{
+</code></pre>
+<p>Web APIのコントローラーは <code>ApiController</code> クラスを継承します。<br><code>ApiController</code> は MVCの <code>Controller</code> クラスを継承していますので、
+MVCの場合と非常によく似た内容になります。</p>
+<pre><code class="lang-cs">        <span class="hljs-keyword">private</span> TodoesContext db = <span class="hljs-keyword">new</span> TodoesContext();
 
         <span class="hljs-comment">// GET: api/Todoes</span>
-        <span class="hljs-keyword">public</span> IQueryable&lt;Todo&gt; GetTodoes()
-        {
+        <span class="hljs-function"><span class="hljs-keyword">public</span> IQueryable&lt;Todo&gt; <span class="hljs-title">GetTodoes</span><span class="hljs-params">()</span>
+        </span>{
             <span class="hljs-keyword">return</span> db.Todoes;
         }
-
-        <span class="hljs-comment">// GET: api/Todoes/5</span>
+</code></pre>
+<p><code>GetTodoes</code> は GETメソッドで <code>api/Todoes</code> にアクセスされた場合に実行されるアクションメソッドです。
+すべてのTodoをリストで返します。</p>
+<p>StatusCodeの指定がない場合は、常に 200 (Ok) を返します。</p>
+<pre><code class="lang-cs">        <span class="hljs-comment">// GET: api/Todoes/5</span>
         [ResponseType(typeof(Todo))]
-        <span class="hljs-function"><span class="hljs-keyword">public</span> IHttpActionResult <span class="hljs-title">GetTodo</span><span class="hljs-params">(<span class="hljs-keyword">int</span> id)</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-function">IHttpActionResult <span class="hljs-title">GetTodo</span><span class="hljs-params">(<span class="hljs-keyword">int</span> id)</span>
         </span>{
             Todo todo = db.Todoes.Find(id);
-            <span class="hljs-keyword">if</span> (todo == null)
+            <span class="hljs-keyword">if</span> (todo == <span class="hljs-keyword">null</span>)
             {
-                <span class="hljs-keyword">return</span> NotFound();
+                <span class="hljs-function"><span class="hljs-keyword">return</span> <span class="hljs-title">NotFound</span><span class="hljs-params">()</span></span>;
             }
 
-            <span class="hljs-keyword">return</span> Ok(todo);
+            <span class="hljs-function"><span class="hljs-keyword">return</span> <span class="hljs-title">Ok</span><span class="hljs-params">(todo)</span></span>;
         }
-
-        <span class="hljs-comment">// PUT: api/Todoes/5</span>
+</code></pre>
+<p>IDを指定された場合は、IDが一致するTodoを返します。</p>
+<p>Todoが見つかった場合はそのデータを返します。<br><code>Ok</code> メソッドはStatusCode 200 を返します。</p>
+<p>Todoが見つからない場合、 StatusCode 404 (Not Found) を返します。</p>
+<pre><code class="lang-cs">        <span class="hljs-comment">// PUT: api/Todoes/5</span>
         [ResponseType(typeof(<span class="hljs-keyword">void</span>))]
-        <span class="hljs-function"><span class="hljs-keyword">public</span> IHttpActionResult <span class="hljs-title">PutTodo</span><span class="hljs-params">(<span class="hljs-keyword">int</span> id, Todo todo)</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-function">IHttpActionResult <span class="hljs-title">PutTodo</span><span class="hljs-params">(<span class="hljs-keyword">int</span> id, Todo todo)</span>
         </span>{
             <span class="hljs-keyword">if</span> (!ModelState.IsValid)
             {
-                <span class="hljs-keyword">return</span> BadRequest(ModelState);
+                <span class="hljs-function"><span class="hljs-keyword">return</span> <span class="hljs-title">BadRequest</span><span class="hljs-params">(ModelState)</span></span>;
             }
 
             <span class="hljs-keyword">if</span> (id != todo.id)
             {
-                <span class="hljs-keyword">return</span> BadRequest();
+                <span class="hljs-function"><span class="hljs-keyword">return</span> <span class="hljs-title">BadRequest</span><span class="hljs-params">()</span></span>;
             }
 
             db.Entry(todo).State = EntityState.Modified;
@@ -447,7 +473,7 @@
             {
                 <span class="hljs-keyword">if</span> (!TodoExists(id))
                 {
-                    <span class="hljs-keyword">return</span> NotFound();
+                    <span class="hljs-function"><span class="hljs-keyword">return</span> <span class="hljs-title">NotFound</span><span class="hljs-params">()</span></span>;
                 }
                 <span class="hljs-keyword">else</span>
                 {
@@ -455,47 +481,58 @@
                 }
             }
 
-            <span class="hljs-keyword">return</span> StatusCode(HttpStatusCode.NoContent);
+            <span class="hljs-function"><span class="hljs-keyword">return</span> <span class="hljs-title">StatusCode</span><span class="hljs-params">(HttpStatusCode.NoContent)</span></span>;
         }
-
-        <span class="hljs-comment">// POST: api/Todoes</span>
+</code></pre>
+<p>PUT で該当IDの項目を更新 (Update) します。</p>
+<p>例外がthrowされた場合は 500 (Internal Server Error) が返されます。<br>また、該当IDの項目が無ければ 404 (Not Found) が返されます。</p>
+<p>更新完了後は特に返却するものは無いので、StatusCode 204 (No Content) を返します。</p>
+<pre><code class="lang-cs">        <span class="hljs-comment">// POST: api/Todoes</span>
         [ResponseType(typeof(Todo))]
-        <span class="hljs-function"><span class="hljs-keyword">public</span> IHttpActionResult <span class="hljs-title">PostTodo</span><span class="hljs-params">(Todo todo)</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-function">IHttpActionResult <span class="hljs-title">PostTodo</span><span class="hljs-params">(Todo todo)</span>
         </span>{
             <span class="hljs-keyword">if</span> (!ModelState.IsValid)
             {
-                <span class="hljs-keyword">return</span> BadRequest(ModelState);
+                <span class="hljs-function"><span class="hljs-keyword">return</span> <span class="hljs-title">BadRequest</span><span class="hljs-params">(ModelState)</span></span>;
             }
 
             db.Todoes.Add(todo);
             db.SaveChanges();
 
-            <span class="hljs-keyword">return</span> CreatedAtRoute(<span class="hljs-string">"DefaultApi"</span>, <span class="hljs-keyword">new</span> { id = todo.id }, todo);
+            <span class="hljs-function"><span class="hljs-keyword">return</span> <span class="hljs-title">CreatedAtRoute</span><span class="hljs-params">(<span class="hljs-string">"DefaultApi"</span>, <span class="hljs-keyword">new</span> { id = todo.id }, todo)</span></span>;
         }
-
-        <span class="hljs-comment">// DELETE: api/Todoes/5</span>
+</code></pre>
+<p>POST で新しいTodoを作成 (Create) します。</p>
+<p>postされた内容が <code>todo</code> にセットされます。
+<code>ModelState.IsValid</code> で内容を検査し、問題があれば 400 (BadRequest) を返します。</p>
+<p>問題なければ、DBを更新し、 201 (Created) を返します。</p>
+<pre><code class="lang-cs">        <span class="hljs-comment">// DELETE: api/Todoes/5</span>
         [ResponseType(typeof(Todo))]
-        <span class="hljs-function"><span class="hljs-keyword">public</span> IHttpActionResult <span class="hljs-title">DeleteTodo</span><span class="hljs-params">(<span class="hljs-keyword">int</span> id)</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-function">IHttpActionResult <span class="hljs-title">DeleteTodo</span><span class="hljs-params">(<span class="hljs-keyword">int</span> id)</span>
         </span>{
             Todo todo = db.Todoes.Find(id);
-            <span class="hljs-keyword">if</span> (todo == null)
+            <span class="hljs-keyword">if</span> (todo == <span class="hljs-keyword">null</span>)
             {
-                <span class="hljs-keyword">return</span> NotFound();
+                <span class="hljs-function"><span class="hljs-keyword">return</span> <span class="hljs-title">NotFound</span><span class="hljs-params">()</span></span>;
             }
 
             db.Todoes.Remove(todo);
             db.SaveChanges();
 
-            <span class="hljs-keyword">return</span> Ok(todo);
+            <span class="hljs-function"><span class="hljs-keyword">return</span> <span class="hljs-title">Ok</span><span class="hljs-params">(todo)</span></span>;
         }
-
-        <span class="hljs-function"><span class="hljs-keyword">protected</span> override <span class="hljs-keyword">void</span> <span class="hljs-title">Dispose</span><span class="hljs-params">(<span class="hljs-keyword">bool</span> disposing)</span>
+</code></pre>
+<p>DELETE で該当のTodoを削除 (Delete) します。</p>
+<p>該当IDの項目が無ければ 404 (Not Found) が返されます。
+削除後は削除されたTodoをそのまま返しています。</p>
+<p>(個人的には StatusCode 204 (No Content) を返しても良いと思います)</p>
+<pre><code class="lang-cs">        <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">override</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Dispose</span><span class="hljs-params">(<span class="hljs-keyword">bool</span> disposing)</span>
         </span>{
             <span class="hljs-keyword">if</span> (disposing)
             {
                 db.Dispose();
             }
-            base.Dispose(disposing);
+            <span class="hljs-keyword">base</span>.Dispose(disposing);
         }
 
         <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">bool</span> <span class="hljs-title">TodoExists</span><span class="hljs-params">(<span class="hljs-keyword">int</span> id)</span>
@@ -505,9 +542,7 @@
     }
 }
 </code></pre>
-<p>Web APIとして公開されるメソッドは <code>Public</code> になっています。</p>
-<p>また、それぞれの命名規則は <code>HTTPメソッド名 + Model名</code> となっています。</p>
-<h4 id="-">動作確認</h4>
+<h3 id="-">動作確認</h3>
 <p>Visual Studioで F5キーを押下 (あるいは <code>|&gt;</code>ボタンをクリック) してデバッグ実行します。</p>
 <p>ブラウザが起動しますが、Webページは用意していないのでエラー画面が表示されると思います。
 Web API は正常に稼働しているはずです。 (動作確認を完了するまでブラウザは終了せず、そのままにしておいてください。)</p>
