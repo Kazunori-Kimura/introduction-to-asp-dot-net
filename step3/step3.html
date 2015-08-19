@@ -83,6 +83,7 @@
   <div class="container contents">
     <!-- contents -->
     <h1 id="4-asp-net-web-api-rest-api-">4. <code>ASP.NET Web API</code>によるREST API開発</h1>
+<p><br></p>
 <h2 id="web-api-">Web API とは？</h2>
 <ul>
 <li><code>API</code>: Application Programming Interface<ul>
@@ -91,7 +92,8 @@
 </li>
 </ul>
 <p>プログラムからのHTTPリクエストに対し、<code>XML</code> や <code>JSON</code> などのデータを返すWebアプリケーションを <em>Web API</em> と呼びます。</p>
-<p><br></p>
+<p><br>
+<br></p>
 <h2 id="web-api-">Web API のメリットは？</h2>
 <ul>
 <li>HTTP が使用できるものであれば、どのようなクライアントからも利用できる<ul>
@@ -105,6 +107,8 @@
 </li>
 </ul>
 <p><br></p>
+<p><hr>
+<br></p>
 <h2 id="-rest-"><code>REST</code> とは？</h2>
 <ul>
 <li>Web API のソフトウェアアーキテクチャのスタイルのひとつ。<ul>
@@ -112,17 +116,20 @@
 </ul>
 </li>
 </ul>
+<p><br></p>
 <h2 id="rest-">RESTの原則</h2>
 <ul>
 <li><em>ステートレス</em> なクライアント/サーバープロトコル</li>
 </ul>
 <p>セッションやクッキーによるセッション状態の管理を行わず、
 一度のリクエスト/レスポンスで問い合わせが完了する。</p>
+<p><br></p>
 <ul>
 <li><code>URI (Uniform Resource Identifier)</code> でリソースを一意に識別する</li>
 </ul>
 <p><code>http://{webapi}/user/1/task/5</code> のような URL にリクエストを投げると
 <code>userId</code>が<code>1</code>のユーザーが持っている<code>taskId</code>が<code>5</code>のタスク情報を返すようなイメージ。</p>
+<p><br></p>
 <ul>
 <li>HTTPメソッドでリソースを操作する</li>
 </ul>
@@ -207,15 +214,22 @@
 <p>今回はクライアント側のプログラムは作成しないので、Web APIに問い合わせを行う
 クライアントアプリケーションを用意します。</p>
 <p>HTTPが喋れるツールであれば何でも良いのですが、今回は <code>cURL</code> を使用します。</p>
+<p><br></p>
+<hr>
+<p><br></p>
 <h3 id="-curl">【用語解説】cURL</h3>
 <blockquote>
 <p>cURL（カール）は、さまざまなプロトコルを用いてデータを転送するライブラリとコマンドラインツールを提供するプロジェクトである。</p>
 <p><a href="http://ja.wikipedia.org/wiki/CURL">cURL</a></p>
 </blockquote>
+<p><br></p>
 <h3 id="-chocolatey">【用語解説】Chocolatey</h3>
 <p>自分で<code>cURL</code>のバイナリを探してきてダウンロード・インストールするのは面倒臭いので、
 パッケージ管理ツールを使用します。</p>
 <p><a href="https://chocolatey.org/">Chocolatey</a> は Linuxでいう <code>yum</code> や <code>apt-get</code> のようなパッケージ管理ツールです。</p>
+<p><br></p>
+<hr>
+<p><br></p>
 <ul>
 <li>Chocolateyのインストール</li>
 </ul>
@@ -223,6 +237,7 @@
 (Chocolateyのサイトにコマンドが記載されているので、それをコピーしてください。)</p>
 <pre><code class="lang-bat"><span class="hljs-variable">@powershell</span> -NoProfile -ExecutionPolicy unrestricted -Command <span class="hljs-string">"iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))"</span> &amp;&amp; SET PATH=<span class="hljs-variable">%PATH</span><span class="hljs-variable">%;</span><span class="hljs-variable">%ALLUSERSPROFILE</span><span class="hljs-variable">%\</span>chocolatey\bin
 </code></pre>
+<p><br></p>
 <ul>
 <li>cURLのインストール</li>
 </ul>
@@ -230,6 +245,7 @@
 <pre><code class="lang-bat">choco <span class="hljs-keyword">install</span> curl
 </code></pre>
 <p><img src="./images/WS000014.JPG" alt="cURLのインストール"></p>
+<p><br></p>
 <h4 id="-">動作確認</h4>
 <p><code>www.example.com</code>のhtmlを取得してみます。</p>
 <pre><code class="lang-bat">&gt;curl http://www.example.com
@@ -302,12 +318,15 @@
 <p>  第2回で作成した MVC の Todo管理アプリケーションと同じ内容です。</p>
 </li>
 </ul>
+<p><br></p>
 <hr>
+<p><br></p>
 <p>それでは、実際に開発を進めていきます。</p>
 <p><a href="https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/tree/master/projects/step3/TodoApi">こちら</a> に実際にVisual Studio 2013で作成したプロジェクトがあります。</p>
 <ul>
 <li>画面キャプチャは Visual Studio 2013 ですが、Visual Studio 2015 でも同様の手順で開発できます。</li>
 </ul>
+<p><br></p>
 <h3 id="-1-">(1) プロジェクトの作成</h3>
 <ul>
 <li>新しいプロジェクトの作成<ul>
@@ -360,6 +379,8 @@
     }
 }
 </code></pre>
+<p><br>
+<br></p>
 <ul>
 <li>続いて <code>TodoesContext.cs</code> を追加します。</li>
 </ul>
@@ -379,8 +400,9 @@
 }
 </code></pre>
 <p>ここまで作成したら、一旦ソリューション全体をビルドしてください。</p>
-<p><br></p>
-<h4 id="controller-">Controllerクラスの追加</h4>
+<p><br>
+<br></p>
+<h3 id="controller-">Controllerクラスの追加</h3>
 <ul>
 <li>Controllersを右クリック→「追加」→「コントローラー」を選択</li>
 </ul>
@@ -397,12 +419,13 @@
 </li>
 </ul>
 <p><img src="./images/WS000009.JPG" alt="コントローラーの追加-3"></p>
-<p>以下の様なコードが自動生成されます。</p>
+<p><br></p>
 <p>Web APIとして公開されるメソッドは <code>Public</code> になっています。
 また、それぞれの命名規則は <code>HTTPメソッド名 + Model名</code> となっています。</p>
 <ul>
 <li><a href="https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/blob/master/projects/step3/TodoApi/TodoApi/Controllers/TodoesController.cs">TodoesController.cs</a></li>
 </ul>
+<p><br></p>
 <pre><code class="lang-cs"><span class="hljs-keyword">using</span> System;
 <span class="hljs-keyword">using</span> System.Collections.Generic;
 <span class="hljs-keyword">using</span> System.Data;
@@ -422,6 +445,7 @@
 </code></pre>
 <p>Web APIのコントローラーは <code>ApiController</code> クラスを継承します。<br><code>ApiController</code> は MVCの <code>Controller</code> クラスを継承していますので、
 MVCの場合と非常によく似た内容になります。</p>
+<p><br><br></p>
 <pre><code class="lang-cs">        <span class="hljs-keyword">private</span> TodoesContext db = <span class="hljs-keyword">new</span> TodoesContext();
 
         <span class="hljs-comment">// GET: api/Todoes</span>
@@ -433,6 +457,7 @@ MVCの場合と非常によく似た内容になります。</p>
 <p><code>GetTodoes</code> は GETメソッドで <code>api/Todoes</code> にアクセスされた場合に実行されるアクションメソッドです。
 すべてのTodoをリストで返します。</p>
 <p>StatusCodeの指定がない場合は、常に 200 (Ok) を返します。</p>
+<p><br><br></p>
 <pre><code class="lang-cs">        <span class="hljs-comment">// GET: api/Todoes/5</span>
         [ResponseType(typeof(Todo))]
         <span class="hljs-keyword">public</span> <span class="hljs-function">IHttpActionResult <span class="hljs-title">GetTodo</span><span class="hljs-params">(<span class="hljs-keyword">int</span> id)</span>
@@ -449,6 +474,7 @@ MVCの場合と非常によく似た内容になります。</p>
 <p>IDを指定された場合は、IDが一致するTodoを返します。</p>
 <p>Todoが見つかった場合はそのデータを返します。<br><code>Ok</code> メソッドはStatusCode 200 を返します。</p>
 <p>Todoが見つからない場合、 StatusCode 404 (Not Found) を返します。</p>
+<p><br><br></p>
 <pre><code class="lang-cs">        <span class="hljs-comment">// PUT: api/Todoes/5</span>
         [ResponseType(typeof(<span class="hljs-keyword">void</span>))]
         <span class="hljs-keyword">public</span> <span class="hljs-function">IHttpActionResult <span class="hljs-title">PutTodo</span><span class="hljs-params">(<span class="hljs-keyword">int</span> id, Todo todo)</span>
@@ -485,8 +511,10 @@ MVCの場合と非常によく似た内容になります。</p>
         }
 </code></pre>
 <p>PUT で該当IDの項目を更新 (Update) します。</p>
+<p>入力内容に問題がある場合は 400 (BadRequest) が返されます。</p>
 <p>例外がthrowされた場合は 500 (Internal Server Error) が返されます。<br>また、該当IDの項目が無ければ 404 (Not Found) が返されます。</p>
 <p>更新完了後は特に返却するものは無いので、StatusCode 204 (No Content) を返します。</p>
+<p><br><br></p>
 <pre><code class="lang-cs">        <span class="hljs-comment">// POST: api/Todoes</span>
         [ResponseType(typeof(Todo))]
         <span class="hljs-keyword">public</span> <span class="hljs-function">IHttpActionResult <span class="hljs-title">PostTodo</span><span class="hljs-params">(Todo todo)</span>
@@ -506,6 +534,8 @@ MVCの場合と非常によく似た内容になります。</p>
 <p>postされた内容が <code>todo</code> にセットされます。
 <code>ModelState.IsValid</code> で内容を検査し、問題があれば 400 (BadRequest) を返します。</p>
 <p>問題なければ、DBを更新し、 201 (Created) を返します。</p>
+<p><br>
+<br></p>
 <pre><code class="lang-cs">        <span class="hljs-comment">// DELETE: api/Todoes/5</span>
         [ResponseType(typeof(Todo))]
         <span class="hljs-keyword">public</span> <span class="hljs-function">IHttpActionResult <span class="hljs-title">DeleteTodo</span><span class="hljs-params">(<span class="hljs-keyword">int</span> id)</span>
@@ -523,9 +553,11 @@ MVCの場合と非常によく似た内容になります。</p>
         }
 </code></pre>
 <p>DELETE で該当のTodoを削除 (Delete) します。</p>
-<p>該当IDの項目が無ければ 404 (Not Found) が返されます。
-削除後は削除されたTodoをそのまま返しています。</p>
-<p>(個人的には StatusCode 204 (No Content) を返しても良いと思います)</p>
+<p>該当IDの項目が無ければ 404 (Not Found) が返されます。</p>
+<p>削除後は削除されたTodoをそのまま返しています。
+(個人的には StatusCode 204 (No Content) を返しても良いと思います)</p>
+<p><br>
+<br></p>
 <pre><code class="lang-cs">        <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">override</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Dispose</span><span class="hljs-params">(<span class="hljs-keyword">bool</span> disposing)</span>
         </span>{
             <span class="hljs-keyword">if</span> (disposing)
@@ -542,6 +574,8 @@ MVCの場合と非常によく似た内容になります。</p>
     }
 }
 </code></pre>
+<p><br>
+<br></p>
 <h3 id="-">動作確認</h3>
 <p>Visual Studioで F5キーを押下 (あるいは <code>|&gt;</code>ボタンをクリック) してデバッグ実行します。</p>
 <p>ブラウザが起動しますが、Webページは用意していないのでエラー画面が表示されると思います。
@@ -561,6 +595,9 @@ curl http:<span class="hljs-comment">//localhost:49192/api/Todoes/1</span>
 # <span class="hljs-keyword">update</span> item
 curl -v -<span class="hljs-keyword">H</span> <span class="hljs-string">"Content-Type: application/json"</span> -<span class="hljs-keyword">H</span> <span class="hljs-string">"Accept:application/json"</span> -X PUT -<span class="hljs-keyword">d</span> <span class="hljs-string">"{\"</span>id\<span class="hljs-string">":5,\"</span>summary\<span class="hljs-string">":\"</span>test2\<span class="hljs-string">",\"</span>detail\<span class="hljs-string">":\"</span>hogehoge\<span class="hljs-string">",\"</span>limit\<span class="hljs-string">":\"</span>2015-02-01\<span class="hljs-string">",\"</span>done\<span class="hljs-string">":\"</span>false\<span class="hljs-string">"}"</span> http:<span class="hljs-comment">//localhost:49192/api/Todoes/5</span>
 </code></pre>
+<p><br></p>
+<hr>
+<p><br></p>
 <h3 id="-1-">補足(1) 絞り込み機能の追加</h3>
 <p>現状、<code>http://localhost:49192/api/Todoes/</code> にリクエストを投げると全件返ってきます。</p>
 <p>URLにパラメータ (<code>QueryString</code>といいます) を付与することで、Todoを絞り込めるように機能を追加してみます。</p>
@@ -594,6 +631,8 @@ curl -v -<span class="hljs-keyword">H</span> <span class="hljs-string">"Content-
 </li>
 </ul>
 <p><code>http://localhost:49192/api/Todoes/?summary=test&amp;done=false</code> といったようにURLパラメータに絞り込み条件を付与すると、条件に一致した項目のみ返ってきます。</p>
+<p><br></p>
+<hr>
 <p><br></p>
 <h3 id="-2-">補足(2) データの格納場所について</h3>
 <p>これまでの処理で登録されたデータは、<code>SQL Server LocalDB</code> に保存されています。</p>
