@@ -109,6 +109,16 @@
 <p><br></p>
 <p><hr>
 <br></p>
+<h2 id="asp-net-web-api-">ASP.NET Web API とは？</h2>
+<p><a href="http://www.asp.net/web-api">ASP.NET Web API</a></p>
+<blockquote>
+<p>ASP.NET Web API is a framework that makes it easy to build HTTP services that reach a broad range of clients, including browsers and mobile devices. ASP.NET Web API is an ideal platform for building RESTful applications on the .NET Framework.</p>
+</blockquote>
+<p>ASP.NET Web APIは、それが簡単にブラウザやモバイル機器などのクライアントの広い範囲を、到達するHTTPサービスを構築することを可能にするフレームワークです。
+ASP.NET Web APIは、.NET Framework上で <em>RESTful</em> なアプリケーションを構築するための理想的なプラットフォームです。
+(Google翻訳)</p>
+<p><br>
+<br></p>
 <h2 id="-rest-"><code>REST</code> とは？</h2>
 <ul>
 <li>Web API のソフトウェアアーキテクチャのスタイルのひとつ。<ul>
@@ -116,7 +126,8 @@
 </ul>
 </li>
 </ul>
-<p><br></p>
+<p><br>
+<br></p>
 <h2 id="rest-">RESTの原則</h2>
 <ul>
 <li><em>ステートレス</em> なクライアント/サーバープロトコル</li>
@@ -420,11 +431,13 @@
 </ul>
 <p><img src="./images/WS000009.JPG" alt="コントローラーの追加-3"></p>
 <p><br></p>
-<p>Web APIとして公開されるメソッドは <code>Public</code> になっています。
-また、それぞれの命名規則は <code>HTTPメソッド名 + Model名</code> となっています。</p>
+<h3 id="-">ソースコード解説</h3>
+<p>生成されたソースコードについて解説していきます。</p>
 <ul>
 <li><a href="https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/blob/master/projects/step3/TodoApi/TodoApi/Controllers/TodoesController.cs">TodoesController.cs</a></li>
 </ul>
+<p>Web APIとして公開されるメソッドは <code>Public</code> になっています。
+また、それぞれの命名規則は <code>HTTPメソッド名 + Model名</code> となっています。</p>
 <p><br></p>
 <pre><code class="lang-cs"><span class="hljs-keyword">using</span> System;
 <span class="hljs-keyword">using</span> System.Collections.Generic;
@@ -621,15 +634,7 @@ curl -v -<span class="hljs-keyword">H</span> <span class="hljs-string">"Content-
     <span class="hljs-keyword">return</span> todoes;
 }
 </code></pre>
-<ul>
-<li><p><code>[FromUri]</code> は <code>QueryString</code>の内容を引数にセットする指定です。</p>
-</li>
-<li><p><code>Select</code>, <code>OrderBy</code>, <code>Where</code> は <code>クエリ ビルダー メソッド</code> と言われるメソッドで <code>DbSet</code> (ここでは <code>db.Todoes</code>) のデータをフィルタリングしたり、並べ替えたりする際に使用します。</p>
-<ul>
-<li><a href="https://msdn.microsoft.com/ja-jp/library/cc716755(v=vs.100">データをフィルター選択する方法 (Entity Framework)</a>.aspx)</li>
-</ul>
-</li>
-</ul>
+<p><code>[FromUri]</code> は <code>QueryString</code>の内容を引数にセットする指定です。</p>
 <p><code>http://localhost:49192/api/Todoes/?summary=test&amp;done=false</code> といったようにURLパラメータに絞り込み条件を付与すると、条件に一致した項目のみ返ってきます。</p>
 <p><br></p>
 <hr>
