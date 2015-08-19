@@ -25,11 +25,25 @@
 <hr>
 <br>
 
+## ASP.NET Web API とは？
+
+[ASP.NET Web API](http://www.asp.net/web-api)
+
+> ASP.NET Web API is a framework that makes it easy to build HTTP services that reach a broad range of clients, including browsers and mobile devices. ASP.NET Web API is an ideal platform for building RESTful applications on the .NET Framework.
+
+ASP.NET Web APIは、それが簡単にブラウザやモバイル機器などのクライアントの広い範囲を、到達するHTTPサービスを構築することを可能にするフレームワークです。
+ASP.NET Web APIは、.NET Framework上で *RESTful* なアプリケーションを構築するための理想的なプラットフォームです。
+(Google翻訳)
+
+<br>
+<br>
+
 ## `REST` とは？
 
 * Web API のソフトウェアアーキテクチャのスタイルのひとつ。
   - REST の原則に従っているシステムは `RESTful`なシステム、 といわれます。
 
+<br>
 <br>
 
 ## RESTの原則
@@ -310,10 +324,14 @@ namespace TodoApi.Models
 
 <br>
 
-Web APIとして公開されるメソッドは `Public` になっています。
-また、それぞれの命名規則は `HTTPメソッド名 + Model名` となっています。
+### ソースコード解説
+
+生成されたソースコードについて解説していきます。
 
 * [TodoesController.cs](https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/blob/master/projects/step3/TodoApi/TodoApi/Controllers/TodoesController.cs)
+
+Web APIとして公開されるメソッドは `Public` になっています。
+また、それぞれの命名規則は `HTTPメソッド名 + Model名` となっています。
 
 <br>
 
@@ -566,11 +584,7 @@ public IQueryable<Todo> GetTodoes([FromUri] Todo param)
 }
 ```
 
-* `[FromUri]` は `QueryString`の内容を引数にセットする指定です。
-
-* `Select`, `OrderBy`, `Where` は `クエリ ビルダー メソッド` と言われるメソッドで `DbSet` (ここでは `db.Todoes`) のデータをフィルタリングしたり、並べ替えたりする際に使用します。
-  - [データをフィルター選択する方法 (Entity Framework)](https://msdn.microsoft.com/ja-jp/library/cc716755(v=vs.100).aspx)
-
+`[FromUri]` は `QueryString`の内容を引数にセットする指定です。
 
 `http://localhost:49192/api/Todoes/?summary=test&done=false` といったようにURLパラメータに絞り込み条件を付与すると、条件に一致した項目のみ返ってきます。
 
