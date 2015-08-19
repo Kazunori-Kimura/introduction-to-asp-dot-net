@@ -1,5 +1,7 @@
 # 4. `ASP.NET Web API`によるREST API開発
 
+<br>
+
 ## Web API とは？
 
 * `API`: Application Programming Interface
@@ -8,6 +10,7 @@
 
 プログラムからのHTTPリクエストに対し、`XML` や `JSON` などのデータを返すWebアプリケーションを *Web API* と呼びます。
 
+<br>
 <br>
 
 ## Web API のメリットは？
@@ -19,11 +22,15 @@
   - システムの役割が明確になり、より良い設計になる (ことが期待できる)
 
 <br>
+<hr>
+<br>
 
 ## `REST` とは？
 
 * Web API のソフトウェアアーキテクチャのスタイルのひとつ。
   - REST の原則に従っているシステムは `RESTful`なシステム、 といわれます。
+
+<br>
 
 ## RESTの原則
 
@@ -32,12 +39,14 @@
 セッションやクッキーによるセッション状態の管理を行わず、
 一度のリクエスト/レスポンスで問い合わせが完了する。
 
+<br>
 
 * `URI (Uniform Resource Identifier)` でリソースを一意に識別する
 
 `http://{webapi}/user/1/task/5` のような URL にリクエストを投げると
 `userId`が`1`のユーザーが持っている`taskId`が`5`のタスク情報を返すようなイメージ。
 
+<br>
 
 * HTTPメソッドでリソースを操作する
 
@@ -84,6 +93,11 @@
 
 HTTPが喋れるツールであれば何でも良いのですが、今回は `cURL` を使用します。
 
+<br>
+
+------
+
+<br>
 
 ### 【用語解説】cURL
 
@@ -91,6 +105,7 @@ HTTPが喋れるツールであれば何でも良いのですが、今回は `cU
 >
 > [cURL](http://ja.wikipedia.org/wiki/CURL)
 
+<br>
 
 ### 【用語解説】Chocolatey
 
@@ -98,6 +113,12 @@ HTTPが喋れるツールであれば何でも良いのですが、今回は `cU
 パッケージ管理ツールを使用します。
 
 [Chocolatey](https://chocolatey.org/) は Linuxでいう `yum` や `apt-get` のようなパッケージ管理ツールです。
+
+<br>
+
+------
+
+<br>
 
 * Chocolateyのインストール
 
@@ -108,6 +129,8 @@ HTTPが喋れるツールであれば何でも良いのですが、今回は `cU
 @powershell -NoProfile -ExecutionPolicy unrestricted -Command "iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))" && SET PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin
 ```
 
+<br>
+
 * cURLのインストール
 
 `Chocolatey` を使用して、`cURL`をインストールします。
@@ -117,6 +140,8 @@ choco install curl
 ```
 
 ![cURLのインストール](./images/WS000014.JPG)
+
+<br>
 
 #### 動作確認
 
@@ -166,13 +191,19 @@ Todoは以下のプロパティを持つものとします。
 
     第2回で作成した MVC の Todo管理アプリケーションと同じ内容です。
 
+<br>
+
 ------
+
+<br>
 
 それでは、実際に開発を進めていきます。
 
 [こちら](https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/tree/master/projects/step3/TodoApi) に実際にVisual Studio 2013で作成したプロジェクトがあります。
 
 * 画面キャプチャは Visual Studio 2013 ですが、Visual Studio 2015 でも同様の手順で開発できます。
+
+<br>
 
 ### (1) プロジェクトの作成
 
@@ -233,6 +264,9 @@ namespace TodoApi.Models
 }
 ```
 
+<br>
+<br>
+
 * 続いて `TodoesContext.cs` を追加します。
 
 `TodoesContext.cs`
@@ -256,8 +290,9 @@ namespace TodoApi.Models
 ここまで作成したら、一旦ソリューション全体をビルドしてください。
 
 <br>
+<br>
 
-#### Controllerクラスの追加
+### Controllerクラスの追加
 
 * Controllersを右クリック→「追加」→「コントローラー」を選択
 
@@ -273,12 +308,14 @@ namespace TodoApi.Models
 
 ![コントローラーの追加-3](./images/WS000009.JPG)
 
-以下の様なコードが自動生成されます。
+<br>
 
 Web APIとして公開されるメソッドは `Public` になっています。
 また、それぞれの命名規則は `HTTPメソッド名 + Model名` となっています。
 
 * [TodoesController.cs](https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net/blob/master/projects/step3/TodoApi/TodoApi/Controllers/TodoesController.cs)
+
+<br>
 
 ```cs
 using System;
@@ -303,6 +340,8 @@ Web APIのコントローラーは `ApiController` クラスを継承します�
 `ApiController` は MVCの `Controller` クラスを継承していますので、
 MVCの場合と非常によく似た内容になります。
 
+<br><br>
+
 ```cs
         private TodoesContext db = new TodoesContext();
 
@@ -317,6 +356,8 @@ MVCの場合と非常によく似た内容になります。
 すべてのTodoをリストで返します。
 
 StatusCodeの指定がない場合は、常に 200 (Ok) を返します。
+
+<br><br>
 
 ```cs
         // GET: api/Todoes/5
@@ -339,6 +380,8 @@ Todoが見つかった場合はそのデータを返します。
 `Ok` メソッドはStatusCode 200 を返します。
 
 Todoが見つからない場合、 StatusCode 404 (Not Found) を返します。
+
+<br><br>
 
 ```cs
         // PUT: api/Todoes/5
@@ -379,10 +422,14 @@ Todoが見つからない場合、 StatusCode 404 (Not Found) を返します。
 
 PUT で該当IDの項目を更新 (Update) します。
 
+入力内容に問題がある場合は 400 (BadRequest) が返されます。
+
 例外がthrowされた場合は 500 (Internal Server Error) が返されます。  
 また、該当IDの項目が無ければ 404 (Not Found) が返されます。
 
 更新完了後は特に返却するものは無いので、StatusCode 204 (No Content) を返します。
+
+<br><br>
 
 ```cs
         // POST: api/Todoes
@@ -408,6 +455,9 @@ postされた内容が `todo` にセットされます。
 
 問題なければ、DBを更新し、 201 (Created) を返します。
 
+<br>
+<br>
+
 ```cs
         // DELETE: api/Todoes/5
         [ResponseType(typeof(Todo))]
@@ -429,10 +479,12 @@ postされた内容が `todo` にセットされます。
 DELETE で該当のTodoを削除 (Delete) します。
 
 該当IDの項目が無ければ 404 (Not Found) が返されます。
-削除後は削除されたTodoをそのまま返しています。
 
+削除後は削除されたTodoをそのまま返しています。
 (個人的には StatusCode 204 (No Content) を返しても良いと思います)
 
+<br>
+<br>
 
 ```cs
         protected override void Dispose(bool disposing)
@@ -452,7 +504,8 @@ DELETE で該当のTodoを削除 (Delete) します。
 }
 ```
 
-
+<br>
+<br>
 
 ### 動作確認
 
@@ -476,6 +529,12 @@ curl http://localhost:49192/api/Todoes/1
 # update item
 curl -v -H "Content-Type: application/json" -H "Accept:application/json" -X PUT -d "{\"id\":5,\"summary\":\"test2\",\"detail\":\"hogehoge\",\"limit\":\"2015-02-01\",\"done\":\"false\"}" http://localhost:49192/api/Todoes/5
 ```
+
+<br>
+
+------
+
+<br>
 
 ### 補足(1) 絞り込み機能の追加
 
@@ -514,6 +573,10 @@ public IQueryable<Todo> GetTodoes([FromUri] Todo param)
 
 
 `http://localhost:49192/api/Todoes/?summary=test&done=false` といったようにURLパラメータに絞り込み条件を付与すると、条件に一致した項目のみ返ってきます。
+
+<br>
+
+------
 
 <br>
 
