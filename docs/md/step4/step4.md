@@ -1,4 +1,4 @@
-# `ASP.NET Web API`と`knockout.js`によるSingle Page Application開発
+# `ASP.NET Web API`と`knockout.js`によるSingle Page Application開発 (1)
 
 ## Single Page Application とは？
 
@@ -17,7 +17,7 @@
 
 <br>
 
-#### 代表的な JavaScriptフレームワーク
+### 代表的な JavaScriptフレームワーク
 
 * [backbone.js](http://backbonejs.org/) : JavaScriptフレームワークの草分け的存在。
 * [AngularJS](https://angularjs.org/) : Googleが中心になって開発している。利用者も多い。
@@ -116,7 +116,7 @@ var varName = function funcName(){ };
 
 <br>
 
-#### 概要
+### 概要
 
 * `UserModel`が *MVVM* の *Model* です。
 * `AppViewModel`が *MVVM* の *ViewModel* です。
@@ -273,29 +273,25 @@ ko.applyBindings(new AppViewModel(models));
 </html>
 ```
 
-#### 概要
-
-##### ViewModel
+### ViewModel
 
 * `ko.applyBindings`で *View* と *ViewModel* を紐付けます。
   - `AppViewModel`の引数に初期表示する`BookmarkModel`の配列を渡しています。
 * `AppViewModel` では受け取った配列を `observableArray` にセットします。
   - `observableArray` は配列を監視し、要素が追加/削除されると *View* に反映されます。
-  - また、合わせて 編集中のbookmark を管理する `currentItem` を定義します。
-`observable`定義時に引数に何も渡さないと、`null`がセットされます。
-  - `addBookmark`メソッドは`observableArray`に要素を追加し、追加された要素を編集中として
-`currentItem`に保持します。
+  - また、合わせて 編集中のbookmark を管理する `currentItem` を定義します。 `observable`定義時に引数に何も渡さないと、`null`がセットされます。
+  - `addBookmark`メソッドは`observableArray`に要素を追加し、追加された要素を編集中として `currentItem`に保持します。
   - `deleteBookmark`メソッドは`observableArray`から指定された要素を削除します。
 
 <br>
 
-##### Model
+### Model
 
 * `title` と `url` のプロパティを持ちます。
 
 <br>
 
-##### View
+### View
 
 * `foreach`
 
@@ -344,10 +340,16 @@ ko.applyBindings(new MenuViewModel(), document.getElementById("menu"));
 ko.applyBindings(new ContentViewModel(), document.getElementById("content"));
 ```
 
+
+### ToDoアプリを作る
+
+
 <br>
 <br>
 
 ------
+
+# `ASP.NET Web API`と`knockout.js`によるSingle Page Application開発 (2)
 
 # ToDoアプリの開発
 
@@ -362,7 +364,7 @@ ko.applyBindings(new ContentViewModel(), document.getElementById("content"));
   - `Cancel`ボタンで編集状態が解除されます。 (編集内容は破棄)
 * `Add`ボタンで新規Todoを登録します。
 
-#### Todoリストの項目
+### Todoリストの項目
 
 * id: Todoを一意に特定する数値。
 * summary: 概要。文字列。
