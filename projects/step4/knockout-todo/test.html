@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>test</title>
+  <style>
+  body {
+    margin: 40px;
+  }
+
+  form {
+    margin: 20px;
+    border: 1px black solid;
+  }
+  </style>
+</head>
+<body>
+
+  <h1>薬品情報</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>id</th>
+        <th>薬品名</th>
+        <th>種別</th>
+        <th>&nbsp;</th>
+      </tr>
+    </thead>
+    <tbody data-bind="foreach: drugList">
+      <tr>
+        <td data-bind="text: id"></td>
+        <td data-bind="text: name"></td>
+        <td data-bind="text: typeName"></td>
+        <td>
+          <button data-bind="click: $root.editItem">Edit</button>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="4">
+          <button data-bind="click: $root.addItem">Add</button>
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <form>
+    <h2>編集エリア</h2>
+    <hr>
+    <table>
+      <tbody>
+        <tr>
+          <td>薬品名</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>種別</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>説明</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <button data-bind="click: $root.commitItem">Commit</button>
+  </form>
+
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="bower_components/knockout/dist/knockout.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "name": "knockout-todo",
+  "version": "0.0.0",
+  "homepage": "https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net",
+  "authors": [
+    "Kazunori.Kimura <kazunori.kimura.js@gmail.com>"
+  ],
+  "description": "knockout todo application",
+  "main": "index.html",
+  "moduleType": [
+    "es6"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.5",
+    "jquery": "~2.1.4",
+    "knockout": "~3.3.0"
+  }
+}
