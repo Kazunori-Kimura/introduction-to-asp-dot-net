@@ -26,7 +26,8 @@
 
 上記以外にも大小様々なフレームワークが存在します。
 
-それぞれ守備範囲が異なるので、プロジェクトにあったものを選択する (あるいは、採用したJavaScriptフレームワークの機能を考慮して設計する) 必要があります。
+それぞれ守備範囲が異なるので、プロジェクトにあったものを選択する
+(あるいは、採用したJavaScriptフレームワークの機能を考慮して設計する) 必要があります。
 
 <br>
 
@@ -41,8 +42,6 @@
 <br>
 <br>
 
-------
-
 ## Knockout.js
 
 ### knockout.js の MVVM
@@ -51,84 +50,16 @@
 
 * *M* odel : サーバーから受け取ったデータ
 * *V* iew : HTML
-* *V* iew*M*odel : Modelを保持し、Viewとの仲介を行います。
+* *V* iew *M* odel : Modelを保持し、Viewとの仲介を行います。
 
 `MVVM` は `クライアントサイドMVC` と呼ばれる事もあります。
 
-### Hello, World!
+<br><br>
 
-まず、非常に簡単な `knockout.js` のアプリをサンプルとして
-`MVVM` の概要について解説します。
 
-```html
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>ko hello</title>
-</head>
-<body>
-  <input type="text"
-    placeholder="お名前"
-    data-bind="value: user.name, valueUpdate: 'afterkeydown'">
 
-  <p>こんにちは、<span data-bind="text: user.name"></span>さん！</p>
 
-  <script src="knockout.js"></script>
-  <script>
 
-// Model
-var UserModel = function UserModel(){
-  var self = this;
-
-  self.name = ko.observable("名無し");
-};
-
-// ViewModel
-var AppViewModel = function AppViewModel(){
-  var self = this;
-
-  self.user = new UserModel();
-};
-
-// bind
-ko.applyBindings(new AppViewModel());
-
-  </script>
-</body>
-</html>
-```
-
-ちなみに...
-
-```js
-var varName = function funcName(){ };
-```
-
-というのは `JavaScript`で`class` (のようなもの) を定義する際の構文です。
-
-また、`var self = this;` というのは、`JavaScript`でよく使用する技法です。
-
-`JavaScript`では文脈によって `this` の中身が異なります (例えば、button押下時のイベントから呼び出された場合、thisにはbuttonのオブジェクトが入っています) が
-`class`内部ではどのような状況であっても自分自身を取得する方法が欲しいので、 `new` した際に 自分自身を `self` という変数に格納しています。
-
-以降、`self`変数を参照することで、どのような文脈からの呼び出しであっても `self` は自分自身を指します。
-
-<br>
-
-### 概要
-
-* `UserModel`が *MVVM* の *Model* です。
-* `AppViewModel`が *MVVM* の *ViewModel* です。
-  - `AppViewModel` は 変数 `user` に *Model* `UserModel` のインスタンスを一つ保持しています。
-* `ko` は `knockout.js`のオブジェクトです。
-* `ko.applyBindings(viewModel);` で `body`と`ViewModel`を紐付けます。
-  - つまり、*MVVM* の *View* と *ViewModel* の紐付けを行っています。
-  - HTML内の各要素に`data-bind`属性を設定することで、*ViewModel* と *View* の紐付けの詳細を定義します。
-* `observable` は該当の変数を`knockout.js`の監視対象とします。
-  - ここでは、`UserModel`の`name`の値が変わるたびに *ViewModel* を介して *View* に反映されます。
-
-⇒ テキストボックスの値を変更すると、ほぼリアルタイムで `span`タグ内のテキストに反映されます。
 
 
 <br><br>
