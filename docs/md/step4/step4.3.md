@@ -389,6 +389,11 @@ var AppViewModel = function () {
 
 * observableArray
 
+`observableArray` は配列を監視し、要素が追加/削除されると *View* に反映されます。
+
+
+<br><br>
+
 ### エントリポイントの作成
 
 ```js
@@ -424,33 +429,24 @@ HTMLが読み込まれたタイミングで、ViewModel を body に紐付けて
 
 登録時は、別のインスタンスから該当のインスタンスに値を戻します。
 
+ViewModelにプロパティとメソッドを追加します。
+
 ```js
-var AppViewModel = function () {
-  var self = this;
+// 選択されたTodoを格納
+self.selectedItem = ko.observable();
 
-  // Todoリスト
-  self.todoList = ko.observableArray([
-    new ToDoModel({ id: 1, summary: 'hoge', detail: 'foobar1', limit: '', done:false }),
-    new ToDoModel({ id: 2, summary: 'foo',  detail: 'foobar2', limit: '', done:false }),
-    new ToDoModel({ id: 3, summary: 'bar',  detail: 'foobar3', limit: '', done:false })
-  ]);
-
-  // 選択されたTodoを格納
-  self.selectedItem = ko.observable();
-
-  /**
-   * リストからTodoを選択する
-   * @param item {ToDoModel} 選択された項目
-   */
-  self.selectTodo = function (item) {
-    self.selectedItem(new ToDoModel({
-      id: item.id(),
-      summary: item.summary(),
-      detail: item.detail(),
-      limit: item.limit(),
-      done: item.done()
-    }));
-  };
+/**
+ * リストからTodoを選択する
+ * @param item {ToDoModel} 選択された項目
+ */
+self.selectTodo = function (item) {
+  self.selectedItem(new ToDoModel({
+    id: item.id(),
+    summary: item.summary(),
+    detail: item.detail(),
+    limit: item.limit(),
+    done: item.done()
+  }));
 };
 ```
 
@@ -547,13 +543,16 @@ AppViewModelに定義したメソッドを呼び出したいのでこのよう�
 
 * checked
 
+<br><br>
 
-## 選択中の項目を強調する
+## 3. 選択中の項目を強調する
 
 現在編集しているTodoがどれなのか分かりやすいように、選択されている要素の背景色を青にします。
 
 bootstrap の active クラスを設定するだけで、青地に白文字で表示されるようになりますので
 knockout では 選択要素の aタグに activeクラスをセットするように実装します。
+
+<br><br>
 
 ### 要素が選択されているかどうかを判定するメソッドの追加
 
@@ -591,3 +590,303 @@ aタグを以下のように修正します。
 * css バインディング
 
 * $data
+
+<br><br>
+
+## 4. 追加ボタンクリック時の処理
+
+編集フォームに空のTodoをセットします。
+
+ViewModelに以下のメソッドを追加します。
+
+```js
+/**
+ * 新しいTodoの入力フォームを表示する
+ */
+self.addTodo = function () {
+  self.selectedItem(new ToDoModel());
+};
+```
+
+追加ボタンにメソッドを紐付けます。
+
+```html
+<button class="btn btn-primary btn-info btn-lg btn-block"
+  data-bind="click: $root.addTodo">
+  <span class="glyphicon glyphicon-plus"></span> 新しいToDoを追加
+</button>
+```
+
+<br>
+
+追加時には削除ボタンが使用できないように非表示とします。
+
+selectedItem の id が 0 の場合は追加、
+selectedItem の id が 0 以外の場合は更新と判断します。
+
+
+```js
+/**
+ * 削除が可能かどうか
+ * @return {boolean}
+ */
+self.isDeletable = function () {
+  return self.selectedItem().id() != 0;
+};
+```
+
+```html
+<button class="btn btn-danger"
+  data-bind="visible:$root.isDeletable()">
+  <span class="glyphicon glyphicon-trash"></span>
+  削除
+</button>
+```
+
+
+<br><br>
+
+## 5. キャンセルボタンクリック時の処理
+
+キャンセルをクリックした時は selectedItem に `null` をセットします。
+
+```js
+/**
+ * キャンセルボタンのクリック
+ */
+self.cancelEdit = function () {
+  // 編集フォームを閉じる
+  self.selectedItem(null);
+};
+```
+
+<br>
+
+キャンセルボタンにメソッドを紐付けます。
+
+```html
+<button class="btn btn-default" data-bind="click: $root.cancelEdit">
+  キャンセル
+</button>
+```
+
+<br><br>
+
+## 6. 登録ボタンクリック時の処理
+
+```js
+/**
+ * 登録ボタンのクリック
+ */
+self.registTodo = function () {
+  var item = self.selectedItem();
+  if (item.id() == 0) {
+    addItem(item);
+  } else {
+    updateItem(item);
+  }
+
+  // 編集フォームを閉じる
+  self.selectedItem(null);
+};
+
+/**
+ * Todoを登録する
+ */
+function addItem (todoItem) {
+  // リストに登録されている末尾の要素のIDを+1する
+  var len = self.todoList().length;
+  var newId = self.todoList()[len - 1].id() + 1;
+  // idを設定
+  todoItem.id(newId);
+  // リストに追加
+  self.todoList.push(todoItem);
+}
+
+/**
+ * Todoを更新する
+ */
+function updateItem (todoItem) {
+  var len = self.todoList().length;
+  for (var i=0; i<len; i++) {
+    var item = self.todoList()[i];
+    if (todoItem.id() == item.id()) {
+      // Todoを更新
+      item.summary(todoItem.summary());
+      item.detail(todoItem.detail());
+      item.limit(todoItem.limit());
+      item.done(todoItem.done());
+
+      break;
+    }
+  }
+}
+```
+
+observableArray は通常の配列のように `length` で要素数を取得したり
+`push` で要素を追加できます。
+
+```html
+<button class="btn btn-primary" data-bind="click: $root.registTodo">
+  <span class="glyphicon glyphicon-floppy-disk"></span>
+  登録
+</button>
+```
+
+登録ボタンをクリックしたらメソッドを呼び出すように紐付けます。
+
+<br><br>
+
+## 7. 削除ボタンクリック時の処理
+
+observableArray の remove メソッドで、現在選択されている要素を削除します。
+
+```js
+/**
+ * 削除ボタンのクリック
+ */
+self.deleteTodo = function () {
+  self.todoList.remove(function(item) {
+    return item.id() == self.selectedItem().id();
+  });
+
+  // 編集フォームを閉じる
+  self.selectedItem(null);
+};
+```
+
+<br>
+
+```html
+<button class="btn btn-danger"
+  data-bind="visible:$root.isDeletable(), click: $root.deleteTodo">
+  <span class="glyphicon glyphicon-trash"></span>
+  削除
+</button>
+```
+
+<br><br>
+
+-------
+
+## おまけ: モーダルダイアログの表示
+
+登録、削除が完了したらモーダルダイアログでメッセージを表示するように実装します。
+
+bootstrap の modalダイアログを利用します。
+
+```html
+<div class="modal fade" id="dialog" data-bind="with: dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" data-bind="text: title"></h4>
+      </div>
+      <div class="modal-body">
+        <p class="lead" data-bind="text: message"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" data-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+DialogModel を定義します。
+
+```js
+/**
+ * modal dialog model
+ */
+var DialogModel = function () {
+  var self = this;
+
+  self.id = '#dialog';
+  self.title = ko.observable('');
+  self.message = ko.observable('');
+
+  /**
+   * ダイアログの表示
+   * @param {object}
+   */
+  self.show = function (opts) {
+    // 初期値
+    var def = {
+      title: '',
+      message: ''
+    };
+    $.extend(def, opts);
+
+    self.title(def.title);
+    self.message(def.message);
+
+    // モーダルダイアログの表示
+    $(self.id).modal('show');
+  };
+  /**
+   * ダイアログの非表示
+   */
+  self.hide = function () {
+    $(self.id).modal('hide');
+  };
+};
+```
+
+AppViewModel で DialogModel を生成します。
+
+```js
+var AppViewModel = function () {
+  var self = this;
+
+  // Todoリスト
+  self.todoList = ko.observableArray([ ... ]);
+
+  // 選択されたTodo
+  self.selectedItem = ko.observable();
+
+  // モーダルダイアログ
+  self.dialog = new DialogModel();
+```
+
+登録、削除後にモーダルダイアログを表示するよう
+処理を修正します。
+
+```js
+/**
+ * 登録ボタンのクリック
+ */
+self.registTodo = function () {
+  var item = self.selectedItem();
+  if (item.id() == 0) {
+    addItem(item);
+  } else {
+    updateItem(item);
+  }
+
+  // 編集フォームを閉じる
+  self.selectedItem(null);
+
+  self.dialog.show({
+    title: '登録完了',
+    message: '登録が完了しました。'
+  });
+};
+
+/**
+ * 削除ボタンのクリック
+ */
+self.deleteTodo = function () {
+  self.todoList.remove(function(item) {
+    return item.id() == self.selectedItem().id();
+  });
+
+  // 編集フォームを閉じる
+  self.selectedItem(null);
+
+  self.dialog.show({
+    title: '削除完了',
+    message: '削除が完了しました。'
+  });
+};
+```
