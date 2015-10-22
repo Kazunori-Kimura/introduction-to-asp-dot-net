@@ -1,4 +1,4 @@
-# SinglePageApplicationの作成 - プロジェクトの作成
+# Web Optimization
 
 ## プロジェクトの作成
 
@@ -33,32 +33,52 @@ Webアプリケーションのレスポンス改善のテクニックのひと�
 
 <br><br>
 
-## Web Optimization のインストール
+### Web Optimization のインストール
 
 `Web Optimization` を *NuGet* で取得します。
 
-`Microsoft.AspNet.Web.Optimization`
+`Microsoft.AspNet.Web.Optimization` をインストールしてください。
 
 <br><br>
 
-## LayoutView の作成
+### レイアウトファイルの作成
 
-* `_LayoutPage1.cshtml` を作成
+`_LayoutPage1.cshtml` を作成します。
+後で修正するので、とりあえずファイルを作成するだけで良いです。
 
-## HomeController の追加
+<br><br>
 
-* `Index` メソッドのみを作成
+### HomeController の追加
+
+空のコントローラを追加し、名前を `HomeController` とします。
+
+今回はクライアントサイドの処理のみ実装していきますので、
+Indexメソッドがあればよいです。
+
+<br><br>
 
 ## Index View の追加
 
-* `Index.cshtml` を作成
+コントローラの Indexメソッドを右クリックし、Viewを追加します。
+
+名前は `Index.cshtml` とし、レイアウトに `_LayoutPage1.cshtml` を使用するよう指定します。
+
+<br><br>
+
 
 ## 独自のCSS, JSを追加
 
-* Contentフォルダに `base.css` を追加
-* Scriptsフォルダに `app.js` を追加
+* Contentフォルダに `base.css` を追加します。
+* Scriptsフォルダに `app.js` を追加します。
+
+<br><br>
 
 ## Global.asax.cs の修正
+
+cssやjavascriptを一括で読み込むように準備を行います。
+
+各ファイルのパスを `Global.asax.cs` に記載していきます。  
+後日、ファイルを追加した場合などはここを修正していきます。
 
 ```cs
 using System;
@@ -95,6 +115,16 @@ namespace KnockoutTodo
 }
 ```
 
+`BundleTable` の行が *Web Optimization* の記述です。  
+それぞれ、`Include` メソッドで列挙されたファイルを `~/bundle/style` あるいは `~/bundle/script` という
+名前のファイルに結合・最小化します。
+
+JavaScriptの場合、依存関係がある場合は記載する順番に気をつけてください。
+
+今回の場合は `bootstrap.js` は `jquery.js` に依存しているため、先に `jquery.js` を読み込んでいます。
+
+<br><br>
+
 ## `_LayoutPage1.cshtml` の修正
 
 ```cs
@@ -115,9 +145,15 @@ namespace KnockoutTodo
 </html>
 ```
 
+`Styles.Render` および `Scripts.Render` メソッドで HTML に CSS/JavaScript の読み込み処理を記載します。
+
+<br><br>
+
 ## Optimizationの確認
 
-デバッグ実行してソースを表示
+デバッグ実行してソースを表示してください。
+
+以下のようになっているはずです。
 
 ```html
 <!DOCTYPE html>
@@ -154,7 +190,10 @@ namespace KnockoutTodo
 </html>
 ```
 
-Web.configを書き換え
+デバッグ実行では、ファイルを minify してしまうとエラー発生時にどこに問題があったのかを
+トレースしづらくなるため、 `Include` メソッドに登録したファイルがそのまま読み込まれます。
+
+`Web.config` を書き換えて、デバッグ実行を無効にします。
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -171,14 +210,14 @@ Web.configを書き換え
     <add key="UnobtrusiveJavaScriptEnabled" value="true" />
   </appSettings>
   <system.web>
-    <compilation debug="true" targetFramework="4.5.2" />
+    <compilation debug="false" targetFramework="4.5.2" />
 ```
 
-`compilation` の `debug` を *false* に変更して、再度デバッグ実行
+`compilation` の `debug` を *false* に変更して、再度実行してください。
 
--> デバッグ無しで実行する、を選択
+確認ダイアログが表示されるので、「デバッグ無しで実行する」を選択します。
 
-再度、ソースを表示してみる
+再度、ソースを表示してみてください。
 
 ```html
 <!DOCTYPE html>
@@ -202,12 +241,24 @@ Web.configを書き換え
 </html>
 ```
 
-* `link` タグ、`script` タグが一つだけになっていることを確認
+`link` タグ、`script` タグが一つだけになっているはずです。
 
-* `?` 以降はファイルを変更してビルドした際に変わる。
-  - 以前ビルドしたファイルをキャッシュしている場合に、必ず最新のスタイルシートやスクリプトを参照させるため。
+`?` 以降はファイルを変更してビルドした際に変わります。  
+以前ビルドしたファイルがキャッシュされている場合があるので、必ず最新のスタイルシートやスクリプトを参照させるためのテクニックです。
+(C#に限らず、Webアプリケーションで特定のファイルのキャッシュを無効化する場合によく使用します。)
 
 
+<br><br>
 
 参考: [
 ASP.NET の Minify & Bundle 機能と HTML5オフラインキャッシュ](http://devadjust.exblog.jp/20061337/)
+
+<br>
+
+------
+
+<br>
+
+[次へ](step4.2.html)
+
+<br><br>

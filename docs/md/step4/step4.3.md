@@ -1,120 +1,15 @@
 # Todoアプリを作成する
 
-Login画面とHome画面の2画面構成とします。
+ひとまず、クライアントサイドだけで動作する Todoアプリ を作成します。
 
-## Login画面の作成
+## Home画面の作成
 
-* LoginViewModelの追加
+まずは HTMLだけを先に作成し、雰囲気を確認します。
 
-`Models/LoginViewModel.cs`
+*bootstrap* を使用するので、Layoutとスタイルシートを少し修正しておきます。
 
-```cs
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 
-namespace KnockoutTodo.Models
-{
-    public class LoginViewModel
-    {
-        [Required]
-        [DisplayName("ユーザー名")]
-        public string UserName { get; set; }
-
-        [Required]
-        [DisplayName("パスワード")]
-        public string Password { get; set; }
-    }
-}
-```
-
-* LoginControllerの追加
-
-`Controllers/LoginController.cs`
-
-```cs
-using KnockoutTodo.Models;
-using System.Web.Mvc;
-using System.Web.Security;
-
-namespace KnockoutTodo.Controllers
-{
-    [AllowAnonymous]
-    public class LoginController : Controller
-    {
-        // GET: Login
-        public ActionResult Index()
-        {
-            return View();
-        }
-
-        /// <summary>
-        /// ログイン処理
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Index([Bind(Include ="UserName,Password")] LoginViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                FormsAuthentication.SetAuthCookie(model.UserName, false);
-                // メイン画面に遷移
-                return RedirectToAction("Index", "Home");
-            }
-            return View(model);
-        }
-
-        /// <summary>
-        /// ログアウト処理
-        /// </summary>
-        /// <returns></returns>
-        public ActionResult SignOut()
-        {
-            FormsAuthentication.SignOut();
-            return RedirectToAction("Index");
-        }
-    }
-}
-```
-
-とりあえず、ログインボタンを押されたら何もチェックせず `Home/Index` に遷移する
-
-<br><br>
-
-* LoginViewの追加
-
-`Views/Login/Index.cshtml`
-
-```html
-@model KnockoutTodo.Models.LoginViewModel
-
-@{
-    ViewBag.Title = "Index";
-    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
-}
-
-<div class="container">
-    @using (Html.BeginForm("Index", "Login", FormMethod.Post,
-                                                new { @class = "form-signin" }))
-    {
-        @Html.AntiForgeryToken()
-
-        <h2 class="form-signin-heading">Please sign in</h2>
-
-        <label for="UserName" class="sr-only">User Name</label>
-        <input type="text" id="UserName" name="UserName" class="form-control"
-               placeholder="User Name" required autofocus>
-        <label for="Password" class="sr-only">Password</label>
-        <input type="password" id="Password" name="Password" class="form-control"
-               placeholder="Password" required>
-
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-    }
-</div>
-```
-
-`_LayoutPage1.cshtml`
+`Views/Shared/_LayoutPage1.cshtml`
 
 ```html
 <!DOCTYPE html>
@@ -135,81 +30,26 @@ namespace KnockoutTodo.Controllers
 </html>
 ```
 
+* metaタグの追加
+* 不要なdivタグの削除
 
-* base.cssの修正
+<br>
 
-`base.css`
+`Content/base.css`
 
 ```css
 body {
   margin-top: 70px;
 }
-
-/* -- login -- */
-.form-signin {
-  max-width: 330px;
-  padding: 15px;
-  margin: 0 auto;
-}
-.form-signin .form-signin-heading,
-.form-signin .checkbox {
-  margin-bottom: 10px;
-}
-.form-signin .checkbox {
-  font-weight: normal;
-}
-.form-signin .form-control {
-  position: relative;
-  height: auto;
-  -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box;
-          box-sizing: border-box;
-  padding: 10px;
-  font-size: 16px;
-}
-.form-signin .form-control:focus {
-  z-index: 2;
-}
-.form-signin input[type="email"] {
-  margin-bottom: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
 ```
 
-```xml
-<?xml version="1.0"?>
-<!--
-  ASP.NET アプリケーションの構成方法の詳細については、
-  http://go.microsoft.com/fwlink/?LinkId=169433 を参照してください
-  -->
-<configuration>
-  <appSettings>
-    <add key="webpages:Version" value="3.0.0.0"/>
-    <add key="webpages:Enabled" value="false"/>
-    <add key="PreserveLoginUrl" value="true"/>
-    <add key="ClientValidationEnabled" value="true"/>
-    <add key="UnobtrusiveJavaScriptEnabled" value="true"/>
-  </appSettings>
-  <system.web>
-    <compilation debug="true" targetFramework="4.5.2"/>
-    <httpRuntime targetFramework="4.5.2"/>
-    <authentication mode="Forms">
-      <forms loginUrl="~/Login/Index"/>
-    </authentication>
-```
+* 上部にナビゲーションバーを配置するので、マージンを設けます。
 
+<br>
 
-## Home画面の作成
+つづいて、HTMLをゴリゴリ書いていきます。
 
-まずは HTMLだけを先に作成し、雰囲気を確認します。
-
-
+ToDoの中身にはとりあえずダミーのデータを設定しておきます。
 
 `Views/Home/Index.cshtml`
 
@@ -313,7 +153,9 @@ body {
 
 <br><br>
 
-## Knockoutの実装
+それでは、JavaScriptを実装して動きを付けていきましょう。
+
+<br><br>
 
 ## 1. ToDoリストを画面に表示する
 
@@ -367,7 +209,7 @@ var ToDoModel = function (params) {
 
 その後、各値を `observable` の変数にセットします。
 
-* observable
+<br><br>
 
 ### ViewModelの作成
 
@@ -391,6 +233,8 @@ var AppViewModel = function () {
 
 `observableArray` は配列を監視し、要素が追加/削除されると *View* に反映されます。
 
+ここでは、Todoのリストを `observableArray` とし、追加・削除されると
+画面左側のTodoリストに反映されるように実装していきます。
 
 <br><br>
 
@@ -405,6 +249,9 @@ $(function(){
 
 HTMLが読み込まれたタイミングで、ViewModel を body に紐付けています。
 
+<br>
+
+### Todoリストの表示
 
 ```html
 <div class="col-md-4">
@@ -418,9 +265,18 @@ HTMLが読み込まれたタイミングで、ViewModel を body に紐付けて
     </div>
 ```
 
-* data-bind
-  - foreach
-  - text
+* `foreach`
+
+繰り返し処理の構文です。  
+`foreach`の内側では、カレントのスコープが各アイテムになります。
+
+ここでは、`foreach: todoList` としているので
+`AppViewModel` の `todoList` の中身を一つづつ取り出し、処理します。
+
+また、`todoList` は `observableArray` なので、要素が追加/削除されるたびに
+`foreach` が呼び出され、`todoList` の内容がViewに反映されます。
+
+<br><br>
 
 ## 2. 選択したTodoを編集フォームに表示する
 
@@ -450,6 +306,8 @@ self.selectTodo = function (item) {
 };
 ```
 
+<br>
+
 ### リストのアイテムとメソッドを紐付ける
 
 ```html
@@ -472,10 +330,17 @@ aタグに `data-bind="click: $root.selectedItem"` と追記します。
 デフォルトでは配列要素のプロパティが選択されます。
 
 aタグをクリックしたときには、配列要素では無く、
-AppViewModelに定義したメソッドを呼び出したいのでこのような記述になります。
+AppViewModel に定義したメソッドを呼び出したいのでこのような記述になります。
 
-メソッドの引数には配列の各要素が渡されます。
+`click` で指定したメソッドの引数には *バインディング・コンテキスト* が渡されます。
 
+> [バインディング・コンテキスト](http://kojs.sukobuto.com/docs/binding-context)  
+> バインディング・コンテキストは、バインディングから参照できるデータをもつオブジェクトです。 バインディングの適用にあたって、Knockout は自動的にバインディング・コンテキストの階層を作成・管理します。 階層のルートは、ko.applyBindings(viewModel) に渡した viewModel です。 また、with や foreach などのフロー制御バインディングを使う度に、 ネストされた ViewModel データを参照する子コンテキストが作成されます。
+
+今回は `foreach` 内で `click` を定義したので、メソッドの引数には配列の各要素が渡されます。
+
+
+<br>
 
 ### 編集フォームと selectedItem を紐付ける
 
@@ -539,9 +404,28 @@ AppViewModelに定義したメソッドを呼び出したいのでこのよう�
 
 * visible
 
+指定された要素が `true` と判定されるような場合、該当要素が表示されます。  
+逆に、指定された要素が `false` と判定されるような場合(`boolean`の`false`、`string`の`""`、`number`の`0`、`null`、`undefined`)、該当要素は非表示となります。
+
+<br>
+
 * with
 
+with バインディングは新たな バインディング・コンテキスト を作成します。
+
+ここでは、編集フォーム内の バインディング・コンテキスト を `selectedItem` に変更しています。
+
+<br>
+
+* value
+
+関連付けられた DOM エレメントの値と ViewModel のプロパティーをリンクさせます。
+`<input>` や `<select>`, `<textarea>` などのフォーム部品で使用します。
+
 * checked
+
+ViewModel のプロパティとチェックボックス や ラジオボタン などのチェックできるフォーム部品をリンクします。
+
 
 <br><br>
 
@@ -573,6 +457,8 @@ self.isActive = function (target) {
 };
 ```
 
+<br>
+
 ### 判定メソッドをViewに紐付ける
 
 aタグを以下のように修正します。
@@ -589,7 +475,21 @@ aタグを以下のように修正します。
 
 * css バインディング
 
+`css: { active: $root.isActive($data) }` とした場合、 `$root.isActive($data)` が
+`true` となった場合のみ、DOM要素に `active` クラスをセットします。
+
+<br>
+
 * $data
+
+`foreach` でループしている時の「現在のアイテム」になります。
+
+`$data` に別名を付けることもできます。
+
+`foreach: { data: items, as: 'item' }` とすると、`$data` の代わりに `item` で
+各要素を参照できます。
+
+`foreach` をネストする場合は別名を付けたほうが分かりやすいでしょう。
 
 <br><br>
 
@@ -608,6 +508,8 @@ self.addTodo = function () {
 };
 ```
 
+<br>
+
 追加ボタンにメソッドを紐付けます。
 
 ```html
@@ -621,7 +523,7 @@ self.addTodo = function () {
 
 追加時には削除ボタンが使用できないように非表示とします。
 
-selectedItem の id が 0 の場合は追加、
+selectedItem の id が 0 の場合は追加、  
 selectedItem の id が 0 以外の場合は更新と判断します。
 
 
@@ -634,6 +536,10 @@ self.isDeletable = function () {
   return self.selectedItem().id() != 0;
 };
 ```
+
+<br>
+
+非表示となるように、 visibleバインディングを設定します。
 
 ```html
 <button class="btn btn-danger"
@@ -673,6 +579,10 @@ self.cancelEdit = function () {
 <br><br>
 
 ## 6. 登録ボタンクリック時の処理
+
+selectedItem の id が 0 の場合は追加、
+selectedItem の id が 0 以外の場合は更新なので、  
+id の値に応じて処理を呼び分けます。
 
 ```js
 /**
@@ -726,6 +636,8 @@ function updateItem (todoItem) {
 observableArray は通常の配列のように `length` で要素数を取得したり
 `push` で要素を追加できます。
 
+<br>
+
 ```html
 <button class="btn btn-primary" data-bind="click: $root.registTodo">
   <span class="glyphicon glyphicon-floppy-disk"></span>
@@ -733,13 +645,24 @@ observableArray は通常の配列のように `length` で要素数を取得し
 </button>
 ```
 
-登録ボタンをクリックしたらメソッドを呼び出すように紐付けます。
+登録ボタンをクリックしたらメソッドを呼び出すように、clickバインディングで紐付けます。
+
+<br>
+
+### 補足: JavaScriptで擬似的な public / private
+
+`self.` から始まるプロパティ、メソッドは *public* だと考えてください。
+
+`var` や `function` から始まるプロパティ、メソッドは *private* です。
+ViewModelの外から参照することはできません。
+
+これも JavaScript でよく使用されるテクニックのひとつです。
 
 <br><br>
 
 ## 7. 削除ボタンクリック時の処理
 
-observableArray の remove メソッドで、現在選択されている要素を削除します。
+observableArray の `remove` メソッドで、現在選択されている要素を削除します。
 
 ```js
 /**
@@ -755,6 +678,9 @@ self.deleteTodo = function () {
 };
 ```
 
+`todoList` の各要素に対して `remove` メソッドで指定された `function` が実行され、
+`true` となった要素が削除されます。
+
 <br>
 
 ```html
@@ -764,6 +690,8 @@ self.deleteTodo = function () {
   削除
 </button>
 ```
+
+clickバインディングで紐付けます。
 
 <br><br>
 
@@ -890,3 +818,17 @@ self.deleteTodo = function () {
   });
 };
 ```
+
+
+<br><br>
+
+------
+
+以上で、クライアントサイドだけで動作する Todoアプリが完成しました。
+
+当然、データを保存する機能がないため、ブラウザをリロードすると更新した内容が失われます。
+
+次回は Ajax で Web API を呼び出すことで クライアントサイドとサーバーサイドの処理を連携させ、
+Todoアプリを完成させます。
+
+<br><br>
