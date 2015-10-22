@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>introduction to asp dot net - ASP.NET勉強会</title>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+  <!-- highlightjs -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css">
+  <!-- font-awesome -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <style>
+    /* Sticky footer styles
+    -------------------------------------------------- */
+    html {
+      position: relative;
+      min-height: 100%;
+    }
+    body {
+      padding-top: 70px;
+      /* Margin bottom by footer height */
+      margin-bottom: 70px;
+    }
+    .footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      /* Set the fixed height of the footer here */
+      height: 60px;
+      background-color: #f5f5f5;
+    }
+    /* Custom page CSS
+    -------------------------------------------------- */
+    /* Not required for template or sticky footer method. */
+    .container {
+      width: auto;
+      max-width: 980px;
+      padding: 0 15px;
+    }
+    .contents p, .contents li {
+      font-size: large;
+      line-height: 180%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 20px;
+      margin-bottom: 15px;
+    }
+    .container .text-muted {
+      margin: 20px 0;
+    }
+    .ad-block {
+      width: auto;
+      max-width: 768px;
+    }
+  </style>
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="http://kazunori-kimura.github.io/introduction-to-asp-dot-net/">introduction to asp dot net</a>
+      </div>
+      <p class="navbar-text navbar-right">
+        <a href="https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net" class="navbar-link" target="_blank">
+          <i class="fa fa-github"></i>
+          View on GitHub
+        </a>
+      </p>
+    </div>
+  </nav>
+
+  <div class="container contents">
+    <!-- contents -->
+    <h1 id="web-optimization">Web Optimization</h1>
+<h2 id="-">プロジェクトの作成</h2>
+<p><em>KnockoutTodo</em> という名前で ASP.NET のプロジェクトを作成します。</p>
+<ul>
+<li>テンプレートは <code>empty</code> とします。</li>
+<li><code>MVC</code> にチェック</li>
+<li><code>Web API</code> にチェック</li>
+</ul>
+<p><br><br></p>
+<h2 id="css-javascript-">CSSおよびJavaScriptライブラリのインストール</h2>
+<p><code>bootstrap</code> と <code>knockout.js</code> を <em>NuGet</em> で取得します。
+<code>jQuery</code> は <code>bootstrap</code> が依存しているため、一緒にダウンロードされるはずです。</p>
+<p><br><br></p>
+<h2 id="asp-net-mvc-javascript-css-minify-">ASP.NET MVCで JavaScript, CSS を minify する</h2>
+<p>昨今の Webアプリケーションでは
+bootstrap や jQuery, knockout.js など、様々な JavaScript/CSSのライブラリを読み込む必要があります。</p>
+<p>それぞれは小さなファイルですが、多数のファイルをリクエストすると
+httpの通信に掛かる遅延が気になってきます。</p>
+<p>Webアプリケーションのレスポンス改善のテクニックのひとつに
+アイコンなどの画像ファイルを一つのファイルにまとめて、
+表示する際にCSSで表示領域を切り取る <em>CSS Sprite</em> という方法があります。</p>
+<p>同じように、CSSやJSを一つのファイルに結合する機能が <em>Web Optimization</em> です。</p>
+<p><br><br></p>
+<h3 id="web-optimization-">Web Optimization のインストール</h3>
+<p><code>Web Optimization</code> を <em>NuGet</em> で取得します。</p>
+<p><code>Microsoft.AspNet.Web.Optimization</code> をインストールしてください。</p>
+<p><br><br></p>
+<h3 id="-">レイアウトファイルの作成</h3>
+<p><code>_LayoutPage1.cshtml</code> を作成します。
+後で修正するので、とりあえずファイルを作成するだけで良いです。</p>
+<p><br><br></p>
+<h3 id="homecontroller-">HomeController の追加</h3>
+<p>空のコントローラを追加し、名前を <code>HomeController</code> とします。</p>
+<p>今回はクライアントサイドの処理のみ実装していきますので、
+Indexメソッドがあればよいです。</p>
+<p><br><br></p>
+<h2 id="index-view-">Index View の追加</h2>
+<p>コントローラの Indexメソッドを右クリックし、Viewを追加します。</p>
+<p>名前は <code>Index.cshtml</code> とし、レイアウトに <code>_LayoutPage1.cshtml</code> を使用するよう指定します。</p>
+<p><br><br></p>
+<h2 id="-css-js-">独自のCSS, JSを追加</h2>
+<ul>
+<li>Contentフォルダに <code>base.css</code> を追加します。</li>
+<li>Scriptsフォルダに <code>app.js</code> を追加します。</li>
+</ul>
+<p><br><br></p>
+<h2 id="global-asax-cs-">Global.asax.cs の修正</h2>
+<p>cssやjavascriptを一括で読み込むように準備を行います。</p>
+<p>各ファイルのパスを <code>Global.asax.cs</code> に記載していきます。<br>後日、ファイルを追加した場合などはここを修正していきます。</p>
+<pre><code class="lang-cs"><span class="hljs-keyword">using</span> System;
+<span class="hljs-keyword">using</span> System.Web;
+<span class="hljs-keyword">using</span> System.Web.Mvc;
+<span class="hljs-keyword">using</span> System.Web.Routing;
+<span class="hljs-keyword">using</span> System.Web.Http;
+<span class="hljs-keyword">using</span> System.Web.Optimization;
+
+<span class="hljs-keyword">namespace</span> <span class="hljs-title">KnockoutTodo</span>
+{
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Global</span> : <span class="hljs-title">HttpApplication</span>
+    {
+        <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">Application_Start</span><span class="hljs-params">(<span class="hljs-keyword">object</span> sender, EventArgs e)</span>
+        </span>{
+            <span class="hljs-comment">// アプリケーションのスタートアップで実行するコードです</span>
+            AreaRegistration.RegisterAllAreas();
+            GlobalConfiguration.Configure(WebApiConfig.Register);
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+
+            <span class="hljs-comment">// css</span>
+            BundleTable.Bundles.Add(<span class="hljs-keyword">new</span> StyleBundle(<span class="hljs-string">"~/bundle/style"</span>).Include(
+                <span class="hljs-string">"~/Content/bootstrap.css"</span>,
+                <span class="hljs-string">"~/Content/bootstrap-theme.css"</span>,
+                <span class="hljs-string">"~/Content/base.css"</span>));
+            <span class="hljs-comment">// js</span>
+            BundleTable.Bundles.Add(<span class="hljs-keyword">new</span> ScriptBundle(<span class="hljs-string">"~/bundle/script"</span>).Include(
+                <span class="hljs-string">"~/Scripts/jquery-1.9.1.js"</span>,
+                <span class="hljs-string">"~/Scripts/bootstrap.js"</span>,
+                <span class="hljs-string">"~/Scripts/knockout-3.3.0.js"</span>,
+                <span class="hljs-string">"~/Scripts/app.js"</span>));
+        }
+    }
+}
+</code></pre>
+<p><code>BundleTable</code> の行が <em>Web Optimization</em> の記述です。<br>それぞれ、<code>Include</code> メソッドで列挙されたファイルを <code>~/bundle/style</code> あるいは <code>~/bundle/script</code> という
+名前のファイルに結合・最小化します。</p>
+<p>JavaScriptの場合、依存関係がある場合は記載する順番に気をつけてください。</p>
+<p>今回の場合は <code>bootstrap.js</code> は <code>jquery.js</code> に依存しているため、先に <code>jquery.js</code> を読み込んでいます。</p>
+<p><br><br></p>
+<h2 id="-_layoutpage1-cshtml-"><code>_LayoutPage1.cshtml</code> の修正</h2>
+<pre><code class="lang-cs"><span class="hljs-doctype">&lt;!DOCTYPE html&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-title">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">meta</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"viewport"</span> <span class="hljs-attribute">content</span>=<span class="hljs-value">"width=device-width"</span> /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">title</span>&gt;</span>@ViewBag.Title<span class="hljs-tag">&lt;/<span class="hljs-title">title</span>&gt;</span>
+    @System.Web.Optimization.Styles.Render("~/bundle/style")
+<span class="hljs-tag">&lt;/<span class="hljs-title">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>
+        @RenderBody()
+    <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+    @System.Web.Optimization.Scripts.Render("~/bundle/script")
+<span class="hljs-tag">&lt;/<span class="hljs-title">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">html</span>&gt;</span>
+</code></pre>
+<p><code>Styles.Render</code> および <code>Scripts.Render</code> メソッドで HTML に CSS/JavaScript の読み込み処理を記載します。</p>
+<p><br><br></p>
+<h2 id="optimization-">Optimizationの確認</h2>
+<p>デバッグ実行してソースを表示してください。</p>
+<p>以下のようになっているはずです。</p>
+<pre><code class="lang-html"><span class="hljs-doctype">&lt;!DOCTYPE html&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-title">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">meta</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"viewport"</span> <span class="hljs-attribute">content</span>=<span class="hljs-value">"width=device-width"</span> /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">title</span>&gt;</span>Index<span class="hljs-tag">&lt;/<span class="hljs-title">title</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">link</span> <span class="hljs-attribute">href</span>=<span class="hljs-value">"/Content/bootstrap.css"</span> <span class="hljs-attribute">rel</span>=<span class="hljs-value">"stylesheet"</span>/&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">link</span> <span class="hljs-attribute">href</span>=<span class="hljs-value">"/Content/bootstrap-theme.css"</span> <span class="hljs-attribute">rel</span>=<span class="hljs-value">"stylesheet"</span>/&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">link</span> <span class="hljs-attribute">href</span>=<span class="hljs-value">"/Content/base.css"</span> <span class="hljs-attribute">rel</span>=<span class="hljs-value">"stylesheet"</span>/&gt;</span>
+
+<span class="hljs-tag">&lt;/<span class="hljs-title">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-title">h2</span>&gt;</span>Index<span class="hljs-tag">&lt;/<span class="hljs-title">h2</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"/Scripts/jquery-1.9.1.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"/Scripts/bootstrap.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"/Scripts/knockout-3.3.0.debug.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"/Scripts/app.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+
+
+<span class="hljs-comment">&lt;!-- Visual Studio Browser Link --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">type</span>=<span class="hljs-value">"application/json"</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"__browserLink_initializationData"</span>&gt;</span><span class="json">
+    {"<span class="hljs-attribute">appName</span>":<span class="hljs-value"><span class="hljs-string">"Microsoft エッジ"</span></span>,"<span class="hljs-attribute">requestId</span>":<span class="hljs-value"><span class="hljs-string">"099fe0d6ac9a43f7a5cccb0aaacebea7"</span></span>}
+</span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">type</span>=<span class="hljs-value">"text/javascript"</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"http://localhost:49578/157766d9780c42159cf2a49ae41dd212/browserLink"</span> <span class="hljs-attribute">async</span>=<span class="hljs-value">"async"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+<span class="hljs-comment">&lt;!-- End Browser Link --&gt;</span>
+
+<span class="hljs-tag">&lt;/<span class="hljs-title">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">html</span>&gt;</span>
+</code></pre>
+<p>デバッグ実行では、ファイルを minify してしまうとエラー発生時にどこに問題があったのかを
+トレースしづらくなるため、 <code>Include</code> メソッドに登録したファイルがそのまま読み込まれます。</p>
+<p><code>Web.config</code> を書き換えて、デバッグ実行を無効にします。</p>
+<pre><code class="lang-xml"><span class="hljs-pi">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
+<span class="hljs-comment">&lt;!--
+  ASP.NET アプリケーションの構成方法の詳細については、
+  http://go.microsoft.com/fwlink/?LinkId=169433 を参照してください
+  --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">configuration</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-title">appSettings</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">add</span> <span class="hljs-attribute">key</span>=<span class="hljs-value">"webpages:Version"</span> <span class="hljs-attribute">value</span>=<span class="hljs-value">"3.0.0.0"</span> /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">add</span> <span class="hljs-attribute">key</span>=<span class="hljs-value">"webpages:Enabled"</span> <span class="hljs-attribute">value</span>=<span class="hljs-value">"false"</span> /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">add</span> <span class="hljs-attribute">key</span>=<span class="hljs-value">"PreserveLoginUrl"</span> <span class="hljs-attribute">value</span>=<span class="hljs-value">"true"</span> /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">add</span> <span class="hljs-attribute">key</span>=<span class="hljs-value">"ClientValidationEnabled"</span> <span class="hljs-attribute">value</span>=<span class="hljs-value">"true"</span> /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">add</span> <span class="hljs-attribute">key</span>=<span class="hljs-value">"UnobtrusiveJavaScriptEnabled"</span> <span class="hljs-attribute">value</span>=<span class="hljs-value">"true"</span> /&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-title">appSettings</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-title">system.web</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">compilation</span> <span class="hljs-attribute">debug</span>=<span class="hljs-value">"false"</span> <span class="hljs-attribute">targetFramework</span>=<span class="hljs-value">"4.5.2"</span> /&gt;</span>
+</code></pre>
+<p><code>compilation</code> の <code>debug</code> を <em>false</em> に変更して、再度実行してください。</p>
+<p>確認ダイアログが表示されるので、「デバッグ無しで実行する」を選択します。</p>
+<p>再度、ソースを表示してみてください。</p>
+<pre><code class="lang-html"><span class="hljs-doctype">&lt;!DOCTYPE html&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-title">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">meta</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"viewport"</span> <span class="hljs-attribute">content</span>=<span class="hljs-value">"width=device-width"</span> /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">title</span>&gt;</span>Index<span class="hljs-tag">&lt;/<span class="hljs-title">title</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">link</span> <span class="hljs-attribute">href</span>=<span class="hljs-value">"/bundle/style?v=SckkXrq8HfNtLA3FZKd7hzAGgT9W7l4oPzHTUmZ-oa81"</span> <span class="hljs-attribute">rel</span>=<span class="hljs-value">"stylesheet"</span>/&gt;</span>
+
+<span class="hljs-tag">&lt;/<span class="hljs-title">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-title">h2</span>&gt;</span>Index<span class="hljs-tag">&lt;/<span class="hljs-title">h2</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">script</span> <span class="hljs-attribute">src</span>=<span class="hljs-value">"/bundle/script?v=XpigI2UJG_YaR_PiSSfaB-BStF3wCNqKejKrjK0a-UI1"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;/<span class="hljs-title">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">html</span>&gt;</span>
+</code></pre>
+<p><code>link</code> タグ、<code>script</code> タグが一つだけになっているはずです。</p>
+<p><code>?</code> 以降はファイルを変更してビルドした際に変わります。<br>以前ビルドしたファイルがキャッシュされている場合があるので、必ず最新のスタイルシートやスクリプトを参照させるためのテクニックです。
+(C#に限らず、Webアプリケーションで特定のファイルのキャッシュを無効化する場合によく使用します。)</p>
+<p><br><br></p>
+<p>参考: <a href="http://devadjust.exblog.jp/20061337/">
+ASP.NET の Minify &amp; Bundle 機能と HTML5オフラインキャッシュ</a></p>
+<p><br></p>
+<hr>
+<p><br></p>
+<p><a href="step4.2.html">次へ</a></p>
+<p><br><br></p>
+  </div>
+
+  <br>
+  <br>
+
+  <div class="container">
+    <div class="center-block ad-block">
+      <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+      <!-- aaa-768x90 -->
+      <ins class="adsbygoogle"
+           style="display:inline-block;width:728px;height:90px"
+           data-ad-client="ca-pub-5886049398949171"
+           data-ad-slot="8568248344"></ins>
+      <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p class="text-muted">ASP.NET勉強会 , &copy; 2015 Kazunori Kimura</p>
+    </div>
+  </footer>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+  <script>
+  $(function(){
+    $(".contents table").addClass("table");
+  });
+  </script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-29149079-3', 'auto');
+  ga('send', 'pageview');
+
+</script>
+</body>
+</html>
