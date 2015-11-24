@@ -83,173 +83,352 @@
   <div class="container contents">
     <!-- contents -->
     <h1 id="-asp-net-web-api-knockout-js-single-page-application-2-"><code>ASP.NET Web API</code>と<code>knockout.js</code>によるSingle Page Application開発 (2)</h1>
-<h2 id="-login-">おまけ: Login画面の作成</h2>
-<ul>
-<li>LoginViewModelの追加</li>
-</ul>
-<p><code>Models/LoginViewModel.cs</code></p>
-<pre><code class="lang-cs"><span class="hljs-keyword">using</span> System.ComponentModel;
-<span class="hljs-keyword">using</span> System.ComponentModel.DataAnnotations;
-
-<span class="hljs-class"><span class="hljs-keyword">namespace</span> <span class="hljs-title">KnockoutTodo</span>.<span class="hljs-title">Models</span>
-</span>{
-    <span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">LoginViewModel</span>
-    </span>{
-        [Required]
-        [DisplayName(<span class="hljs-string">"ユーザー名"</span>)]
-        <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> UserName { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
-
-        [Required]
-        [DisplayName(<span class="hljs-string">"パスワード"</span>)]
-        <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> Password { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
-    }
-}
-</code></pre>
-<ul>
-<li>LoginControllerの追加</li>
-</ul>
-<p><code>Controllers/LoginController.cs</code></p>
-<pre><code class="lang-cs"><span class="hljs-keyword">using</span> KnockoutTodo.Models;
-<span class="hljs-keyword">using</span> System.Web.Mvc;
-<span class="hljs-keyword">using</span> System.Web.Security;
-
-<span class="hljs-keyword">namespace</span> KnockoutTodo.Controllers
-{
-    [AllowAnonymous]
-    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> LoginController : Controller
-    {
-        <span class="hljs-comment">// GET: Login</span>
-        <span class="hljs-function"><span class="hljs-keyword">public</span> ActionResult <span class="hljs-title">Index</span><span class="hljs-params">()</span>
-        </span>{
-            <span class="hljs-keyword">return</span> View();
-        }
-
-        <span class="hljs-comment">/// &lt;summary&gt;</span>
-        <span class="hljs-comment">/// ログイン処理</span>
-        <span class="hljs-comment">/// &lt;/summary&gt;</span>
-        <span class="hljs-comment">/// &lt;param name="model"&gt;&lt;/param&gt;</span>
-        <span class="hljs-comment">/// &lt;returns&gt;&lt;/returns&gt;</span>
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        <span class="hljs-function"><span class="hljs-keyword">public</span> ActionResult <span class="hljs-title">Index</span><span class="hljs-params">([Bind(Include ="UserName,Password")</span>] LoginViewModel model)
-        </span>{
-            <span class="hljs-keyword">if</span> (ModelState.IsValid)
-            {
-                FormsAuthentication.SetAuthCookie(model.UserName, <span class="hljs-keyword">false</span>);
-                <span class="hljs-comment">// メイン画面に遷移</span>
-                <span class="hljs-keyword">return</span> RedirectToAction(<span class="hljs-string">"Index"</span>, <span class="hljs-string">"Home"</span>);
-            }
-            <span class="hljs-keyword">return</span> View(model);
-        }
-
-        <span class="hljs-comment">/// &lt;summary&gt;</span>
-        <span class="hljs-comment">/// ログアウト処理</span>
-        <span class="hljs-comment">/// &lt;/summary&gt;</span>
-        <span class="hljs-comment">/// &lt;returns&gt;&lt;/returns&gt;</span>
-        <span class="hljs-function"><span class="hljs-keyword">public</span> ActionResult <span class="hljs-title">SignOut</span><span class="hljs-params">()</span>
-        </span>{
-            FormsAuthentication.SignOut();
-            <span class="hljs-keyword">return</span> RedirectToAction(<span class="hljs-string">"Index"</span>);
-        }
-    }
-}
-</code></pre>
-<p>とりあえず、ログインボタンを押されたら何もチェックせず <code>Home/Index</code> に遷移する</p>
+<p><a href="../step4/step4.3.html">前回</a> は <em>Knockout.js</em> を使用して
+ブラウザだけで動作するTodoアプリケーションを作成しました。</p>
+<p>今回はサーバー側の処理を実装し、前回作成したフロントエンドと結合します。</p>
 <p><br><br></p>
+<h2 id="web-api-">Web API の作成</h2>
+<p><a href="../step3/step3.html">以前</a> 取り上げた <em>ASP.NET Web API</em> の開発手順と全く同じです。</p>
+<p><br><br></p>
+<h3 id="-1-entityframework-">(1) EntityFrameworkを追加</h3>
 <ul>
-<li>LoginViewの追加</li>
+<li>プロジェクトを右クリック→「NuGet パッケージの管理」</li>
+<li><em>EntityFramework</em> を選択して「インストール」</li>
 </ul>
-<p><code>Views/Login/Index.cshtml</code></p>
-<pre><code class="lang-html"><span class="hljs-annotation">@model</span> <span class="hljs-type">KnockoutTodo</span>.<span class="hljs-type">Models</span>.<span class="hljs-type">LoginViewModel</span>
+<p><br><br></p>
+<h3 id="-2-model-">(2) Modelクラスの追加</h3>
+<ul>
+<li><code>Models</code>を右クリック→「追加」→「クラス」を選択します。</li>
+<li>名前を <code>Todo.cs</code> として「追加」します。</li>
+</ul>
+<p><code>Todo.cs</code></p>
+<pre><code class="lang-cs"><span class="hljs-keyword">using</span> System;
+<span class="hljs-keyword">using</span> System.Collections.Generic;
+<span class="hljs-keyword">using</span> System.Linq;
+<span class="hljs-keyword">using</span> System.Web;
 
-@{
-    <span class="hljs-type">ViewBag</span>.<span class="hljs-type">Title</span> = <span class="hljs-string">"Index"</span>;
-    <span class="hljs-type">Layout</span> = <span class="hljs-string">"~/Views/Shared/_LayoutPage1.cshtml"</span>;
-}
+<span class="hljs-class"><span class="hljs-keyword">namespace</span> <span class="hljs-title">TodoApi</span>.<span class="hljs-title">Models</span>
+</span>{
+    <span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span>
+    </span>{
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> id { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
 
-&lt;div <span class="hljs-class"><span class="hljs-keyword">class</span>=</span><span class="hljs-string">"container"</span>&gt;
-    <span class="hljs-annotation">@using</span> (<span class="hljs-type">Html</span>.<span class="hljs-type">BeginForm</span>(<span class="hljs-string">"Index"</span>, <span class="hljs-string">"Login"</span>, <span class="hljs-type">FormMethod</span>.<span class="hljs-type">Post</span>,
-                                                <span class="hljs-keyword">new</span> { <span class="hljs-annotation">@class</span> = <span class="hljs-string">"form-signin"</span> }))
-    {
-        <span class="hljs-annotation">@Html</span>.<span class="hljs-type">AntiForgeryToken</span>()
+        [Required]
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> summary { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
 
-        &lt;h2 <span class="hljs-class"><span class="hljs-keyword">class</span>=</span><span class="hljs-string">"form-signin-heading"</span>&gt;<span class="hljs-type">Please</span> sign in&lt;/h2&gt;
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> detail { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
 
-        &lt;label <span class="hljs-keyword">for</span>=<span class="hljs-string">"UserName"</span> <span class="hljs-class"><span class="hljs-keyword">class</span>=</span><span class="hljs-string">"sr-only"</span>&gt;<span class="hljs-type">User</span> <span class="hljs-type">Name</span>&lt;/label&gt;
-        &lt;input <span class="hljs-class"><span class="hljs-keyword">type</span>=</span><span class="hljs-string">"text"</span> id=<span class="hljs-string">"UserName"</span> name=<span class="hljs-string">"UserName"</span> <span class="hljs-class"><span class="hljs-keyword">class</span>=</span><span class="hljs-string">"form-control"</span>
-               placeholder=<span class="hljs-string">"User Name"</span> required autofocus&gt;
-        &lt;label <span class="hljs-keyword">for</span>=<span class="hljs-string">"Password"</span> <span class="hljs-class"><span class="hljs-keyword">class</span>=</span><span class="hljs-string">"sr-only"</span>&gt;<span class="hljs-type">Password</span>&lt;/label&gt;
-        &lt;input <span class="hljs-class"><span class="hljs-keyword">type</span>=</span><span class="hljs-string">"password"</span> id=<span class="hljs-string">"Password"</span> name=<span class="hljs-string">"Password"</span> <span class="hljs-class"><span class="hljs-keyword">class</span>=</span><span class="hljs-string">"form-control"</span>
-               placeholder=<span class="hljs-string">"Password"</span> required&gt;
+        <span class="hljs-keyword">public</span> DateTime limit { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
 
-        &lt;button <span class="hljs-class"><span class="hljs-keyword">class</span>=</span><span class="hljs-string">"btn btn-lg btn-primary btn-block"</span> <span class="hljs-class"><span class="hljs-keyword">type</span>=</span><span class="hljs-string">"submit"</span>&gt;<span class="hljs-type">Sign</span> in&lt;/button&gt;
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">bool</span> done { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
     }
-&lt;/div&gt;
+}
 </code></pre>
 <ul>
-<li>base.cssの修正</li>
+<li>続いて <code>TodoesContext.cs</code> を追加します。</li>
 </ul>
-<p><code>base.css</code></p>
-<pre><code class="lang-css"><span class="hljs-tag">body</span> <span class="hljs-rules">{
-  <span class="hljs-rule"><span class="hljs-attribute">margin-top</span>:<span class="hljs-value"> <span class="hljs-number">70px</span></span></span>;
-}</span>
+<p><code>TodoesContext.cs</code></p>
+<pre><code class="lang-cs"><span class="hljs-keyword">using</span> System;
+<span class="hljs-keyword">using</span> System.Collections.Generic;
+<span class="hljs-keyword">using</span> System.Data.Entity;
+<span class="hljs-keyword">using</span> System.Linq;
+<span class="hljs-keyword">using</span> System.Web;
 
-<span class="hljs-comment">/* -- login -- */</span>
-<span class="hljs-class">.form-signin</span> <span class="hljs-rules">{
-  <span class="hljs-rule"><span class="hljs-attribute">max-width</span>:<span class="hljs-value"> <span class="hljs-number">330px</span></span></span>;
-  <span class="hljs-rule"><span class="hljs-attribute">padding</span>:<span class="hljs-value"> <span class="hljs-number">15px</span></span></span>;
-  <span class="hljs-rule"><span class="hljs-attribute">margin</span>:<span class="hljs-value"> <span class="hljs-number">0</span> auto</span></span>;
-}</span>
-<span class="hljs-class">.form-signin</span> <span class="hljs-class">.form-signin-heading</span>,
-<span class="hljs-class">.form-signin</span> <span class="hljs-class">.checkbox</span> <span class="hljs-rules">{
-  <span class="hljs-rule"><span class="hljs-attribute">margin-bottom</span>:<span class="hljs-value"> <span class="hljs-number">10px</span></span></span>;
-}</span>
-<span class="hljs-class">.form-signin</span> <span class="hljs-class">.checkbox</span> <span class="hljs-rules">{
-  <span class="hljs-rule"><span class="hljs-attribute">font-weight</span>:<span class="hljs-value"> normal</span></span>;
-}</span>
-<span class="hljs-class">.form-signin</span> <span class="hljs-class">.form-control</span> <span class="hljs-rules">{
-  <span class="hljs-rule"><span class="hljs-attribute">position</span>:<span class="hljs-value"> relative</span></span>;
-  <span class="hljs-rule"><span class="hljs-attribute">height</span>:<span class="hljs-value"> auto</span></span>;
-  <span class="hljs-rule"><span class="hljs-attribute">-webkit-box-sizing</span>:<span class="hljs-value"> border-box</span></span>;
-     <span class="hljs-rule"><span class="hljs-attribute">-moz-box-sizing</span>:<span class="hljs-value"> border-box</span></span>;
-          <span class="hljs-rule"><span class="hljs-attribute">box-sizing</span>:<span class="hljs-value"> border-box</span></span>;
-  <span class="hljs-rule"><span class="hljs-attribute">padding</span>:<span class="hljs-value"> <span class="hljs-number">10px</span></span></span>;
-  <span class="hljs-rule"><span class="hljs-attribute">font-size</span>:<span class="hljs-value"> <span class="hljs-number">16px</span></span></span>;
-}</span>
-<span class="hljs-class">.form-signin</span> <span class="hljs-rule"><span class="hljs-attribute">.form-control</span>:<span class="hljs-value">focus {
-  z-index: <span class="hljs-number">2</span></span></span>;
+<span class="hljs-class"><span class="hljs-keyword">namespace</span> <span class="hljs-title">TodoApi</span>.<span class="hljs-title">Models</span>
+</span>{
+    <span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoesContext</span> : <span class="hljs-title">DbContext</span>
+    </span>{
+        <span class="hljs-keyword">public</span> DbSet&lt;Todo&gt; Todoes { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+    }
 }
-<span class="hljs-class">.form-signin</span> <span class="hljs-tag">input</span><span class="hljs-attr_selector">[type="email"]</span> <span class="hljs-rules">{
-  <span class="hljs-rule"><span class="hljs-attribute">margin-bottom</span>:<span class="hljs-value"> -<span class="hljs-number">1px</span></span></span>;
-  <span class="hljs-rule"><span class="hljs-attribute">border-bottom-right-radius</span>:<span class="hljs-value"> <span class="hljs-number">0</span></span></span>;
-  <span class="hljs-rule"><span class="hljs-attribute">border-bottom-left-radius</span>:<span class="hljs-value"> <span class="hljs-number">0</span></span></span>;
-}</span>
-<span class="hljs-class">.form-signin</span> <span class="hljs-tag">input</span><span class="hljs-attr_selector">[type="password"]</span> <span class="hljs-rules">{
-  <span class="hljs-rule"><span class="hljs-attribute">margin-bottom</span>:<span class="hljs-value"> <span class="hljs-number">10px</span></span></span>;
-  <span class="hljs-rule"><span class="hljs-attribute">border-top-left-radius</span>:<span class="hljs-value"> <span class="hljs-number">0</span></span></span>;
-  <span class="hljs-rule"><span class="hljs-attribute">border-top-right-radius</span>:<span class="hljs-value"> <span class="hljs-number">0</span></span></span>;
-}</span>
 </code></pre>
-<pre><code class="lang-xml"><span class="hljs-pi">&lt;?xml version="1.0"?&gt;</span>
-<span class="hljs-comment">&lt;!--
-  ASP.NET アプリケーションの構成方法の詳細については、
-  http://go.microsoft.com/fwlink/?LinkId=169433 を参照してください
-  --&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-title">configuration</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-title">appSettings</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">add</span> <span class="hljs-attribute">key</span>=<span class="hljs-value">"webpages:Version"</span> <span class="hljs-attribute">value</span>=<span class="hljs-value">"3.0.0.0"</span>/&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">add</span> <span class="hljs-attribute">key</span>=<span class="hljs-value">"webpages:Enabled"</span> <span class="hljs-attribute">value</span>=<span class="hljs-value">"false"</span>/&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">add</span> <span class="hljs-attribute">key</span>=<span class="hljs-value">"PreserveLoginUrl"</span> <span class="hljs-attribute">value</span>=<span class="hljs-value">"true"</span>/&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">add</span> <span class="hljs-attribute">key</span>=<span class="hljs-value">"ClientValidationEnabled"</span> <span class="hljs-attribute">value</span>=<span class="hljs-value">"true"</span>/&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">add</span> <span class="hljs-attribute">key</span>=<span class="hljs-value">"UnobtrusiveJavaScriptEnabled"</span> <span class="hljs-attribute">value</span>=<span class="hljs-value">"true"</span>/&gt;</span>
-  <span class="hljs-tag">&lt;/<span class="hljs-title">appSettings</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-title">system.web</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">compilation</span> <span class="hljs-attribute">debug</span>=<span class="hljs-value">"true"</span> <span class="hljs-attribute">targetFramework</span>=<span class="hljs-value">"4.5.2"</span>/&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">httpRuntime</span> <span class="hljs-attribute">targetFramework</span>=<span class="hljs-value">"4.5.2"</span>/&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">authentication</span> <span class="hljs-attribute">mode</span>=<span class="hljs-value">"Forms"</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">forms</span> <span class="hljs-attribute">loginUrl</span>=<span class="hljs-value">"~/Login/Index"</span>/&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-title">authentication</span>&gt;</span>
+<p>ここまで作成したら、一旦ソリューション全体をビルドしてください。</p>
+<p><br><br></p>
+<h3 id="-3-controller-">(3) Controllerクラスの追加</h3>
+<ul>
+<li>Controllersを右クリック→「追加」→「コントローラー」を選択</li>
+<li><code>Entity Framework を使用したアクションがある Web API 2 コントローラー</code> を選択して「追加」をクリック</li>
+<li>モデル クラスに <code>Todo</code>、データ コンテキスト クラスに <code>TodoesContext</code> を選択して「追加」をクリック<ul>
+<li>コントローラー名は自動で <code>TodoesController</code> となるはず</li>
+</ul>
+</li>
+</ul>
+<p>以下の様なメソッドが定義されます。</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>URL</th>
+<th>Method</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Create</td>
+<td>/api/Todoes/</td>
+<td>post</td>
+<td>1件作成</td>
+</tr>
+<tr>
+<td>Read</td>
+<td>/api/Todoes/{id}</td>
+<td>get</td>
+<td>指定したTodoを取得</td>
+</tr>
+<tr>
+<td>ReadAll</td>
+<td>/api/Todoes/</td>
+<td>get</td>
+<td>全てのTodoを取得</td>
+</tr>
+<tr>
+<td>Update</td>
+<td>/api/Todoes/{id}</td>
+<td>put</td>
+<td>指定したTodoを更新</td>
+</tr>
+<tr>
+<td>Delete</td>
+<td>/api/Todoes/{id}</td>
+<td>delete</td>
+<td>指定したTodoを削除</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p>これで、サーバーサイドの実装は完了しました。</p>
+<p><br><br></p>
+<h2 id="-">フロントエンドとの結合</h2>
+<p>今回作成したサーバーサイドの Web API と <a href="../step4/step4.3.html">前回</a> 作成した
+フロントエンドをくっつけます。</p>
+<p><br></p>
+<h3 id="-1-todo-">(1) 初期表示時にTodoリストを表示する</h3>
+<p>画面の読み込み完了後、非同期にて、<em>GET</em> メソッドで <code>/api/Todoes/</code> に問い合わせを行います。</p>
+<p>サーバーから取得したTodoのリストを <em>observableArray</em> にセットします。</p>
+<p><code>Scripts/app.js</code></p>
+<pre><code class="lang-js"><span class="hljs-comment">// app.js</span>
+
+<span class="hljs-comment">/**
+ * Todo Model
+ *<span class="hljs-phpdoc"> @param</span> 初期値 {object}
+ */</span>
+<span class="hljs-keyword">var</span> ToDoModel = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(params)</span> </span>{ ... };
+
+<span class="hljs-comment">/**
+ * modal dialog model
+ */</span>
+<span class="hljs-keyword">var</span> DialogModel = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{ ... };
+
+<span class="hljs-comment">/**
+ * ViewModel
+ */</span>
+<span class="hljs-keyword">var</span> AppViewModel = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">var</span> <span class="hljs-keyword">self</span> = this;
+
+    <span class="hljs-comment">/* ~~ 省略 ~~ */</span>
+
+    <span class="hljs-comment">/**
+     * Todoをすべて取得する
+     */</span>
+    <span class="hljs-keyword">self</span>.loadList = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+        $.ajax({
+            url: <span class="hljs-string">"/api/Todoes"</span>,
+            dataType: <span class="hljs-string">"json"</span>,
+            method: <span class="hljs-string">"GET"</span>
+        })
+            .done(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(data)</span> </span>{
+                <span class="hljs-keyword">if</span> (data) {
+                    <span class="hljs-comment">// 一旦全削除</span>
+                    <span class="hljs-keyword">self</span>.todoList.removeAll();
+
+                    <span class="hljs-comment">// 取得したTodoをリストにセット</span>
+                    $.each(data, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(index, item)</span> </span>{
+                        <span class="hljs-comment">// yyyy-mm-ddThh:mm:ss という形式で送られてくるので、</span>
+                        <span class="hljs-comment">// 不要な "T" 以降をカット</span>
+                        item.limit = item.limit.split(<span class="hljs-string">"T"</span>)[<span class="hljs-number">0</span>];
+                        <span class="hljs-keyword">if</span> (item.limit == <span class="hljs-string">"1960-01-01"</span>) {
+                            <span class="hljs-comment">// ダミーの日付の場合はブランクに置き換える</span>
+                            item.limit = <span class="hljs-string">""</span>;
+                        }
+                        <span class="hljs-keyword">self</span>.todoList.push(<span class="hljs-keyword">new</span> ToDoModel(item));
+                    });
+                }
+            });
+    };
+};
+
+<span class="hljs-comment">// エントリポイント</span>
+$(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">var</span> app = <span class="hljs-keyword">new</span> AppViewModel();
+    ko.applyBindings(app);
+
+    app.loadList();
+});
 </code></pre>
+<p>日付の処理に少し工夫が必要です。</p>
+<p>サーバーから送られてくる値は <code>yyyy-MM-ddTHH:mm:ss</code> という形式になっています。
+今回は日付のみが必要なので、 不要な部分をカットして表示しています。</p>
+<p><br><br></p>
+<h3 id="-2-todo-todo-">(2) 新しいTodoを追加する / Todoの更新を行う</h3>
+<p>追加の場合、登録ボタンクリック時に 非同期にて <em>POST</em> メソッドで <code>/api/Todoes/</code> に問い合わせを行います。</p>
+<p>更新の場合、登録ボタンクリック時に 非同期にて <em>PUT</em> メソッドで <code>/api/Todoes/{id}</code> に問い合わせを行います。</p>
+<p>登録に成功したら、フォームを非表示にして Todoリストを再取得します。</p>
+<pre><code class="lang-js"><span class="hljs-comment">/**
+ * 登録ボタンのクリック
+ */</span>
+<span class="hljs-built_in">self</span><span class="hljs-built_in">.</span>registTodo <span class="hljs-subst">=</span> function () {
+    <span class="hljs-built_in">var</span> item <span class="hljs-subst">=</span> <span class="hljs-built_in">self</span><span class="hljs-built_in">.</span>selectedItem();
+
+    <span class="hljs-comment">// limitが空だとサーバーサイドでエラーとなるため</span>
+    <span class="hljs-comment">// ダミーの日付を登録する</span>
+    <span class="hljs-built_in">var</span> model <span class="hljs-subst">=</span> ko<span class="hljs-built_in">.</span>toJS(item);
+    <span class="hljs-keyword">if</span> (model<span class="hljs-built_in">.</span>limit <span class="hljs-subst">==</span> <span class="hljs-string">""</span>) {
+        model<span class="hljs-built_in">.</span>limit <span class="hljs-subst">=</span> <span class="hljs-string">"1960-01-01"</span>;
+    }
+
+    <span class="hljs-comment">// ajaxのパラメータ</span>
+    <span class="hljs-built_in">var</span> <span class="hljs-keyword">params</span> <span class="hljs-subst">=</span> {
+        dataType: <span class="hljs-string">"json"</span>,
+        <span class="hljs-built_in">data</span>: model
+    };
+
+    <span class="hljs-keyword">if</span> (item<span class="hljs-built_in">.</span>id() <span class="hljs-subst">==</span> <span class="hljs-number">0</span>) {
+        <span class="hljs-comment">// Create</span>
+        <span class="hljs-keyword">params</span><span class="hljs-built_in">.</span>url <span class="hljs-subst">=</span> <span class="hljs-string">"/api/Todoes"</span>;
+        <span class="hljs-keyword">params</span><span class="hljs-built_in">.</span>method <span class="hljs-subst">=</span> <span class="hljs-string">"POST"</span>;
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-comment">// Update</span>
+        <span class="hljs-keyword">params</span><span class="hljs-built_in">.</span>url <span class="hljs-subst">=</span> <span class="hljs-string">"/api/Todoes/"</span> <span class="hljs-subst">+</span> item<span class="hljs-built_in">.</span>id();
+        <span class="hljs-keyword">params</span><span class="hljs-built_in">.</span>method <span class="hljs-subst">=</span> <span class="hljs-string">"PUT"</span>;
+    }
+
+    $<span class="hljs-built_in">.</span>ajax(<span class="hljs-keyword">params</span>)
+        <span class="hljs-built_in">.</span>done(function (<span class="hljs-built_in">data</span>) {
+            <span class="hljs-comment">// 編集フォームを閉じる</span>
+            <span class="hljs-built_in">self</span><span class="hljs-built_in">.</span>selectedItem(<span class="hljs-built_in">null</span>);
+
+            <span class="hljs-comment">// Todoリストを再読み込み</span>
+            <span class="hljs-built_in">self</span><span class="hljs-built_in">.</span>loadList();
+
+            <span class="hljs-built_in">self</span><span class="hljs-built_in">.</span>dialog<span class="hljs-built_in">.</span>show({
+                title: <span class="hljs-string">'登録完了'</span>,
+                message: <span class="hljs-string">'登録が完了しました。'</span>
+            });
+        });
+};
+</code></pre>
+<p><br></p>
+<p><em>jQuery</em> の <code>ajax</code> メソッドで、入力されたデータを <em>POST/PUT</em> します。</p>
+<p><em>TodoModel</em> には <em>observable</em> のプロパティがいくつかありますが、
+これは <em>Knockout.js</em> が使用する付加情報が含まれています。</p>
+<p>これらの情報はサーバー側で登録処理を行うのに邪魔になるため、 <code>ko.toJS</code> メソッドを使用して
+純粋な <em>JavaScriptのオブジェクト</em> に変換します。</p>
+<blockquote>
+<ul>
+<li><code>ko.toJS</code> - この関数はあなたのビューモデルのオブジェクトグラフに対して、各 observable を現在の値に置換した後で複製するため、Knockout に関連したアーティファクトが存在せず、あなたのデータのみを含んだプレーンなコピーを取得できます。</li>
+</ul>
+</blockquote>
+<p><a href="http://kojs.sukobuto.com/docs/json-data">JSON データの読み込みと保存</a></p>
+<p>また、<code>limit</code> が未指定の場合、サーバーサイドで <code>DateTime</code> に変換する際に
+エラーとなってしまいます。</p>
+<p>空の場合はすごい古い年月をダミー値として登録しておき
+表示時にダミー値と一致する場合はブランクに置き換えるようにしました。</p>
+<p><br></p>
+<p><code>function addItem</code>, <code>function updateItem</code> はもう使用しないので、削除しておきます。</p>
+<p><br><br></p>
+<h3 id="-3-todo-">(3) リストからTodoを選択すると、詳細を表示する</h3>
+<p>できるだけ新しい情報を表示するため、リストを選択すると
+非同期にて <em>GET</em> メソッドで <code>/api/Todoes/{id}</code> に問い合わせを行うようにします。</p>
+<p>取得したデータを入力フォームに表示します。</p>
+<pre><code class="lang-js"><span class="hljs-comment">/**
+ * リストからTodoを選択する
+ *<span class="hljs-phpdoc"> @param</span> item {ToDoModel} 選択された項目
+ */</span>
+<span class="hljs-keyword">self</span>.selectTodo = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(item)</span> </span>{
+    $.ajax({
+        url: <span class="hljs-string">"/api/Todoes/"</span> + item.id(),
+        dataType: <span class="hljs-string">"json"</span>,
+        method: <span class="hljs-string">"GET"</span>
+    })
+        .done(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(data)</span> </span>{
+            <span class="hljs-keyword">if</span> (data) {
+                <span class="hljs-comment">// yyyy-mm-ddThh:mm:ss という形式で送られてくるので、</span>
+                <span class="hljs-comment">// 不要な "T" 以降をカット</span>
+                data.limit = data.limit.split(<span class="hljs-string">"T"</span>)[<span class="hljs-number">0</span>];
+                <span class="hljs-keyword">if</span> (data.limit == <span class="hljs-string">"1960-01-01"</span>) {
+                    <span class="hljs-comment">// ダミーの日付の場合はブランクに置き換える</span>
+                    data.limit = <span class="hljs-string">""</span>;
+                }
+                <span class="hljs-keyword">self</span>.selectedItem(<span class="hljs-keyword">new</span> ToDoModel(data));
+            }
+        });
+};
+</code></pre>
+<p><br><br></p>
+<h3 id="-4-todo-">(4) Todoの削除を行う</h3>
+<p>削除ボタンクリックで 非同期にて <em>DELETE</em> メソッドで <code>/api/Todoes/{id}</code> に問い合わせを行うようにします。</p>
+<p>削除完了後、リストを再読み込みします。</p>
+<pre><code class="lang-js"><span class="hljs-comment">/**
+ * 削除ボタンのクリック
+ */</span>
+<span class="hljs-keyword">self</span>.deleteTodo = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    $.ajax({
+        url: <span class="hljs-string">"/api/Todoes/"</span> + <span class="hljs-keyword">self</span>.selectedItem().id(),
+        dataType: <span class="hljs-string">"json"</span>,
+        method: <span class="hljs-string">"DELETE"</span>
+    })
+        .done(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(data)</span> </span>{
+            <span class="hljs-comment">// 編集フォームを閉じる</span>
+            <span class="hljs-keyword">self</span>.selectedItem(<span class="hljs-keyword">null</span>);
+
+            <span class="hljs-comment">// リストを再読み込み</span>
+            <span class="hljs-keyword">self</span>.loadList();
+
+            <span class="hljs-keyword">self</span>.dialog.show({
+                title: <span class="hljs-string">'削除完了'</span>,
+                message: <span class="hljs-string">'削除が完了しました。'</span>
+            });
+        });
+};
+</code></pre>
+<p><br><br></p>
+<p>デバッグ実行して、以下を確認してください。</p>
+<ul>
+<li>Todoの表示・追加・変更・削除が行えること</li>
+<li>ブラウザを一度閉じ、再度アクセスしても前回登録した内容が表示されること</li>
+</ul>
+<p><br><br></p>
+<hr>
+<p><em>ASP.NET Web API</em> と <em>Knockout.js</em> による <em>Single Page Application開発</em> について解説しました。</p>
+<p><em>ASP.NET</em> と直接は関係しないために取り上げませんでしたが
+実際のアプリケーションには以下の様な機能が必要になってきます。</p>
+<ul>
+<li>クライアントサイドでの入力チェック</li>
+<li>エラーが発生した場合にエラー内容を画面に表示する</li>
+<li>サーバーとの通信中に操作できないように画面をロックする</li>
+</ul>
+<p><br></p>
+<p><em>Single Page Application</em> では <em>Ajax</em> による非同期処理を駆使することで
+UI/UX の向上が見込まれますが、以下の様な問題点もあります。</p>
+<ul>
+<li>ブラウザで動く <em>JavaScript</em> がまだまだ貧弱である<ul>
+<li>多数のライブラリ間の依存関係を解決する仕組み</li>
+<li><em>MVVM</em> などのアーキテクチャにしたがってコーディングしても、クラスやモジュールを読み込む仕組み</li>
+</ul>
+</li>
+<li>新しい <em>JavaScript</em> ライブラリがどんどんリリース / バージョンアップ している<ul>
+<li>どれを使えば良いか...？</li>
+</ul>
+</li>
+<li>そもそも <em>JavaScript</em> 自体が進化していっている<ul>
+<li><em>ECMAScript5</em> -&gt; <em>ECMAScript2015</em> -&gt; <em>ECMAScript2016</em></li>
+</ul>
+</li>
+</ul>
+<p>非常に進化のスピードが早い分野なので、
+実際に開発する際には新しい情報を収集するように心がけてください。</p>
+<p><br><br></p>
   </div>
 
   <br>

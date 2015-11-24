@@ -382,10 +382,14 @@ ASP.NET Web APIは、.NET Framework上で <em>RESTful</em> なアプリケーシ
     <span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span>
     </span>{
         <span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> id { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
         [Required]
         <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> summary { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
         <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> detail { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
         <span class="hljs-keyword">public</span> DateTime limit { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
         <span class="hljs-keyword">public</span> <span class="hljs-keyword">bool</span> done { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
     }
 }
