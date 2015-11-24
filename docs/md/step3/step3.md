@@ -269,10 +269,14 @@ namespace TodoApi.Models
     public class Todo
     {
         public int id { get; set; }
+
         [Required]
         public string summary { get; set; }
+
         public string detail { get; set; }
+
         public DateTime limit { get; set; }
+
         public bool done { get; set; }
     }
 }

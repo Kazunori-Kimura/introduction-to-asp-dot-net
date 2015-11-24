@@ -1,0 +1,115 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">KnockoutTodo</a>
+        </div>
+        <button class="btn btn-link navbar-btn navbar-right">ログアウト</button>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="list-group" data-bind="foreach: todoList">
+                <a href="#" class="list-group-item"
+                   data-bind="click: $root.selectTodo, css: { active: $root.isActive($data) }">
+                    <h4 class="list-group-item-heading"
+                        data-bind="text: summary"></h4>
+                    <p class="list-group-item-text"
+                       data-bind="text: detail"></p>
+                </a>
+            </div>
+
+            <div>
+                <button class="btn btn-primary btn-info btn-lg btn-block"
+                        data-bind="click: $root.addTodo">
+                    <span class="glyphicon glyphicon-plus"></span> 新しいToDoを追加
+                </button>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="panel panel-default"
+                 data-bind="with: selectedItem, visible: selectedItem">
+                <div class="panel-heading">
+                    <h3 class="panel-title">#<span data-bind="text: id"></span></h3>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="txtSummary" class="col-sm-2 control-label">概要</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control"
+                                       id="txtSummary"
+                                       data-bind="value: summary">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="txtDetail" class="col-sm-2 control-label">詳細</label>
+                            <div class="col-sm-10">
+                                <textarea id="txtDetail" rows="3" class="form-control"
+                                          data-bind="value: detail"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="txtLimit" class="col-sm-2 control-label">期限</label>
+                            <div class="col-sm-10">
+                                <input type="date" class="form-control"
+                                       id="txtLimit"
+                                       data-bind="value: limit">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" id="chkDone"
+                                               data-bind="checked: done"> 完了
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="panel-footer">
+                    <button class="btn btn-primary"
+                            data-bind="click: $root.registTodo">
+                        <span class="glyphicon glyphicon-floppy-disk"></span>
+                        登録
+                    </button>
+                    <button class="btn btn-danger"
+                            data-bind="visible: $root.isDeletable(), click: $root.deleteTodo">
+                        <span class="glyphicon glyphicon-trash"></span>
+                        削除
+                    </button>
+                    <button class="btn btn-default"
+                            data-bind="click: $root.cancelEdit">
+                        キャンセル
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dialog" data-bind="with: dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" data-bind="text: title"></h4>
+            </div>
+            <div class="modal-body">
+                <p class="lead" data-bind="text: message"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>

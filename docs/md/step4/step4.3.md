@@ -775,6 +775,9 @@ var AppViewModel = function () {
 
   // モーダルダイアログ
   self.dialog = new DialogModel();
+
+  /* ~~ 省略 ~~ */
+};
 ```
 
 登録、削除後にモーダルダイアログを表示するよう
