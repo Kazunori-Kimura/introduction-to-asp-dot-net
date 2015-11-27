@@ -85,6 +85,18 @@ ASP.NETでは、Webアプリケーションを作成するため、以下の3つ
 
 ---
 
+<br>
+
+### おまけ
+
+* [build2015まとめ](./appendix/build2015.html)
+* [vscodeについて](./appendix/vscode.html)
+* [connect2015まとめ](./appendix/connect2015.html)
+
+<br>
+
+---
+
 <br><br>
 
 各ページのサンプルコードは [Github](https://github.com/Kazunori-Kimura/introduction-to-asp-dot-net) にアップしています。
